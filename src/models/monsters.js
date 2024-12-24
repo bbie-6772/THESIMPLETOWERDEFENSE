@@ -2,6 +2,38 @@ import { Server as SocketIO } from "socket.io";
 import { getGameAssets } from "../init/assets.js";
 import { v4 as uuidv4 } from "uuid";
 
+/*=== 사용법 ===*/
+//// 1. 인스턴스 초기화 (최초 한번만 하면됨 위치 상관없음)
+// Monsters.getInstance(socket); <- 반드시 소켓을 추가해야합니다..
+
+
+//// 2. 편하게 사용할려면 변수에 담으면 됩니다.
+//  const monsters = Monsters.getInstance(socket); <- 편하게 사용하기 위해 변수에 인스턴스를 담습니다.
+//  안써도 되는데 안쓴다면 
+//  Monsters.getInstance(socket).함수(); <- 이런식으로 써도 됩니다.
+
+//// 3. 몬스터생성은 반드시 게임시작후에 해야합니다.
+//  monsters.createMonster(io, count); 
+//  매개변수 (io) => io는 io 입니다.
+//  매개변수 (count) => 몬스터 카운터 입니다. 
+
+//// 4. 충돌 혹은 피격 이벤트 발생하면 사용해야합니다.  
+// monsters.setMonsterHealth(io, index, data); <-
+// 매개변수 (io) => io는 io 입니다.
+// 매개변수 (index) => index. 입니다.
+// 매개변수 (data) => 피격 대미지입니다. 
+// 해당 함수는 피격후 체력이 0이라면 삭제 함수가 동시에 실행됩니다.
+
+
+//// 5. 웨어포인트 변경. 
+// monsters.setMonsterWaypoint(index, wp_x, wp_y); <-
+// 매개변수 (index) = > index 입니다.
+// 매개변수 (wp_x)  = > 현재 몬스터의 x 좌표입니다.
+// 매개변수 (wp_y)  = > 현재 몬스터의 y 좌표입니다.
+
+/*==============*/
+
+
 export default class Monsters {
   // 생성자.
   constructor(socket) {
@@ -31,9 +63,9 @@ export default class Monsters {
   }
 
   // 싱글턴
-  static getInstance = () => {
+  static getInstance = (socket) => {
     if (!Monsters.instance) {
-      Monsters.instance = new Monsters();
+      Monsters.instance = new Monsters(socket);
     }
     return Monsters.instance;
   };
