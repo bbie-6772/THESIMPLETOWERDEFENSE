@@ -1,0 +1,36 @@
+{
+  "name": "tower",
+  "version": "1.0.0",
+  "data": [
+    {
+      "id": 1,
+      "type": 0,
+      "damage": 100,
+      "target": 1,
+      "range": 100,
+      "cost": 100,
+      "cooldown": 500,
+      "image": ""
+    },
+    {
+      "id": 2,
+      "type": 1,
+      "damage": 100,
+      "target": 2,
+      "range": 50,
+      "cost": 100,
+      "cooldown": 500,
+      "image": ""
+    },
+    {
+      "id": 3,
+      "type": 2,
+      "damage": 50,
+      "target": 1,
+      "range": 100,
+      "cost": 100,
+      "cooldown": 500,
+      "image": ""
+    }
+  ]
+}
