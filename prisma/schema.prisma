@@ -14,9 +14,32 @@ datasource db {
 }
 
 model Users {
-  id            Int       @id @default(autoincrement()) @map("id")
-  nickname      String    @unique @map("nickname")
-  password      String     @map("password")
- 
+  id            Int     @id @default(autoincrement()) @map("id")
+  nickname      String  @unique @map("nickname")
+  password      String  @map("password")
+  highScoreS    Int     @map("high_score_single")
+  highScoreM    Int     @map("high_score_multi")
+
+  Ranks1        Ranks[] @relation("User1Relation")
+  Ranks2        Ranks[] @relation("User2Relation")
+
   @@map("Users")
+}
+
+model Ranks {
+  id          Int     @id @default(autoincrement()) @map("id")
+  userId1     Int     @map("user_id_1")
+  userId2     Int     @map("user_id_2")
+  score       Int     @map("score")
+
+  user1       Users    @relation("User1Relation", fields: [userId1], references: [id], onDelete: Cascade)
+  user2       Users?    @relation("User2Relation", fields: [userId2], references: [id], onDelete: Cascade)
+
+  @@map("Ranks")
+}
+
+model Forbidden {
+  word        String  @id @map("word")
+ 
+  @@map("Forbidden")
 }
