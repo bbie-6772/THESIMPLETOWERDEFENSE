@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Users {
-  id            Int     @id @default(autoincrement()) @map("id")
+  id            String     @id @map("id")
   nickname      String  @unique @map("nickname")
   password      String  @map("password")
   highScoreS    Int     @map("high_score_single")
@@ -28,8 +28,8 @@ model Users {
 
 model Ranks {
   id          Int     @id @default(autoincrement()) @map("id")
-  userId1     Int     @map("user_id_1")
-  userId2     Int     @map("user_id_2")
+  userId1     String  @map("user_id_1")
+  userId2     String  @map("user_id_2")
   score       Int     @map("score")
 
   user1       Users    @relation("User1Relation", fields: [userId1], references: [id], onDelete: Cascade)
