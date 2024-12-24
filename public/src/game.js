@@ -1,6 +1,6 @@
-import { Base } from "./base.js";
-import { Monster } from "./monster.js";
-import { Tower } from "./tower.js";
+import { Base } from "./model/base.js";
+import { Monster } from "./model/monster.js";
+import { Tower } from "./model/tower.js";
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!

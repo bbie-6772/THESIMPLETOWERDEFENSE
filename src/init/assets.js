@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 //디렉토리 경로(현재 파일위치) 추출
 const __dirname = path.dirname(__filename);
 // 현재 파일위치 기준으로 assets 폴더 찾기(../../ => 최상위 폴더로 이동)
-const basePath = path.join(__dirname, '../assets')
+const basePath = path.join(__dirname, '../../public/assets')
 
 //파일 읽기 함수
 const readFileAsync = (filename) => {
@@ -31,7 +31,7 @@ const readFileAsync = (filename) => {
 export const loadGameAssets = async () => {
     try {
         // 파일들을 Promise.all() 을 이용해 병렬적으로 가져옴
-        const [stages, unlock, item, monster] = await Promise.all([
+        const [stages, towers, monsters] = await Promise.all([
             readFileAsync('stages.json'),
             readFileAsync('towers.json'),
             readFileAsync('monsters.json'),

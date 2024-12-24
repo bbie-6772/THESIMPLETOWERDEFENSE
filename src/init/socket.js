@@ -6,6 +6,7 @@ const initSocket = (server) => {
     // initSocket에 받은 server의 포트와 연결함
     io.attach(server)
     // 핸들러 등록
+    
 }
 
 export default initSocket
