@@ -5,27 +5,30 @@
     "speed": 10,
     "gold": 100,
     "score": 100,
-    "image": "",
+    "image": ""
   },
   {
     "id": "bat",
     "health": 100,
     "speed": 8,
     "gold": 100,
-    "score": 100
+    "score": 100,
+    "image": ""
   },
   {
     "id": "bear",
     "health": 100,
     "speed": 8,
     "gold": 100,
-    "score": 100
+    "score": 100,
+    "image": ""
   },
   {
     "id": "bettle",
     "health": 100,
     "speed": 8,
     "gold": 100,
-    "score": 100
+    "score": 100,
+    "image": ""
   }
 ]

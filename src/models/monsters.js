@@ -25,6 +25,7 @@ import { v4 as uuidv4 } from "uuid";
 
 //// 5. 각종 get/set함수. 그냥 사용하시면 됩니다. 
 
+//// 6. 이 주석은 지울 예쩡입니다. 
 
 /*==============*/
 
@@ -43,8 +44,8 @@ export default class Monsters {
 
     /*== 변수 ==*/
     this.monster = {}; // 몬스터의 정보를 담을 객체.
-    this.currentWP_X = null; // 현재 웨어포인트 x좌표.
-    this.currentWP_Y = null; // 현재 웨어포인트 y좌표.
+    this.x = null; // 현재 웨어포인트 x좌표.
+    this.y = null; // 현재 웨어포인트 y좌표.
     this.isRespawn = false; // 지금 리스폰 상태.
     this.monsterCount = 0; // 타이머.
     this.killCount = 0; // 킬카운터.
@@ -87,7 +88,7 @@ export default class Monsters {
     }
 
     // 2. 시작 포지션은 반드시 존재해야합니다.
-    if (instance.currentWP_X === null && instance.currentWP_Y === null) {
+    if (instance.x === null && instance.y === null) {
       console.log("시작 좌표를 지정해주세요.");
       return;
     }
@@ -119,14 +120,17 @@ export default class Monsters {
 
         // 8. 클라에 보낼 메세지를 만든다. (임시!!!!!)
         const monsterInfo = {
-          id: monsterList[randomIdex].id, // 이름
+          gameId: instance.eventName, // 게임 id
+          name: monsterList[randomIdex].name, // 이름
           uuid: uuid, // uuid
-          health: monsterList[randomIdex].health, // 체력
-          speed: monsterList[randomIdex].speed, // 스피드
-          currentWP_X: instance.currentWP_X, // 시작 포지션 x
-          currentWP_Y: instance.currentWP_Y, // 시작 포지션 y
-          nextWP_X: null, // 다음 웨어 포인트 x
-          nextWP_Y: null, // 다음 웨어 포인트 y
+          x: instance.x, // 시작 포지션 x
+          y: instance.y, // 시작 포지션 y
+          targetX: null, // 다음 웨어 포인트 x
+          targetY: null, // 다음 웨어 포인트 y
+          stat: {
+            health: monsterList[randomIdex].health, // 체력
+            speed: monsterList[randomIdex].speed, // 스피드
+          }
         };
 
         // 9. 메세지를 보내자. (전체로)
@@ -161,8 +165,8 @@ export default class Monsters {
     // 게임시작시 발생하는 메세지.
     this.socket.on("monstersInitialization", (data) => {
       this.eventName = data.message.gameId;
-      this.currentWP_X = data.message.position.currentWP_X;
-      this.currentWP_Y = data.message.position.currentWP_Y;
+      this.x = data.message.x;
+      this.y = data.message.y;
       this.isRespawn = true;
     });
   }
@@ -244,7 +248,7 @@ export default class Monsters {
 
     // 몬스터의 체력이 0이 라면
     if (instance.monster[index].health <= 0) {
-      instance.monster.splice(index, 1); // 해당 인덱스의 몬스터 삭제
+      delete instance.monster[index]; // 해당 인덱스의 몬스터 삭제
       instance.killCount += 1;
 
       // 삭제 되었다면
