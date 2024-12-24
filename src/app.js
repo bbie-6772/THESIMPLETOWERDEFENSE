@@ -18,7 +18,7 @@ server.listen(PORT, async () => {
 
     try {
         // 서버 구동 시에 게임 Data Table 로드
-        const assets = await loadGameAssets();
+        // const assets = await loadGameAssets();
     } catch (err) {
         console.error('Failed to load game assets: '+ err.message)
     }
