@@ -1,6 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 //전역변수
 let gameAssets = {};
@@ -14,17 +14,17 @@ const basePath = path.join(__dirname, '../../public/assets')
 
 //파일 읽기 함수
 const readFileAsync = (filename) => {
-    return new Promise ((resolve, reject) => {
-        fs.readFile(path.join(basePath, filename), 'utf8', (err,data) => {
-            // 에러의 경우 실패 처리 후 반환
-            if (err) {
-                reject(err);
-                return;
-            }
-            // 성공 시 JSON 형태로 변환하여 반환
-            resolve(JSON.parse(data))
-        })
-    })
+  return new Promise((resolve, reject) => {
+    fs.readFile(path.join(basePath, filename), "utf8", (err, data) => {
+      // 에러의 경우 실패 처리 후 반환
+      if (err) {
+        reject(err);
+        return;
+      }
+      // 성공 시 JSON 형태로 변환하여 반환
+      resolve(JSON.parse(data));
+    });
+  });
 };
 
 //파일 로드!
@@ -45,5 +45,5 @@ export const loadGameAssets = async () => {
 
 //가져온 파일 데이터 읽기
 export const getGameAssets = () => {
-    return gameAssets;
+  return gameAssets;
 };
