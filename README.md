@@ -38,5 +38,5 @@ npx prisma db push
 
 jyko1101@gmail.com 's Tasks
 - 8자 맵 구현
-- 몬스터 이동
+- 몬스터 이동 / 위치 동기화
 - 몬스터 상태이상(경직) 이벤트
