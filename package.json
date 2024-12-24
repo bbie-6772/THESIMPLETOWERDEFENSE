@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "repository": "https://github.com/bbie-6772/THESIMPLETOWERDEFENSE.git",
-  "author": "조용필 <78397393+bbie-6772@users.noreply.github.com>",
+  "author": "<78397393+bbie-6772@users.noreply.github.com>",
   "license": "MIT",
   "type": "module",
   "dependencies": {

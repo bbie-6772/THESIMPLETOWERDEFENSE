@@ -7,7 +7,7 @@ let rankings = null
 const socket = io('http://localhost:3000', {
     query: {
         clientVersion: CLIENT_VERSION,
-        // 로컬에 저장된 id 정보를 같이 보냄
+        // 엑세스 토큰을 줘서 사용자 로그인 여부 확인?
     },
 });
 
