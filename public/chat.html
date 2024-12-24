@@ -1,0 +1,56 @@
+// client.html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Socket.IO Client</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <h1>Socket.IO Test</h1>
+    <input type="text" id="messageInput" placeholder="Enter message">
+    <button onclick="sendMessage()">Send</button>
+    <button onclick="testButton()">Test</button>
+    <div id="messages"></div>
+
+    <script>
+        const socket = io();
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value;
+
+            socket.emit('clientMessage', { message: message });
+            input.value = '';
+        }
+
+        function testButton() {
+            const message = "테스트!"; // 하드코딩된 데이터
+            socket.emit('clientMessage', { message: message });
+        }
+
+
+        socket.on('connect', () => {
+            console.log('Connected to server');
+            addMessage('Connected to server');
+        });
+
+        socket.on('serverResponse', (data) => {
+            console.log('Server response:', data.message);
+            addMessage('Server: ' + data.message);
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+            addMessage('Disconnected from server');
+        });
+
+        function addMessage(text) {
+            const messages = document.getElementById('messages');
+            messages.innerHTML += '<p>' + text + '</p>';
+        }
+    </script>
+</body>
+
+</html>
