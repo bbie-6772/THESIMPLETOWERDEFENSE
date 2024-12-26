@@ -1,5 +1,10 @@
 import { CLIENT_VERSION } from "./constants.js";
 
+let userId = null;
+let nickname = null;
+let highScoreS = null;
+let highScoreM = null;
+
 const token = localStorage.getItem("access-Token")
 // 로그인이 안되어있을 시 로그인 창으로
 if (!token) {
@@ -16,13 +21,25 @@ const socket = io('http://localhost:3000', {
     },
 });
 
-socket.on('response', (data) => {
-    
+socket.once('connection', (data) => {
+    if (data.status === "fail") {
+        alert("다시 로그인 해주세요!")
+        window.location.href = './login.html';
+    } else {
+        // 값 저장
+        [ userId, nickname, highScoreS, highScoreM ]= data
+    }
 });
+
+socket.on("response", (data) => {
+    
+})
 
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
 export const sendEvent = (handlerId, payload) => {
     socket.emit('event', {
-
+        userId,
+        handlerId,
+        payload
     });
 };

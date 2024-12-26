@@ -1,6 +1,7 @@
 import { CLIENT_VERSION } from "../constant.js"
 import handlerMappings from "./handler.Mapping.js"
 import { prisma } from "../init/prisma.js";
+import { addUser } from "../models/users.js";
 import jwt from "jsonwebtoken";
 
 export const handleConnection = async (socket) => {
@@ -32,17 +33,20 @@ export const handleConnection = async (socket) => {
         //JWT 토큰에서 가져온 사용자 정보를 이용해서 데이터베이스에서 해당 사용자가 실제로 존재하는지 확인하는 작업
         const loginUser = await prisma.users.findUnique({ where: { id: decoded.id } });
         // 사용자 정보가 데이터베이스에 없는 경우
-
         if (!loginUser) {
             socket.emit('response', {
                 status: "fail",
                 message: "Can't find account please log-in again "
             });
-            return;
+            return;``
         }
 
-        //유저와 연결되면 uuid를 메세지로 전달
-        socket.emit('connection', information)
+        //유저 추가
+        addUser(loginUser.id, loginUser.nickname)
+
+        //유저와 연결되면 클라이언트에게 인터페이스 용 값 전달
+        socket.emit('connection', [loginUser.id, loginUser.nickname, loginUser.highScoreS, loginUser.highScoreM])
+
     } catch (err) {
         console.log(err)
         socket.emit('response', {
@@ -51,7 +55,6 @@ export const handleConnection = async (socket) => {
         });
         return;
     }
-      
 }
 
 export const handleDisconnect = (socket, uuid) => {
