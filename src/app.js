@@ -17,6 +17,7 @@ initSocket(server);
 /* 라우터 경로 배정 */
 app.use("/api", userRouter);
 
+
 server.listen(PORT, async () => {
   console.log("Server is running on PORT: " + PORT);
 
