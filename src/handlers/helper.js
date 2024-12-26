@@ -1,7 +1,7 @@
 import { CLIENT_VERSION } from "../constant.js"
 import handlerMappings from "./handler.Mapping.js"
 import { prisma } from "../init/prisma.js";
-import { addUser,getUser } from "../models/users.js";
+import { addUser,getUser } from "../models/users.model.js";
 import jwt from "jsonwebtoken";
 
 export const handleConnection = async (socket) => {

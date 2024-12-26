@@ -102,6 +102,14 @@ export const towerCoolDown = (tower, cooldown, deltaTime) => {
   return false;
 };
 
+export const merge = (userId, one, other) => {
+  towerModel.getTower(one, other);
+}
+
+export const upgrade = (towerId) => {
+
+}
+
 const towerModel = {
   addTower,
   getTowers,
@@ -112,4 +120,5 @@ const towerModel = {
   currentTowerStat,
   towerCoolDown,
 };
+
 export default towerModel;

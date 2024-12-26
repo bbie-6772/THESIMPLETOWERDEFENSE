@@ -1,25 +1,10 @@
-import express from 'express';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
 import Groq from 'groq-sdk';
 import dotenv from 'dotenv';
 
 dotenv.config();
 process.noDeprecation = true;
 
-const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
-});
-
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
-// 정적 파일 제공
-app.use(express.static('public'));
 
 let tempmsg = [];
 // 메시지 검증 함수

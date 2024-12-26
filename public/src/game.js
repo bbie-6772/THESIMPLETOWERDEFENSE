@@ -253,13 +253,19 @@ function initGame() {
     //return;
   }
 
-  monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
-  initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
-  placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
-  placeBase(); // 기지 배치
+  // 몬스터 경로 생성
+  monsterPath = generateRandomMonsterPath(); 
+  // 맵 초기화 (배경, 몬스터 경로 그리기)
+  initMap(); 
+  // 설정된 초기 타워 개수만큼 사전에 타워 배치
+  placeInitialTowers(); 
+  // 기지 배치
+  placeBase(); 
 
-  //setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
-  //gameLoop(); // 게임 루프 최초 실행
+  // 설정된 몬스터 생성 주기마다 몬스터 생성
+  setInterval(spawnMonster, monsterSpawnInterval); 
+  // 게임 루프 최초 실행
+  gameLoop(); 
   isInitGame = true;
 }
 

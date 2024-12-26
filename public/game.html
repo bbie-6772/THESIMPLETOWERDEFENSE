@@ -19,11 +19,20 @@
       #gameCanvas {
         border: 2px solid #000;
         display: block;
+        position:absolute;
+        z-index: 1;
+      }
+      #debugCanvas{
+        display:block;
+        position: absolute;
+        z-index: 2;
+        pointer-events: none;
       }
     </style>
   </head>
   <body>
     <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+    <canvas id="debugCanvas" width="1920" height="1080"></canvas>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script type="module" src="./src/game.js"> </script>
   </body>

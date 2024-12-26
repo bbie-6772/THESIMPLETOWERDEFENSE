@@ -1,4 +1,4 @@
-import { addRoom, getRoom, getRooms } from "../models/gameRoom.js";
+import { addRoom, getRoom, getRooms } from "../models/gameRoom.model.js";
 
 
 export const makeRoom = (userId, payload) => {

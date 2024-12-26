@@ -8,8 +8,4 @@ export const receiveMonsterMessage = (io, socket) => {
     monsters.monstersInitialization(data);
     monsters.createMonster(io, 1000);
   });
-
-  socket.on(monsters.eventName, (data) => {
-    // 업데이트 로직.?
-  });
 };
