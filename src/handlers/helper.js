@@ -1,7 +1,7 @@
 import { CLIENT_VERSION } from "../constant.js"
 import handlerMappings from "./handler.Mapping.js"
 import { prisma } from "../init/prisma.js";
-import { addUser,getUser } from "../models/users.js";
+import { addUser, getUser } from "../models/users.js";
 import jwt from "jsonwebtoken";
 
 export const handleConnection = async (socket) => {
@@ -38,13 +38,13 @@ export const handleConnection = async (socket) => {
                 status: "fail",
                 message: "Can't find account please log-in again "
             });
-            return;``
+            return; ``
         }
 
         //유저 추가
         addUser(loginUser.id, loginUser.nickname)
 
-        console.log(loginUser.id,"접속")
+        console.log(loginUser.id, "접속")
 
         //유저와 연결되면 클라이언트에게 인터페이스 용 값 전달
         socket.emit('connection', [loginUser.id, loginUser.nickname, loginUser.highScoreS, loginUser.highScoreM])
@@ -68,7 +68,7 @@ export const handlerEvent = (io, socket, data) => {
     console.log(data)
     //클라이언트 버전 확인
     if (!CLIENT_VERSION.includes(data.clientVersion)) {
-        socket.emit('response', { 
+        socket.emit('response', {
             status: "fail",
             message: "Client version not found"
         });
@@ -87,7 +87,7 @@ export const handlerEvent = (io, socket, data) => {
     const handler = handlerMappings[data.handlerId]
     if (!handler) {
         socket.emit('response', {
-            status : "fail",
+            status: "fail",
             message: "Handler not found"
         })
         return;
