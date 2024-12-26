@@ -1,12 +1,14 @@
 import { Base } from "./model/base.js";
 import { Monster } from "./model/monster.js";
 import { Tower } from "./model/tower.js";
+import { sendEvent } from "./init/socket.js";
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
 
-let serverSocket; // 서버 웹소켓 객체
+sendEvent()
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -19,7 +21,7 @@ let baseHp = 0; // 기지 체력
 let towerCost = 0; // 타워 구입 비용
 let numOfInitialTowers = 0; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
-let monsterSpawnInterval = 0; // 몬스터 생성 주기
+let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
 
@@ -29,21 +31,21 @@ let isInitGame = false;
 
 // 이미지 로딩 파트
 const backgroundImage = new Image();
-backgroundImage.src = "images/bg.webp";
+backgroundImage.src = "../assets/images/bg.webp";
 
 const towerImage = new Image();
-towerImage.src = "images/tower.png";
+towerImage.src = "../assets/images/tower.png";
 
 const baseImage = new Image();
-baseImage.src = "images/base.png";
+baseImage.src = "../assets/images/base.png";
 
 const pathImage = new Image();
-pathImage.src = "images/path.png";
+pathImage.src = "../assets/images/path.png";
 
 const monsterImages = [];
 for (let i = 1; i <= NUM_OF_MONSTERS; i++) {
   const img = new Image();
-  img.src = `images/monster${i}.png`;
+  img.src = `../assets/images/monster${i}.png`;
   monsterImages.push(img);
 }
 
@@ -248,24 +250,9 @@ Promise.all([
   ...monsterImages.map(
     (img) => new Promise((resolve) => (img.onload = resolve))
   ),
-]).then(() => {
-  /* 서버 접속 코드 (여기도 완성해주세요!) */
-  let somewhere;
-  serverSocket = io("서버주소", {
-    auth: {
-      token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
-    },
-  });
+])
 
-  /* 
-    서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다! 
-    e.g. serverSocket.on("...", () => {...});
-    이 때, 상태 동기화 이벤트의 경우에 아래의 코드를 마지막에 넣어주세요! 최초의 상태 동기화 이후에 게임을 초기화해야 하기 때문입니다! 
-    if (!isInitGame) {
-      initGame();
-    }
-  */
-});
+initGame()
 
 const buyTowerButton = document.createElement("button");
 buyTowerButton.textContent = "타워 구입";
@@ -277,5 +264,8 @@ buyTowerButton.style.fontSize = "16px";
 buyTowerButton.style.cursor = "pointer";
 
 buyTowerButton.addEventListener("click", placeNewTower);
-
 document.body.appendChild(buyTowerButton);
+
+requestAnimationFrame(gameLoop)
+
+
