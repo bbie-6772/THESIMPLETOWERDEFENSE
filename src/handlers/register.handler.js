@@ -1,15 +1,11 @@
 //uuid 생성 버전4 
 import { handleConnection, handleDisconnect, handlerEvent } from "./helper.js";
-import { getRanking } from "../models/ranking.model.js";
-
 
 const registerHandler = (io) => {
     // 모든 유저가 '연결' 시 콜백함수 실행
     io.on('connection', (socket) => {
-        
         // 만든 유저 정보를 클라이언트로 전달
-        handleConnection(socket, userInfo)
-        io.emit('rank', getRanking())
+        handleConnection(socket)
 
         // '이벤트' 발생 시 맵핑 실행
         socket.on('event', (data) => handlerEvent(io, socket, data));
