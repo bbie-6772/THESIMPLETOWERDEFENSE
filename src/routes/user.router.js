@@ -2,6 +2,7 @@ import express from "express";
 import { prisma } from "../init/prisma.js";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 
 //환경 변수 파일(.env)을 로드
 dotenv.config();
@@ -60,7 +61,7 @@ router.post("/sign-up", async (req, res) => {
         const user = await prisma.users.create({
             data: {
                 id, 
-                pw: hashedPassword,
+                password: hashedPassword,
                 nickname,
             }
         });
@@ -97,7 +98,7 @@ router.post("/sign-in", async (req, res) => {
             .json({ errorMessage: "아이디 또는 비밀번호가 틀렸습니다" });
 
         // 입력된 비밀번호와 데이터베이스의 암호화된 비밀번호를 비교
-        const isPasswordValid = await bcrypt.compare(pw, user.pw);
+        const isPasswordValid = await bcrypt.compare(pw, user.password);
         // 비밀번호가 일치하지 않으면 401 상태 코드와 에러 메시지 반환
         if (!isPasswordValid) return res
             .status(401)
@@ -105,7 +106,7 @@ router.post("/sign-in", async (req, res) => {
 
         // 비밀번호가 일치하면 JWT 생성
         // JWT 페이로드에 사용자 아이디 사용
-        const token = jwt.sign({userKey: user.id},
+        const token = jwt.sign({id: user.id},
             process.env.SECRET_KEY, 
             { expiresIn: "3h" }
         );
