@@ -24,14 +24,14 @@ window.addEventListener('resize', () => {
 canvas.addEventListener('click', function (event) {
   var x = (event.clientX - canvasRect.left) * scaleX;
   var y = (event.clientY - canvasRect.top) * scaleY;
-  console.log(x, y);
   var t = GetTowerFromCoordinate(x, y);
   if (t) {
-    // dctx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
-    // dctx.fillStyle = 'green';
-    // dctx.lineWidth = 3;       // 테두리 두께
-    // dctx.strokeRect(t.x, t.y, t.width, t.height);
-    // console.log(t);
+    dctx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
+    dctx.fillStyle = 'green';
+    dctx.lineWidth = 3;       // 테두리 두께
+    dctx.strokeRect(t.x, t.y, t.width, t.height);
+    console.log(x, y);
+    console.log(t);
   }
 })
 
