@@ -1,3 +1,5 @@
+var towers = [];
+
 export class Tower {
   constructor(x, y, cost) {
     // 생성자 안에서 타워들의 속성을 정의한다고 생각하시면 됩니다!
@@ -11,6 +13,7 @@ export class Tower {
     this.cooldown = 0; // 타워 공격 쿨타임
     this.beamDuration = 0; // 타워 광선 지속 시간
     this.target = null; // 타워 광선의 목표
+    towers.push(this);
   }
 
   draw(ctx, towerImage) {
@@ -46,3 +49,9 @@ export class Tower {
     }
   }
 }
+
+export const GetTowerFromCoordinate = (x, y) => {
+  return towers.find((e) => {
+    return (e.x > x - e.width && e.x < x && e.y > y - e.height && e.y < y);
+  })
+};
