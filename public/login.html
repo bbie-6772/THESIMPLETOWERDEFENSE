@@ -48,7 +48,7 @@
       </div>
     </div>
   </div>
-  <script>
+  <script type="module">
     // 백엔드 API 주소
     const API_BASE_URL = 'http://localhost:3000/api';
 
@@ -71,7 +71,7 @@
           // 로컬 스토리지에 적용  
           localStorage.setItem('access-Token', response.headers.get("authorization"));
 
-          window.location.href = "index.html";
+          window.location.href = "lobby.html";
         } else {
           alert(result.errorMessage)
         }
