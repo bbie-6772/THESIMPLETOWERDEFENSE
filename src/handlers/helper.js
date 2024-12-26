@@ -1,11 +1,57 @@
 import { CLIENT_VERSION } from "../constant.js"
 import handlerMappings from "./handler.Mapping.js"
-import { getRanking, loadRanking } from "../models/ranking.model.js"
+import { prisma } from "../init/prisma.js";
+import jwt from "jsonwebtoken";
 
-export const handleConnection = (socket, userInfo) => {
+export const handleConnection = async (socket) => {
+    try {
+        const information = socket.handshake.query
+        const authorization = information.accessToken
+        const [tokenType, token] = authorization.split(' ');
 
-    //유저와 연결되면 uuid를 메세지로 전달
-    socket.emit('connection', userInfo )
+        //클라이언트 버전 확인
+        if (!CLIENT_VERSION.includes(information.clientVersion)) {
+            socket.emit('response', {
+                status: "fail",
+                message: "Client version not found"
+            });
+            return;
+        }
+
+        // token이 비어있거나(없는 경우) tokenType이 Bearer가 아닌경우
+        if (!token || tokenType !== 'Bearer') {
+            socket.emit('response', {
+                status: "fail",
+                message: "Not a valid account"
+            });
+            return;
+        }
+
+        // 토큰 검증
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        //JWT 토큰에서 가져온 사용자 정보를 이용해서 데이터베이스에서 해당 사용자가 실제로 존재하는지 확인하는 작업
+        const loginUser = await prisma.users.findUnique({ where: { id: decoded.id } });
+        // 사용자 정보가 데이터베이스에 없는 경우
+
+        if (!loginUser) {
+            socket.emit('response', {
+                status: "fail",
+                message: "Can't find account please log-in again "
+            });
+            return;
+        }
+
+        //유저와 연결되면 uuid를 메세지로 전달
+        socket.emit('connection', information)
+    } catch (err) {
+        console.log(err)
+        socket.emit('response', {
+            status: "fail",
+            message: "Not a valid token"
+        });
+        return;
+    }
+      
 }
 
 export const handleDisconnect = (socket, uuid) => {
@@ -13,7 +59,6 @@ export const handleDisconnect = (socket, uuid) => {
 }
 
 export const handlerEvent = (io, socket, data) => {
-    loadRanking()
     //클라이언트 버전 확인
     if (!CLIENT_VERSION.includes(data.clientVersion)) {
         socket.emit('response', { 
@@ -36,8 +81,6 @@ export const handlerEvent = (io, socket, data) => {
 
     // 디버깅용 확인
     // if (response.status !== "success") console.log(response)
-
-    io.emit('rank', getRanking())
     // 서버 전 유저에게 알림
     if (response.broadcast) {
         io.emit('response', response);
