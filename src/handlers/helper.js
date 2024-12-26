@@ -93,7 +93,7 @@ export const handlerEvent = (io, socket, data) => {
         return;
     }
 
-    const response = handler(data.userId, data.payload)
+    const response = handler(data.userId, data.payload);
 
     // 서버 전 유저에게 알림
     if (response.broadcast) {
