@@ -3,34 +3,45 @@ import { v4 as uuidv4 } from "uuid";
 let gameRooms = [];
 
 export const addRoom = (userId, gameName, password, difficult) => {
-    // 게임 방 고유 번호 생성
-    const gameId = uuidv4()
+    try {
+        // 게임 방 고유 번호 생성
+        const gameId = uuidv4()
 
-    const timer = {
-        1: 50,
-        2: 30,
-        3: 15,
-        4: 5
+        const timer = {
+            1: 50,
+            2: 30,
+            3: 15,
+            4: 5
+        }
+
+        const room = {
+            gameId: gameId,
+            gameName: gameName,
+            userId1: userId,
+            userId2: null,
+            difficult: difficult,
+            password: password,
+            score: 0,
+            startTime: 0,
+            monsterCount: 0,
+            gameOverTimer: timer[difficult],
+        }
+
+        gameRooms.push(room)
+        return true 
+    } catch (err) {
+        console.log(err)
+        return false
     }
 
-    const room = {
-        gameId: gameId,
-        gameName: gameName,
-        userId1: userId,
-        userId2: null,
-        difficult: difficult,
-        password: password,
-        score: 0,
-        startTime: 0,
-        monsterCount: 0,
-        gameOverTimer: timer[difficult],
-    }
-
-    gameRooms.push(room)
 }
 
 export const getRoom = (userId) => {
     return gameRooms.find((e) => e.userId1 === userId || e.userId2 === userId)
+}
+
+export const getRooms = () => {
+    return gameRooms
 }
 
 export const deleteRoom  = (userId) => {
