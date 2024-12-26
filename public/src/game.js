@@ -1,14 +1,38 @@
 import { Base } from "./model/base.js";
 import { Monster } from "./model/monster.js";
-import { Tower } from "./model/tower.js";
-import { sendEvent } from "./init/socket.js";
+import { Tower, GetTowerFromCoordinate } from "./model/tower.js";
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
 
 const canvas = document.getElementById("gameCanvas");
+const debugCanvas = document.getElementById("debugCanvas");
 const ctx = canvas.getContext("2d");
+const dctx = debugCanvas.getContext("2d");
+
+var canvasRect = canvas.getBoundingClientRect();
+var scaleX = canvas.width / canvasRect.width;  // 가로 스케일
+var scaleY = canvas.height / canvasRect.height; // 세로 스케일
+window.addEventListener('resize', () => {
+  canvasRect = canvas.getBoundingClientRect();
+  scaleX = canvas.width / canvasRect.width;  // 가로 스케일
+  scaleY = canvas.height / canvasRect.height; // 세로 스케일
+})
+
+canvas.addEventListener('click', function (event) {
+  var x = (event.clientX - canvasRect.left) * scaleX;
+  var y = (event.clientY - canvasRect.top) * scaleY;
+  var t = GetTowerFromCoordinate(x, y);
+  if (t) {
+    dctx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
+    dctx.fillStyle = 'green';
+    dctx.lineWidth = 3;       // 테두리 두께
+    dctx.strokeRect(t.x, t.y, t.width, t.height);
+    console.log(x, y);
+    console.log(t);
+  }
+})
 
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
@@ -17,7 +41,7 @@ let base; // 기지 객체
 let baseHp = 0; // 기지 체력
 
 let towerCost = 0; // 타워 구입 비용
-let numOfInitialTowers = 0; // 초기 타워 개수
+let numOfInitialTowers = 3; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 const monsters = [];
@@ -226,7 +250,7 @@ function gameLoop() {
 
 function initGame() {
   if (isInitGame) {
-    return;
+    //return;
   }
 
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
@@ -234,8 +258,8 @@ function initGame() {
   placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
 
-  setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
-  gameLoop(); // 게임 루프 최초 실행
+  //setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
+  //gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
 
