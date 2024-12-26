@@ -2,7 +2,7 @@ import { Server as SocketIO } from "socket.io";
 import { getGameAssets } from "../init/assets.js";
 import { v4 as uuidv4 } from "uuid";
 
-import { MonsterStorage } from "./monsterStorage.model.js";
+import{ Rooms } from './monsterStorage.model.js'
 
 export default class Monsters {
   // 생성자.
