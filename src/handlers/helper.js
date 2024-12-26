@@ -1,7 +1,7 @@
 import { CLIENT_VERSION } from "../constant.js"
 import handlerMappings from "./handler.Mapping.js"
 import { prisma } from "../init/prisma.js";
-import { addUser } from "../models/users.js";
+import { addUser,getUser } from "../models/users.js";
 import jwt from "jsonwebtoken";
 
 export const handleConnection = async (socket) => {
@@ -12,7 +12,7 @@ export const handleConnection = async (socket) => {
 
         //클라이언트 버전 확인
         if (!CLIENT_VERSION.includes(information.clientVersion)) {
-            socket.emit('response', {
+            socket.emit('connection', {
                 status: "fail",
                 message: "Client version not found"
             });
@@ -21,7 +21,7 @@ export const handleConnection = async (socket) => {
 
         // token이 비어있거나(없는 경우) tokenType이 Bearer가 아닌경우
         if (!token || tokenType !== 'Bearer') {
-            socket.emit('response', {
+            socket.emit('connection', {
                 status: "fail",
                 message: "Not a valid account"
             });
@@ -34,7 +34,7 @@ export const handleConnection = async (socket) => {
         const loginUser = await prisma.users.findUnique({ where: { id: decoded.id } });
         // 사용자 정보가 데이터베이스에 없는 경우
         if (!loginUser) {
-            socket.emit('response', {
+            socket.emit('connection', {
                 status: "fail",
                 message: "Can't find account please log-in again "
             });
@@ -44,12 +44,14 @@ export const handleConnection = async (socket) => {
         //유저 추가
         addUser(loginUser.id, loginUser.nickname)
 
+        console.log(loginUser.id,"접속")
+
         //유저와 연결되면 클라이언트에게 인터페이스 용 값 전달
         socket.emit('connection', [loginUser.id, loginUser.nickname, loginUser.highScoreS, loginUser.highScoreM])
 
     } catch (err) {
         console.log(err)
-        socket.emit('response', {
+        socket.emit('connection', {
             status: "fail",
             message: "Not a valid token"
         });
@@ -62,11 +64,22 @@ export const handleDisconnect = (socket, uuid) => {
 }
 
 export const handlerEvent = (io, socket, data) => {
+
+    console.log(data)
     //클라이언트 버전 확인
     if (!CLIENT_VERSION.includes(data.clientVersion)) {
         socket.emit('response', { 
             status: "fail",
             message: "Client version not found"
+        });
+        return;
+    }
+
+    const user = getUser(data.userId)
+    if (!user) {
+        socket.emit('response', {
+            status: "fail",
+            message: "User not found"
         });
         return;
     }
@@ -82,13 +95,11 @@ export const handlerEvent = (io, socket, data) => {
 
     const response = handler(data.userId, data.payload)
 
-    // 디버깅용 확인
-    // if (response.status !== "success") console.log(response)
     // 서버 전 유저에게 알림
     if (response.broadcast) {
         io.emit('response', response);
         return;
     }
     // 대상 유저에게만 보냄
-    socket.emit('response', response);
+    socket.emit('response', [data.handlerId, response]);
 }
