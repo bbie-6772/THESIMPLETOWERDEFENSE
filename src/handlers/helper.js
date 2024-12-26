@@ -32,7 +32,7 @@ export const handlerEvent = (io, socket, data) => {
         return;
     }
 
-    const response = handler(data.userId, data.payload)
+    const response = handler(data.userId, data.payload);
 
     // 디버깅용 확인
     // if (response.status !== "success") console.log(response)
