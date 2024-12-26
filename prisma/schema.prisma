@@ -17,8 +17,8 @@ model Users {
   id            String     @id @map("id")
   nickname      String  @unique @map("nickname")
   password      String  @map("password")
-  highScoreS    Int     @map("high_score_single")
-  highScoreM    Int     @map("high_score_multi")
+  highScoreS    Int     @map("high_score_single") @default(0)
+  highScoreM    Int     @map("high_score_multi") @default(0)
 
   Ranks1        Ranks[] @relation("User1Relation")
   Ranks2        Ranks[] @relation("User2Relation")

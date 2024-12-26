@@ -8,12 +8,6 @@ const tier_scale_range = 1;
 const tier_scale_cost = 1;
 const tier_scale_cooldown = 1;
 
-// 각 배열 내용용
-// {
-// userId: userId
-// data: [{X,Y,towerId,tier}]
-// }
-
 
 //타워 추가
 export const addTower = (userId, X, Y, towerId, tier) => {
