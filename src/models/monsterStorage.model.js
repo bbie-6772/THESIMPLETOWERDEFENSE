@@ -13,36 +13,26 @@ export default class MonsterStorage {
     return MonsterStorage.instance;
   };
 
-  // 데이터 추가
-  addTypedData(type, roomId, dataUuid, data) {
-    switch (type) {
-      case 0:
-        // 정보
-        addDatas(this.info, roomId, dataUuid, data);
-        break;
-      case 1:
-        // 몬스터
-        addDatas(this.monsters, roomId, dataUuid, data);
-        break;
+  // 몬스터 생성.
+  addMonster(id, dataUuid, data) {
+    // 해당 Id가 존재하지 않는다면 새로 생성.
+    if (!this.monsters[id]) {
+      this.monsters[id] = {};
     }
+
+    // 몬스터 생성.
+    this.monsters[id][dataUuid] = data;
   }
 
-  addData(object, roomId, dataUuid, data) {
+  // 정보 생성.
+  addInfo(id, data) {
     // 해당 Id가 존재하지 않는다면 새로 생성.
-    if (!object[roomId]) {
-      object[roomId] = {};
+    if (!this.info[id]) {
+      this.info[id] = {};
     }
 
-    if (!object[roomId][dataUuid]) {
-      // 전에 데이터가 없다면 새로 추가.
-      object[roomId][dataUuid] = data;
-    } else {
-      // 기존에 있으면 덮어 씌우거나 더 추가.
-      object[roomId][dataUuid] = {
-        ...object[roomId][dataUuid],
-        ...data,
-      };
-    }
+    // 정보 생성.
+    this.info[id] = data;
   }
 
   // 데이터 조회 (정보)

@@ -29,23 +29,10 @@ export default class Monsters {
     return this.monsters;
   }
 
-  
-  // (Get) 몬스터 현재 좌표.
-  getMonsterPosition(index) {
-    if(this.monsters[index] !== undefined) {
-      const currentX = this.monsters[index].x;
-      const currentY = this.monsters[index].y;
-
-      return {x : currentX, y : currentY};
-    } else {
-      console.log("몬스터가 존재 하지 않습니다. (좌표)");
-    }
-  }
-
   // 클라 -> 서버 메세지.
   sendMonsterMessage(gameId,x,y) {
     // 최초 초기화 (이걸해야 리스폰이 가능함.)
-    this.socket.emit('monstersInitialization', {
+    this.socket.emit('monsterEventInit', {
       message : {
         gameId : gameId,
         x: x,
@@ -66,17 +53,6 @@ export default class Monsters {
         console.log(this.monsters[index]);
       }
 
-      // 몬스터 삭제.
-      if(data.message.eventName === "deleteMonster"){
-        const index = data.message.index;
-
-        if(this.monsters[index] !== undefined) {
-          delete this.monsters[index];
-        } else {
-          console.log("몬스터 삭제 실패. (인덱스 확인)");
-        }
-        
-      }
     });
   }
 
