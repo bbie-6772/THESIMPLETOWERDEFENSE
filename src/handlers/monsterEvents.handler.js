@@ -6,7 +6,7 @@ export const receiveMonsterMessage = (io, socket) => {
   // 초기화.
   socket.on("monsterEventInit", (data) => {
     monsters.monstersInitialization(data);
-    monsters.createMonster(io, 10);
+    monsters.createMonster(io, 1000);
   });
 
   socket.on(monsters.eventName, (data) => {

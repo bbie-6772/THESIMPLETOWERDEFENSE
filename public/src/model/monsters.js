@@ -30,14 +30,14 @@ export default class Monsters {
   }
 
   // 클라 -> 서버 메세지.
-  sendMonsterMessage(gameId,x,y) {
+  sendMonsterMessage(gameId, x, y) {
     // 최초 초기화 (이걸해야 리스폰이 가능함.)
-    this.socket.emit('monsterEventInit', {
-      message : {
-        gameId : gameId,
+    this.socket.emit("monsterEventInit", {
+      message: {
+        gameId: gameId,
         x: x,
-        y: y
-      }
+        y: y,
+      },
     });
   }
 
@@ -45,15 +45,23 @@ export default class Monsters {
   receiveMonsterMessage() {
     this.socket.on(this.gameId, (data) => {
       // 몬스터 스폰.
-      if(data.message.eventName === "spawnMonster"){
+      if (data.message.eventName === "spawnMonster") {
         const index = data.message.info.uuid;
         this.monsters[index] = data.message.info;
 
         console.log("몬스터 스폰 완료.");
         console.log(this.monsters[index]);
       }
-
     });
-  }
 
+    // 몬스터 삭제.
+    if(data.message.eventName === "monsterRemove"){
+      const index = data.message.index;
+
+      console.log("몬스터 삭제 완료.");
+      delete this.monsters[index];
+
+    }
+
+  }
 }

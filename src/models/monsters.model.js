@@ -128,13 +128,13 @@ export default class Monsters {
   monstersInitialization(data) {
     this.eventName = data.message.gameId;
     this.spawnCount = 0;
+    this.x = data.message.x;
+    this.t = data.message.y;
     this.info.totalCount = 0;
     this.info.aliveCount = 0;
     this.info.kills = 0;
     this.info.respawning = true;
     this.info.wave = 1;
-
-    console.log("왔나요?");
 
     // 정보 데이터 생성.
     this.monsterStorage.addInfo(this.eventName, this.info);
@@ -159,16 +159,14 @@ export default class Monsters {
     });
 
     // 삭제
-    instance.removeMonster(io, index, monster);
+    this.removeMonster(io, index, monster);
   };
 
   // 몬스터 삭제.
-  removeMonster = (uuid, monster) => {
+  removeMonster = (io,uuid, monster) => {
     // 몬스터의 체력이 0이라면?
-    if (monster.health <= 0) {
-      this.monsterStorage.removeMonster(this.eventName, uuid); // 삭제.
-
-
+    if (monster.stat.health <= 0) {
+      
       // 정보 업데이트, 
       this.info.kills += 1;
       this.info.aliveCount =  Object.keys(this.monsterStorage.getMonsters(this.eventName)).length;
@@ -178,7 +176,13 @@ export default class Monsters {
         aliveCount: this.info.aliveCount
       });
 
-      
+      // 삭제. - 수정해야함! 
+      io.emit(this.eventName, {
+        message : {
+          eventName : "monsterRemove",
+          index : monster.uuid,
+        }
+      });
     }
   };
 }
