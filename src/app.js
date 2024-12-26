@@ -3,11 +3,15 @@ import { createServer } from "http";
 import initSocket from "./init/socket.js";
 import { loadGameAssets } from "./init/assets.js";
 import userRouter from "./routes/user.router.js";
+import MonsterStorage from "./models/monsterStorage.model.js";
 
 const app = express();
 const server = createServer(app);
 
 const PORT = 3000;
+
+// 몬스터저장소 인스턴스 생성()
+MonsterStorage.getInstance();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

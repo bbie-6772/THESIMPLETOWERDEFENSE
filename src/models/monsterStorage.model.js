@@ -3,6 +3,36 @@ export default class MonsterStorage {
   constructor() {
     this.info = {};
     this.monsters = {};
+
+    /*
+      ## monsters ## 
+        gameId: 룸 아이디
+        name: 몬스터 이름
+        uuid: 몬스터 uuid (매게변수로 쓰인다.)
+        x: 몬스터 좌표 x
+        y: 몬스터 좌표 y
+        targetX: 웨어포인트 좌표 x
+        targetY: 웨어포인트 좌표 y
+        stat: {
+          health: 몬스터 체력
+          speed: 몬스터 스피드
+        }
+
+      ## info ## 
+        totalCount: 누적소환_몬스터의 수 
+        aliveCount: 생존_몬스터의 수 
+        kills     : 죽은_몬스터의 수
+        respawning: 리스폰 여부
+        wave: 0,  : 현재 웨이브 (점수 계산용)
+    */
+
+    /*===매게변수====*/
+    /*
+      id          : 룸 아이디.
+      monsterUuid : 몬스터 uuid
+      data        : 데이터
+    */
+    /*===============*/
   }
 
   // 싱글턴.
@@ -14,14 +44,14 @@ export default class MonsterStorage {
   };
 
   // 몬스터 생성.
-  addMonster(id, dataUuid, data) {
+  addMonster(id, monsterUuid, data) {
     // 해당 Id가 존재하지 않는다면 새로 생성.
     if (!this.monsters[id]) {
       this.monsters[id] = {};
     }
 
     // 몬스터 생성.
-    this.monsters[id][dataUuid] = data;
+    this.monsters[id][monsterUuid] = data;
   }
 
   // 정보 생성.

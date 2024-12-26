@@ -6,7 +6,8 @@ import MonsterStorage  from "./monsterStorage.model.js";
 
 export default class Monsters {
   // 생성자.
-  constructor(socket) {
+  constructor(io,socket) {
+    this.io = io;
     this.socket = socket; // socket
     this.eventName = null; // 이벤트 네임 (멀티용)
     this.monsterStorage = MonsterStorage.getInstance(); // 인스턴스 연결
@@ -29,7 +30,7 @@ export default class Monsters {
   }
 
   // 싱글턴
-  static getInstance = (socket) => {
+  static getInstance = (io,socket) => {
     if (!Monsters.instance) {
       Monsters.instance = new Monsters(socket);
     }
@@ -37,7 +38,7 @@ export default class Monsters {
   };
 
   // 몬스터 생성.
-  createMonster(io, count) {
+  createMonster(count) {
     // 0. 리스폰이 아닌 경우에는 시작하면안됨.
     if (!this.info.respawning) {
       console.log("리스폰 중이 아닙니다.");
@@ -97,7 +98,7 @@ export default class Monsters {
         };
 
         // 9. 메세지를 보내자. (전체로) - 수정 해야함!!
-        io.emit(this.eventName, {
+        this.io.emit(this.eventName, {
           message: {
             eventName: "spawnMonster",
             info: monsterInfo,
@@ -141,8 +142,10 @@ export default class Monsters {
   }
 
   // (Set) 몬스터 체력 수정.
-  setMonsterHealth = (io, index, data) => {
-    let monster = this.monsterStorage.getMonster(this.eventName, index)
+  // 매개변수(monsterUuid) : 몬스터 uuid
+  // 매개변수(data) : 피격데미지.
+  setMonsterHealth = (monsterUuid, data) => {
+    let monster = this.monsterStorage.getMonster(this.eventName, monsterUuid);
 
     // 몬스터 유효성 검사.
     if (Object.keys(monster).length === 0) {
@@ -151,7 +154,7 @@ export default class Monsters {
     }
 
     // 몬스터 체력 업데이트
-    this.monsterStorage.updateMonster(this.eventName, index, {
+    this.monsterStorage.updateMonster(this.eventName, monsterUuid, {
       stat: {
         health: monster.stat.health - data,
         speed: monster.stat.speed,
@@ -159,11 +162,12 @@ export default class Monsters {
     });
 
     // 삭제
-    this.removeMonster(io, index, monster);
+    monster = this.monsterStorage.getMonster(this.eventName, index); // 갱신
+    this.removeMonster(monster); // 삭제.
   };
 
   // 몬스터 삭제.
-  removeMonster = (io,uuid, monster) => {
+  removeMonster = ( monster) => {
     // 몬스터의 체력이 0이라면?
     if (monster.stat.health <= 0) {
       
@@ -177,7 +181,7 @@ export default class Monsters {
       });
 
       // 삭제. - 수정해야함! 
-      io.emit(this.eventName, {
+      this.io.emit(this.eventName, {
         message : {
           eventName : "monsterRemove",
           index : monster.uuid,
