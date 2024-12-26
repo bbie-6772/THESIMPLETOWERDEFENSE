@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko"> <!-- 문서의 언어를 한국어로 설정 -->
+
+<head>
+    <meta charset="UTF-8"> <!-- 문자 인코딩을 UTF-8로 설정 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 반응형 웹 디자인을 위한 뷰포트 설정 -->
+    <title>멀티채널 채팅</title> <!-- 웹 페이지 제목 -->
+    <link rel="stylesheet" href="chat.css"> <!-- 외부 CSS 파일 링크 -->
+</head>
+
+<body>
+    <div class="chat-container"> <!-- 전체 채팅 컨테이너 -->
+        <div class="channels-list"> <!-- 채널 목록 영역 -->
+            <h2>채널 목록</h2> <!-- 채널 목록 제목 -->
+            <div id="channelList"></div> <!-- 채널 목록을 표시할 div -->
+        </div>
+        <div class="chat-area"> <!-- 채팅 영역 -->
+            <div id="chatHeader"> <!-- 채팅 헤더 -->
+                <h2 id="currentChannel">채널을 선택해주세요</h2> <!-- 현재 선택된 채널 제목 -->
+            </div>
+            <div id="messages"></div> <!-- 메시지를 표시할 div -->
+            <div class="input-area"> <!-- 입력 영역 -->
+                <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." disabled> <!-- 메시지 입력 필드 (비활성화 상태) -->
+                <button id="sendButton" disabled>전송</button> <!-- 전송 버튼 (비활성화 상태) -->
+            </div>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script> <!-- Socket.IO 클라이언트 라이브러리 임포트 -->
+    <script src="chat.js"></script> <!-- 클라이언트 스크립트 파일 임포트 -->
+</body>
+
+</html>
