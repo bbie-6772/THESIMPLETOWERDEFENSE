@@ -1,10 +1,5 @@
 export default class MonsterStorage {
-  // 생성자.
-  constructor() {
-    this.info = {};
-    this.monsters = {};
-
-    /*
+  /*
       ## monsters ## 
         gameId: 룸 아이디
         name: 몬스터 이름
@@ -37,6 +32,14 @@ export default class MonsterStorage {
       data        : 데이터
     */
     /*===============*/
+
+
+  // 생성자.
+  constructor() {
+
+    this.info = {};
+    this.monsters = {};
+    
   }
 
   // 싱글턴.
@@ -72,7 +75,7 @@ export default class MonsterStorage {
   // 데이터 조회 (정보)
   getInfo(id) {
     // 찾는 데이터가 존재 하지않는다면.
-    if(!this.info[id]) {
+    if (!this.info[id]) {
       console.log("정보가 존재하지 않습니다.");
     }
 
@@ -80,9 +83,9 @@ export default class MonsterStorage {
   }
 
   // 데이터 업데이트 (정보)
-  updateInfo(id,newData) {
+  updateInfo(id, newData) {
     // 찾는 데이터가 존재 하지않는다면.
-    if(!this.info[id]) {
+    if (!this.info[id]) {
       console.log("정보가 존재하지 않습니다.");
       return;
     }
@@ -146,5 +149,20 @@ export default class MonsterStorage {
     }
 
     delete this.monsters[id][monsterUuid];
+  }
+
+  // 데이터 삭제 (몬스터들)
+  removeMonsters(id) {
+    if (!this.monsters[id]) {
+      console.log("삭제할 몬스터들이 존재하지 않습니다.");
+      return;
+    }
+
+    delete this.monsters[id];
+  }
+
+  // 전체 데이터 조회
+  test() {
+    return this.monsters;
   }
 }

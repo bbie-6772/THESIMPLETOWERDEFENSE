@@ -195,8 +195,27 @@ function placeBase() {
   base.draw(ctx, baseImage);
 }
 
-function spawnMonster() {
-  monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
+// 테스트 
+export function A() {
+  return monsterPath;
+}
+
+// 테스트 
+export function B() {
+  return monsterImages;
+}
+
+// 테스트 
+export function C() {
+  return monsterLevel;
+}
+
+export function spawnMonster(A,B,C, uuid) {
+  monsters.push(new Monster(A, B, C, uuid));
+}
+
+export function getUuid(monster) {
+  return monster.getUuid();
 }
 
 function gameLoop() {
@@ -204,15 +223,36 @@ function gameLoop() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
   drawPath(monsterPath); // 경로 다시 그리기
 
+
+  //infoMessage
+  Monsters.getInstance().infoMessage();
+  let test01 = Monsters.getInstance().data;
+
+  const { score, gold, wave } = test01;
+
+  /*
+  ## info ## 
+        totalCount: 누적소환_몬스터의 수 
+        aliveCount: 생존_몬스터의 수 
+        kills     : 죽은_몬스터의 수
+        respawning: 리스폰 여부
+        wave: 0,  : 현재 웨이브 (점수 계산용)
+        score : 획득한 스코어
+        gold : 획득한 골드.
+  
+  
+  */
+
+
   ctx.font = "25px Times New Roman";
   ctx.fillStyle = "skyblue";
   ctx.fillText(`최고 기록: ${highScore}`, 100, 50); // 최고 기록 표시
   ctx.fillStyle = "white";
   ctx.fillText(`점수: ${score}`, 100, 100); // 현재 스코어 표시
   ctx.fillStyle = "yellow";
-  ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
+  ctx.fillText(`골드: ${gold}`, 100, 150); // 골드 표시
   ctx.fillStyle = "black";
-  ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
+  ctx.fillText(`현재 레벨: ${wave}`, 100, 200); // 최고 기록 표시
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
@@ -230,6 +270,7 @@ function gameLoop() {
 
   // 몬스터가 공격을 했을 수 있으므로 기지 다시 그리기
   base.draw(ctx, baseImage);
+  
 
   for (let i = monsters.length - 1; i >= 0; i--) {
     const monster = monsters[i];
@@ -242,8 +283,14 @@ function gameLoop() {
       }
       monster.draw(ctx);
     } else {
+
+      //Monsters.getInstance().sendMonsterDieMessage(monsters[i].getUuid());
       /* 몬스터가 죽었을 때 */
       monsters.splice(i, 1);
+
+
+      /// 여기다가.
+      //sendMonsterDieMessage
     }
   }
 
@@ -254,6 +301,9 @@ function initGame() {
   if (isInitGame) {
     //return;
   }
+  
+  // 몬스터 리스폰 시작 - 테스트
+  Monsters.getInstance().sendMonsterMessage(0,0);
 
   
 
@@ -267,7 +317,7 @@ function initGame() {
   placeBase(); 
 
   // 설정된 몬스터 생성 주기마다 몬스터 생성
-  setInterval(spawnMonster, monsterSpawnInterval); 
+  //setInterval(spawnMonster, monsterSpawnInterval); 
   // 게임 루프 최초 실행
   gameLoop(); 
   isInitGame = true;

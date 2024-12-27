@@ -12,7 +12,7 @@ const PORT = 3000;
 
 // 몬스터저장소 인스턴스 생성()
 MonsterStorage.getInstance();
-
+console.log("test");
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static("public"));
