@@ -3,11 +3,17 @@ import { createServer } from "http";
 import initSocket from "./init/socket.js";
 import { loadGameAssets } from "./init/assets.js";
 import userRouter from "./routes/user.router.js";
+import cors from "cors";
 
 const app = express();
 const server = createServer(app);
 
 const PORT = 3000;
+
+// CORS middleware
+app.use(cors({
+  origin: '*',
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
