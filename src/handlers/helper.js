@@ -2,6 +2,7 @@ import { CLIENT_VERSION } from "../constant.js"
 import handlerMappings from "./handler.Mapping.js"
 import { prisma } from "../init/prisma.js";
 import { addUser,getUser } from "../models/users.model.js";
+import { getRooms } from "../models/gameRoom.model.js";
 import jwt from "jsonwebtoken";
 
 export const handleConnection = async (socket) => {
@@ -46,8 +47,21 @@ export const handleConnection = async (socket) => {
 
         console.log(loginUser.id,"접속")
 
+        // 주요 정보 변환
+        const rooms = getRooms().map((e) => {
+            return {
+                gameId: e.gameId,
+                gameName: e.gameName,
+                userId1: e.userId1,
+                userId2: e.userId2,
+                difficult: e.difficult,
+                password: e.password ? true : false
+            }
+        })
+
         //유저와 연결되면 클라이언트에게 인터페이스 용 값 전달
         socket.emit('connection', [loginUser.id, loginUser.nickname, loginUser.highScoreS, loginUser.highScoreM])
+        socket.emit('connection', [loginUser.id, loginUser.nickname, loginUser.highScoreS, loginUser.highScoreM, rooms])
 
     } catch (err) {
         console.log(err)
