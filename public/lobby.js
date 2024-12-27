@@ -11,12 +11,28 @@ let roomList = null;
 let roomSelectionModal = null;
 let selectedRoomDetails = null;
 let confirmRoomSelection = null;
-let playButton = null;
+let createButton = null;
 let refreshButton = null;
 
 let roomName = null;
 let roomType = null;
 let roomPassword = null;
+let waitRoom = null
+let waitRoomName = null;
+let waitRoomType = null;
+let waitRoomPassword = null;
+
+let chatBox = null;
+let host = null;
+let entry = null;
+
+let exitButton = null;
+let kickButton = null;
+let playButton = null;
+
+let name = document.createElement('div');
+let type = document.createElement('div');
+let password = document.createElement('div');
 
 document.addEventListener('DOMContentLoaded', () => {
     roomCreationForm = document.getElementById('roomCreationForm');
@@ -27,8 +43,24 @@ document.addEventListener('DOMContentLoaded', () => {
     roomSelectionModal = new bootstrap.Modal(document.getElementById('roomSelectionModal'));
     selectedRoomDetails = document.getElementById('selectedRoomDetails');
     confirmRoomSelection = document.getElementById('confirmRoomSelection');
-    playButton = document.getElementById('playButton');
+    createButton = document.getElementById('playButton');
     refreshButton = document.getElementById('refreshButton');
+
+    roomName = document.getElementById('roomName')
+    roomType = document.getElementById('roomType')
+    roomPassword = document.getElementById('roomPassword')
+    waitRoom = new bootstrap.Modal(document.getElementById('waitRoom'), {
+        backdrop: 'static',
+        keyboard: false  
+    });
+
+    chatBox = document.getElementById('chatBox');
+    host = document.getElementById('host');
+    entry = document.getElementById('entry');
+
+    playButton = document.getElementById('playButton');
+    kickButton = document.getElementById('kickButton');
+    exitButton = document.getElementById('exitButton');
 
     // 체크박스 상태에 따라 비밀번호 입력 필드 활성/비활성화  
     enableCheckbox.addEventListener('change', function () {
@@ -42,17 +74,22 @@ document.addEventListener('DOMContentLoaded', () => {
     },);
 
     // 방 생성 이벤트 핸들러  
-    roomCreationForm.addEventListener('submit', function (e) {
-        // 입력값 추출
-        roomName = document.getElementById('roomName').value;
-        roomType = document.getElementById('roomType').value;
-        roomPassword = passwordInput.value;
+    roomCreationForm.addEventListener('submit', async function (e) {
+        waitRoomName = document.getElementById('waitRoomName')
+        waitRoomType = document.getElementById('waitRoomType')
+        waitRoomPassword = document.getElementById('waitRoomPassword')
 
         e.preventDefault();
 
-        //요청 보내기
-        sendEvent(1001, { gameName: roomName, type: roomType, password: roomPassword })
+        // 방 생성, 참가 요청 실패 시 기존 방으로
+        if (await sendEvent(1001, { gameName: roomName.value, type: roomType.value, password: passwordInput.value })) {
+            
+            waitRoomName.append(name);
+            waitRoomType.append(type);
+            waitRoomPassword.append(password);
 
+            waitRoom.show()
+        }
         this.reset();
     });
 
@@ -65,19 +102,42 @@ document.addEventListener('DOMContentLoaded', () => {
         // 일정 시간 후 버튼 다시 활성화  
         setTimeout(() => {
             this.disabled = false;
-        }, 3000); // 3초 후 다시 활성화  
+        // 2초 후 다시 활성화 
+        }, 2000); 
     });  
 
-    // 방 선택 확인 이벤트  
-    confirmRoomSelection.addEventListener('click', function () {
+    // 방 선택 후 확인버튼 이벤트  
+    confirmRoomSelection.addEventListener('click', async function () {
         if (selectedRoom) {
-
             // 비밀번호가 있는 방일 시,
-            if (selectedRoom.password)
-
+            if (selectedRoom.password){
+                console.log("비번있음")
+            }
+            
+            if (await sendEvent(1001, { roomId: selectedRoom.id })) {
                 alert(`${selectedRoom.name}방으로 입장합니다`);
-            roomSelectionModal.hide();
+
+                roomSelectionModal.hide();
+
+                waitRoomName.append(name);
+                waitRoomType.append(type);
+                waitRoomPassword.append(password);
+
+                waitRoom.show()
+            }
         }
+    });
+
+    // 준비 완료, 시작 이벤트
+    playButton.addEventListener('click', function () {
+    });
+
+    // 강퇴 이벤트
+    kickButton.addEventListener('click', function () {
+    });
+
+    // 나가기 이벤트
+    exitButton.addEventListener('click', function () {
     });
 
 })
@@ -130,22 +190,39 @@ function selectRoom(room) {
 
     // 모달에 방 정보 표시  
     selectedRoomDetails.innerHTML = `  
-            <p><strong>방 이름:</strong> ${room.name}</p>  
-            <p><strong>난이도: </strong> ${getRoomTypeLabel(room.type)}</p>  
+            <p><strong>방 이름:</strong> ${selectedRoom.name}</p>  
+            <p><strong>난이도: </strong> ${getRoomTypeLabel(selectedRoom.type)}</p>  
             <p><strong>최대 인원:</strong> 2명</p>  
             `;
 
     roomSelectionModal.show();
 }
 
+// 대기방 업데이트 함수  
+export const updateRoomInfo = (roomInfo) => {
+    // 방 정보 업데이트
+    name.innerText = roomInfo.gameName
+    type.innerText = getRoomTypeLabel(roomInfo.difficult)
+    password.innerText = roomInfo.password || "없음"
+}
+
+// 대기방 유저 업데이트 함수
+export const updateUser = (roomInfo) => {
+    console.log(roomInfo)
+    host.innerText = roomInfo.userId1
+    entry.innerText = roomInfo.userId2 || "비어 있음"
+}
+
 export const updateRooms = (roomsInfo) => {
     rooms = []
-    roomsInfo.forEach((e) => rooms.push({
-        id: e.gameId,
-        name: e.gameName,
-        type: e.difficult,
-        password: e.password ? true : false
-    }))
+    if(Array.isArray(roomsInfo)){
+        roomsInfo.forEach((e) => rooms.push({
+            id: e.gameId,
+            name: e.gameName,
+            type: e.difficult,
+            password: e.password ? true : false
+        }))
+    }
     renderRooms()
 }
 
