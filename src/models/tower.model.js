@@ -102,11 +102,26 @@ export const towerCoolDown = (tower, cooldown, deltaTime) => {
   return false;
 };
 
-export const merge = (userId, one, other) => {
-  towerModel.getTower(one, other);
+export const merge = (uuid, x1, y1, x2, y2) => {
+  // one : (x1, y1), other : (x2, y2)
+  const one = getUsersTower(uuid, x1, y1);
+  const other = getUsersTower(uuid, x2, y2);
+  const newtier = other.tier + 1;
+  
+  // one과 other를 삭제한다
+  removeUsersTower(uuid, x1, y1);
+  removeUsersTower(uuid, x2, y2);
+
+  // other 자리에 무작위 상위 티어 타워를 생성한다
+  const towers = getGameAssets().towers;
+  const randomTower = getRandomInt(0, towers.data.length);
+  addTower(uuid, x, y, randomTower, newtier);
+
+  // 생성된 타워에 대한 정보를 반환한다(클라이언트에 전달해야함)
+  return { randomTower, newtier, x2, y2 };
 }
 
-export const upgrade = (towerId) => {
+export const upgrade = (uuid, towerId) => {
 
 }
 
@@ -119,6 +134,8 @@ const towerModel = {
   removeUsersTower,
   currentTowerStat,
   towerCoolDown,
+  merge,
+  upgrade,
 };
 
 export default towerModel;
