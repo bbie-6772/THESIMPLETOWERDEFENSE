@@ -8,4 +8,9 @@ export const receiveMonsterMessage = (io, socket) => {
     monsters.monstersInitialization(data);
     monsters.createMonster(io, 1000);
   });
+
+  // 테스트
+  socket.on("test", (data) => {
+    monsters.setMonsterHealth(data.uuid,100);
+  });
 };

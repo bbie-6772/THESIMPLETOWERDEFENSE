@@ -13,6 +13,8 @@ export default class MonsterStorage {
         y: 몬스터 좌표 y
         targetX: 웨어포인트 좌표 x
         targetY: 웨어포인트 좌표 y
+        score : 스코어
+        gold : 골드.
         stat: {
           health: 몬스터 체력
           speed: 몬스터 스피드
@@ -24,6 +26,8 @@ export default class MonsterStorage {
         kills     : 죽은_몬스터의 수
         respawning: 리스폰 여부
         wave: 0,  : 현재 웨이브 (점수 계산용)
+        score : 획득한 스코어
+        gold : 획득한 골드.
     */
 
     /*===매게변수====*/

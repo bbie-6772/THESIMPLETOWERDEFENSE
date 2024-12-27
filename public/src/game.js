@@ -1,6 +1,8 @@
 import { Base } from "./model/base.js";
 import { Monster } from "./model/monster.js";
 import { Tower, GetTowerFromCoordinate } from "./model/tower.js";
+import {} from "./init/socket.js"
+import Monsters from "./model/monsterSpawner.js"
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
@@ -252,6 +254,8 @@ function initGame() {
   if (isInitGame) {
     //return;
   }
+
+  
 
   // 몬스터 경로 생성
   monsterPath = generateRandomMonsterPath(); 

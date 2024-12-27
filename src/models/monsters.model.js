@@ -23,6 +23,8 @@ export default class Monsters {
       kills: 0, // 처치한 몬스터 수
       respawning: false, // 리스폰 중 여부
       wave: 0, // 현재 웨이브 (점수 계산용)
+      score : 0, // 스코어
+      gold : 0, // 골드.
     };
 
     this.stagesAssets = getGameAssets; // 스테이지 에셋
@@ -91,6 +93,8 @@ export default class Monsters {
           y: this.y, // 시작 포지션 y
           targetX: null, // 다음 웨어 포인트 x (웨어 포인트 정보를 가져와야함.)
           targetY: null, // 다음 웨어 포인트 y (웨어 포인트 정보를 가져와야함.)
+          gold: monsterList[randomIdex].gold,
+          score: monsterList[randomIdex].score,
           stat: {
             health: monsterList[randomIdex].health, // 체력
             speed: monsterList[randomIdex].speed, // 스피드
@@ -104,6 +108,7 @@ export default class Monsters {
             info: monsterInfo,
           },
         });
+
 
         // // 10. 검증용 데이터 베열에 담기
         this.monsterStorage.addMonster(this.eventName, uuid, monsterInfo);
@@ -120,6 +125,8 @@ export default class Monsters {
           this.monsterStorage.updateInfo(this.eventName, {
           totalCount: this.info.totalCount,
           });
+
+          console.log(this.monsterStorage.getInfo(this.eventName));
         }, 1000); // 1초마다 한번만 메시지 전송
       }
     }, 1000); // 1000ms = 1초
@@ -136,6 +143,8 @@ export default class Monsters {
     this.info.kills = 0;
     this.info.respawning = true;
     this.info.wave = 1;
+    this.info.score = 0;
+    this.info.gold = 0;
 
     // 정보 데이터 생성.
     this.monsterStorage.addInfo(this.eventName, this.info);
@@ -153,6 +162,7 @@ export default class Monsters {
       return;
     }
 
+    console.log("몬스터가 공격당했습니다.");
     // 몬스터 체력 업데이트
     this.monsterStorage.updateMonster(this.eventName, monsterUuid, {
       stat: {
@@ -162,7 +172,7 @@ export default class Monsters {
     });
 
     // 삭제
-    monster = this.monsterStorage.getMonster(this.eventName, index); // 갱신
+    monster = this.monsterStorage.getMonster(this.eventName, monsterUuid); // 갱신
     this.removeMonster(monster); // 삭제.
   };
 
@@ -170,15 +180,27 @@ export default class Monsters {
   removeMonster = ( monster) => {
     // 몬스터의 체력이 0이라면?
     if (monster.stat.health <= 0) {
+      let info = this.monsterStorage.getInfo(this.eventName);
       
+      this.info.gold += monster.gold * info.wave;
+      this.info.score += monster.score* info.wave;
+
+      // 몬스터 삭제.
+      this.monsterStorage.removeMonster(this.eventName, monster.uuid);
+
       // 정보 업데이트, 
       this.info.kills += 1;
       this.info.aliveCount =  Object.keys(this.monsterStorage.getMonsters(this.eventName)).length;
-
+      
+      // 정보 업데이트.
       this.monsterStorage.updateInfo(this.eventName, {
         kills: this.info.kills,
-        aliveCount: this.info.aliveCount
+        aliveCount: this.info.aliveCount,
+        gold: this.info.gold,
+        score: this.info.score,
       });
+
+      console.log("몬스터가 사망했습니다.");
 
       // 삭제. - 수정해야함! 
       this.io.emit(this.eventName, {

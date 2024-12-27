@@ -1,6 +1,7 @@
 //uuid 생성 버전4 
 import { handleConnection, handleDisconnect, handlerEvent } from "./helper.js";
 import Monsters from "../models/monsters.model.js"
+import {receiveMonsterMessage} from "./monsterEvents.handler.js"
 
 const registerHandler = (io) => {
     // 모든 유저가 '연결' 시 콜백함수 실행
@@ -10,6 +11,8 @@ const registerHandler = (io) => {
 
         // 몬스터핸들러 초기화.
         Monsters.getInstance(io, socket);
+        receiveMonsterMessage(io, socket);
+        
 
         // '이벤트' 발생 시 맵핑 실행
         socket.on('event', (data) => handlerEvent(io, socket, data));
