@@ -30,10 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     playButton = document.getElementById('playButton');
     refreshButton = document.getElementById('refreshButton');
 
-    roomName = document.getElementById('roomName').value;
-    roomType = document.getElementById('roomType').value;
-    roomPassword = passwordInput.value;
-
     // 체크박스 상태에 따라 비밀번호 입력 필드 활성/비활성화  
     enableCheckbox.addEventListener('change', function () {
         if (this.checked) {
@@ -47,6 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 방 생성 이벤트 핸들러  
     roomCreationForm.addEventListener('submit', function (e) {
+        // 입력값 추출
+        roomName = document.getElementById('roomName').value;
+        roomType = document.getElementById('roomType').value;
+        roomPassword = passwordInput.value;
+
         e.preventDefault();
 
         //요청 보내기
