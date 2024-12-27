@@ -1,8 +1,45 @@
 export default class MonsterStorage {
+  /*
+      ## monsters ## 
+        gameId: 룸 아이디
+        name: 몬스터 이름
+        uuid: 몬스터 uuid (매게변수로 쓰인다.)
+        x: 몬스터 좌표 x
+        y: 몬스터 좌표 y
+        targetX: 웨어포인트 좌표 x
+        targetY: 웨어포인트 좌표 y
+        score : 스코어
+        gold : 골드.
+        stat: {
+          health: 몬스터 체력
+          speed: 몬스터 스피드
+        }
+
+      ## info ## 
+        totalCount: 누적소환_몬스터의 수 
+        aliveCount: 생존_몬스터의 수 
+        kills     : 죽은_몬스터의 수
+        respawning: 리스폰 여부
+        wave: 0,  : 현재 웨이브 (점수 계산용)
+        score : 획득한 스코어
+        gold : 획득한 골드.
+    */
+
+    /*===매게변수====*/
+    /*
+      id          : 룸 아이디.
+      monsterUuid : 몬스터 uuid
+      data        : 데이터
+    */
+    /*===============*/
+
+
   // 생성자.
   constructor() {
+
     this.info = {};
     this.monsters = {};
+    
   }
 
   // 싱글턴.
@@ -14,14 +51,14 @@ export default class MonsterStorage {
   };
 
   // 몬스터 생성.
-  addMonster(id, dataUuid, data) {
+  addMonster(id, monsterUuid, data) {
     // 해당 Id가 존재하지 않는다면 새로 생성.
     if (!this.monsters[id]) {
       this.monsters[id] = {};
     }
 
     // 몬스터 생성.
-    this.monsters[id][dataUuid] = data;
+    this.monsters[id][monsterUuid] = data;
   }
 
   // 정보 생성.
@@ -38,7 +75,7 @@ export default class MonsterStorage {
   // 데이터 조회 (정보)
   getInfo(id) {
     // 찾는 데이터가 존재 하지않는다면.
-    if(!this.info[id]) {
+    if (!this.info[id]) {
       console.log("정보가 존재하지 않습니다.");
     }
 
@@ -46,9 +83,9 @@ export default class MonsterStorage {
   }
 
   // 데이터 업데이트 (정보)
-  updateInfo(id,newData) {
+  updateInfo(id, newData) {
     // 찾는 데이터가 존재 하지않는다면.
-    if(!this.info[id]) {
+    if (!this.info[id]) {
       console.log("정보가 존재하지 않습니다.");
       return;
     }
@@ -112,5 +149,20 @@ export default class MonsterStorage {
     }
 
     delete this.monsters[id][monsterUuid];
+  }
+
+  // 데이터 삭제 (몬스터들)
+  removeMonsters(id) {
+    if (!this.monsters[id]) {
+      console.log("삭제할 몬스터들이 존재하지 않습니다.");
+      return;
+    }
+
+    delete this.monsters[id];
+  }
+
+  // 전체 데이터 조회
+  test() {
+    return this.monsters;
   }
 }
