@@ -1,39 +1,32 @@
+//====================================================================================================================
+//====================================================================================================================
+// src/manager/gameSimulator.js
 // 게임 시뮬레이션 돌리는 서버 마스터 코드
-import { Server as SocketIO } from "socket.io"; // 소켓 사용
-
-// import { Base } from "./model/base.js";
-// import { Monster } from "./model/monster.js";
-// import { Tower } from "./model/tower.js";
-/* 
-  어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
-*/
+// 로직 부분에 대해서 클라이언트와 동일해야 한다
+//====================================================================================================================
+//====================================================================================================================
 
 // #region variables
+// *** 클라이언트와 동일해야 한다.
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
-
 let userGold = 0; // 유저 골드
 let base; // 기지 객체
 let baseHp = 0; // 기지 체력
-
 let towerCost = 0; // 타워 구입 비용
 let numOfInitialTowers = 3; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
-
 let score = 0; // 게임 점수
 let highScore = 0; // 기존 최고 점수
 
-
 let monsterPath;
-
 // #endregion
 
 
 // #region Game Logic Part
 // =======================================================================================================================================
-
 const generatePath = () => {
     const path = [];
     // 캔버스 위치로 snapping 현재 canvas width="1920" height="1080" 고려, 임시로 하드코딩 >> 추후 config로 설정값 관리 리팩토링 필요
@@ -119,18 +112,12 @@ function spawnMonster() {
 // =======================================================================================================================================
 // #endregion
 
-
-
-
-
-
 //#region socket
 let io;
 //#endregion
 
 function gameLoop() {
     // #region gameLoop Logic
-    // console.log("확인용 로그");
     // 타워 몬스터 공격 처리
     towers.forEach((tower) => {
         tower.updateCooldown();
@@ -162,8 +149,7 @@ function gameLoop() {
         }
     }
     // #endregion
-
-    // 30fps 실행
+    // 100fps 실행
     setTimeout(gameLoop, 100);
 }
 
@@ -173,14 +159,12 @@ export function initGame(socketIO) {
     // #region initGame Logic
     // 몬스터 경로 생성
     monsterPath = generatePath();
-    // 맵 초기화 (배경, 몬스터 경로 그리기)
     // 설정된 초기 타워 개수만큼 사전에 타워 배치
     placeInitialTowers();
     // 기지 배치
     placeBase();
     // 설정된 몬스터 생성 주기마다 몬스터 생성
     // setInterval(spawnMonster, monsterSpawnInterval);
-
     // 설정된 몬스터 생성 주기마다 몬스터 생성, 최대 3마리까지만 생성 
     let monsterSpawnCount = 0; // 몬스터 생성 횟수 초기화
     const monsterSpawnIntervalId = setInterval(() => {
