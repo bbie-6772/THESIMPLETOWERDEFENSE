@@ -1,3 +1,13 @@
+import { initGame } from "../manager/gameSimulator.js";
+
+// 임시 게임시작 이후 위치 동기화
+export const testGameStart = (userId, payload, io) => {
+    initGame(io);
+    return { 
+        status: 'success', 
+        resType: 'testGameStart',
+    };
+};
 
 // 임시 위치 동기화 업데이트
 export const locationUpdate = (userId, payload) => {
