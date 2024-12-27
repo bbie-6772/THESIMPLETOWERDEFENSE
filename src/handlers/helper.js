@@ -39,13 +39,13 @@ export const handleConnection = async (socket) => {
                 status: "fail",
                 message: "Can't find account please log-in again "
             });
-            return;``
+            return; ``
         }
 
         //유저 추가
         addUser(loginUser.id, loginUser.nickname)
 
-        console.log(loginUser.id,"접속")
+        console.log(loginUser.id, "접속")
 
         // 주요 정보 변환
         const rooms = getRooms().map((e) => {
@@ -142,5 +142,4 @@ export const handlerEvent = (io, socket, data) => {
         });
         return;
     }
-        
 }
