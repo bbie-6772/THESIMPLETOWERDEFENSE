@@ -1,7 +1,8 @@
 import { CLIENT_VERSION } from "../constant.js"
 import handlerMappings from "./handler.Mapping.js"
 import { prisma } from "../init/prisma.js";
-import { addUser, getUser } from "../models/users.js";
+import { addUser,getUser } from "../models/users.model.js";
+import { getRooms } from "../models/gameRoom.model.js";
 import jwt from "jsonwebtoken";
 
 export const handleConnection = async (socket) => {
@@ -46,8 +47,20 @@ export const handleConnection = async (socket) => {
 
         console.log(loginUser.id, "접속")
 
+        // 주요 정보 변환
+        const rooms = getRooms().map((e) => {
+            return {
+                gameId: e.gameId,
+                gameName: e.gameName,
+                userId1: e.userId1,
+                userId2: e.userId2,
+                difficult: e.difficult,
+                password: e.password ? true : false
+            }
+        })
+
         //유저와 연결되면 클라이언트에게 인터페이스 용 값 전달
-        socket.emit('connection', [loginUser.id, loginUser.nickname, loginUser.highScoreS, loginUser.highScoreM])
+        socket.emit('connection', [loginUser.id, loginUser.nickname, loginUser.highScoreS, loginUser.highScoreM, rooms])
 
     } catch (err) {
         console.log(err)
@@ -64,42 +77,69 @@ export const handleDisconnect = (socket, uuid) => {
 }
 
 export const handlerEvent = (io, socket, data) => {
+    try {
+        console.log(data)
+        //클라이언트 버전 확인
+        if (!CLIENT_VERSION.includes(data.clientVersion)) {
+            socket.emit('response', { 
+                status: "fail",
+                message: "Client version not found"
+            });
+            return;
+        }
 
-    console.log(data)
-    //클라이언트 버전 확인
-    if (!CLIENT_VERSION.includes(data.clientVersion)) {
-        socket.emit('response', {
+        const [tokenType, token] = data.token.split(' ');
+        // token이 비어있거나(없는 경우) tokenType이 Bearer가 아닌경우
+        if (!token || tokenType !== 'Bearer') {
+            socket.emit('connection', {
+                status: "fail",
+                message: "Not a valid account"
+            });
+            return;
+        }
+
+        // 토큰 검증
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        if (data.userId !== decoded.id) {
+            socket.emit('response', {
+                status: "fail",
+                message: "Not valid Id"
+            });
+            return;
+        }
+        const user = getUser(data.userId)
+        if (!user) {
+            socket.emit('response', {
+                status: "fail",
+                message: "User not found"
+            });
+            return;
+        }
+
+        const handler = handlerMappings[data.handlerId]
+        if (!handler) {
+            socket.emit('response', {
+                status : "fail",
+                message: "Handler not found"
+            })
+            return;
+        }
+
+        const response = handler(data.userId, data.payload, socket);
+
+        // 서버 전 유저에게 알림
+        if (response.broadcast) {
+            io.emit('response', response);
+            return;
+        }
+        // 대상 유저에게만 보냄
+        socket.emit('response', [data.handlerId, response]);
+    } catch (err) {
+        console.log(err)
+        socket.emit('connection', {
             status: "fail",
-            message: "Client version not found"
+            message: "Not a valid token"
         });
         return;
     }
-
-    const user = getUser(data.userId)
-    if (!user) {
-        socket.emit('response', {
-            status: "fail",
-            message: "User not found"
-        });
-        return;
-    }
-
-    const handler = handlerMappings[data.handlerId]
-    if (!handler) {
-        socket.emit('response', {
-            status: "fail",
-            message: "Handler not found"
-        })
-        return;
-    }
-
-    const response = handler(data.userId, data.payload)
-
-    // 서버 전 유저에게 알림
-    if (response.broadcast) {
-        io.emit('response', response);
-        return;
-    }
-    // 대상 유저에게만 보냄
-    socket.emit('response', [data.handlerId, response]);
 }

@@ -47,6 +47,16 @@ export class Monster {
       return isDestroyed;
     }
   }
+  // lerp
+  lerp(start, end, t) {
+    return start + (end - start) * t;
+  }
+  // 클라이언트에서 받은 목적지로 부드럽게 이동하는 메서드
+  moveWithLerp(targetX, targetY) {
+    // Lerp를 사용하여 부드럽게 이동
+    this.x = targetX;//this.lerp(this.x, targetX, this.speed);
+    this.y = targetY;//this.lerp(this.y, targetY, this.speed);
+  }
 
   draw(ctx) {
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);

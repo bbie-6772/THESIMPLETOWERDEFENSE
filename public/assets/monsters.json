@@ -1,1 +1,38 @@
-{}
+{
+  "name": "monster",
+  "version": "1.0.0",
+  "data": [
+    {
+      "name": "ant",
+      "health": 100,
+      "speed": 1,
+      "gold": 100,
+      "score": 100,
+      "image": "../assets/images/ant.png"
+    },
+    {
+      "name": "bat",
+      "health": 100,
+      "speed": 1,
+      "gold": 100,
+      "score": 100,
+      "image": "../assets/images/bat.png"
+    },
+    {
+      "name": "bear",
+      "health": 100,
+      "speed": 1,
+      "gold": 100,
+      "score": 100,
+      "image": "../assets/images/bear.png"
+    },
+    {
+      "name": "bettle",
+      "health": 100,
+      "speed": 1,
+      "gold": 100,
+      "score": 100,
+      "image": "../assets/images/bettle.png"
+    }
+  ]
+}

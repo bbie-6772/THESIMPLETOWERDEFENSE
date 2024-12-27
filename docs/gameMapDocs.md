@@ -76,7 +76,6 @@ function drawRotatedImage(image, x, y, width, height, angle) {
 // analysis: 앞선 generateRandomMonsterPath로 만들어진 path 기반으로 캔버스 그리기
 // 이 때, monsterPath에 저장된 순서로 그려짐.
 ```
-
 ```js
 // client: game.js :: 몬스터 경로 근처 무작위 위치 반환
 function getRandomPositionNearPath(maxDistance) {
@@ -104,23 +103,16 @@ function getRandomPositionNearPath(maxDistance) {
 <br>
 
 > #### 계획
+> 
 > 현재 게임모드는 싱글모드와 2인 co-op 모드
 > 싱글 모드일 경우엔, 사각형 맵
 > 2인 co-op 모드의 경우, 두 사각형이 있는 8자형 맵
 >
 > 그리는 함수는 존재하니, 모드에 따른 맵에 대한 몬스터 경로(vertex 기반) 만들기
 
-<br>
+---
 
-> #### 이동 동기화 피드백
-
-프레임 설정 ex. 100ms 로 시작해서 점차 줄여가면서 최적화 시도
-
->> 브로드캐스팅 대신 부하가 좀 생김
->> 프레임을 낮춘다면 뚝뚝 끊김
-
-따라서 클라이언트에서는 보정이 필요
-선형보간 lerp로 이동
-
-1. 프레임 단위로 할것인가
-2. 목적지 단위로 할 것인가
+> #### 1224 회의
+> 
+> 게임 모드 상관없이 동일한 8자 맵
+> 6개 vertex 기반 sequence 저장한 path 생성

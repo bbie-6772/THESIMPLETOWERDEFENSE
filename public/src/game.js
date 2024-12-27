@@ -1,14 +1,25 @@
 import { Base } from "./model/base.js";
 import { Monster } from "./model/monster.js";
-import { Tower } from "./model/tower.js";
-import { sendEvent } from "./init/socket.js";
-
+import { Tower, GetTowerFromCoordinate } from "./model/tower.js";
+import { Button, getButtons, setButton } from "./model/buttons.model.js";
+import { canvasMouseEventinit, drawmousePoint } from "./event/canvasMouseEvent.js";
+import { loadGameAssets } from "./init/assets.js";
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
 
 const canvas = document.getElementById("gameCanvas");
+const debugCanvas = document.getElementById("debugCanvas");
 const ctx = canvas.getContext("2d");
+
+var canvasRect = canvas.getBoundingClientRect();
+var scaleX = canvas.width / canvasRect.width;  // 가로 스케일
+var scaleY = canvas.height / canvasRect.height; // 세로 스케일
+window.addEventListener('resize', () => {
+  canvasRect = canvas.getBoundingClientRect();
+  scaleX = canvas.width / canvasRect.width;  // 가로 스케일
+  scaleY = canvas.height / canvasRect.height; // 세로 스케일
+})
 
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
@@ -17,12 +28,13 @@ let base; // 기지 객체
 let baseHp = 0; // 기지 체력
 
 let towerCost = 0; // 타워 구입 비용
-let numOfInitialTowers = 0; // 초기 타워 개수
+let numOfInitialTowers = 3; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
 
+let gameAssets = null;
 let score = 0; // 게임 점수
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
@@ -118,6 +130,7 @@ function drawRotatedImage(image, x, y, width, height, angle) {
   ctx.restore();
 }
 
+//사용 안함
 function getRandomPositionNearPath(maxDistance) {
   // 타워 배치를 위한 몬스터가 지나가는 경로 상에서 maxDistance 범위 내에서 랜덤한 위치를 반환하는 함수!
   const segmentIndex = Math.floor(Math.random() * (monsterPath.length - 1));
@@ -137,6 +150,13 @@ function getRandomPositionNearPath(maxDistance) {
     x: posX + offsetX,
     y: posY + offsetY,
   };
+}
+function placeInitButtons(){
+  console.log(gameAssets.buttons);
+  gameAssets.buttons.data.forEach(element =>{
+    setButton(new Button(element.text,element.X,element.Y,element.width,element.height,element.marginX,element.marginY));
+
+  });
 }
 
 function placeInitialTowers() {
@@ -188,6 +208,10 @@ function gameLoop() {
   ctx.fillStyle = "black";
   ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
 
+  getButtons().forEach((button)=>{
+    button.draw(ctx);
+  });
+
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
     tower.draw(ctx, towerImage);
@@ -204,6 +228,7 @@ function gameLoop() {
 
   // 몬스터가 공격을 했을 수 있으므로 기지 다시 그리기
   base.draw(ctx, baseImage);
+  drawmousePoint(ctx);
 
   for (let i = monsters.length - 1; i >= 0; i--) {
     const monster = monsters[i];
@@ -224,18 +249,29 @@ function gameLoop() {
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
 
-function initGame() {
+async function initGame() {
   if (isInitGame) {
-    return;
+    //return;
   }
+  gameAssets = await loadGameAssets();
+  console.log(gameAssets);
+  // 몬스터 경로 생성
+  monsterPath = generateRandomMonsterPath(); 
+  // 맵 초기화 (배경, 몬스터 경로 그리기)
+  initMap(); 
+  // 설정된 초기 타워 개수만큼 사전에 타워 배치
+  placeInitialTowers(); 
+  // 기지 배치
+  placeBase(); 
+  // 버튼 배치
+  placeInitButtons();
 
-  monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
-  initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
-  placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
-  placeBase(); // 기지 배치
+  canvasMouseEventinit(canvas);
 
-  setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
-  gameLoop(); // 게임 루프 최초 실행
+  // 설정된 몬스터 생성 주기마다 몬스터 생성
+  setInterval(spawnMonster, monsterSpawnInterval); 
+  // 게임 루프 최초 실행
+  gameLoop(); 
   isInitGame = true;
 }
 

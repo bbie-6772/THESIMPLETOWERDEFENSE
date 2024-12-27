@@ -1,3 +1,13 @@
+var towers = [];
+
+//0,0 좌표의 타워
+const tower0Position = [200, 200];
+// 타워끼리의 거리
+const towersGapX = 200;
+const towersGapY = 200;
+// 블럭과의 거리
+const blockGap = 200;
+
 export class Tower {
   constructor(x, y, cost) {
     // 생성자 안에서 타워들의 속성을 정의한다고 생각하시면 됩니다!
@@ -11,6 +21,7 @@ export class Tower {
     this.cooldown = 0; // 타워 공격 쿨타임
     this.beamDuration = 0; // 타워 광선 지속 시간
     this.target = null; // 타워 광선의 목표
+    towers.push(this);
   }
 
   draw(ctx, towerImage) {
@@ -46,3 +57,16 @@ export class Tower {
     }
   }
 }
+
+export const GetTowerFromCoordinate = (x, y) => {
+  return towers.find((e) => {
+    return e.x > x - e.width && e.x < x && e.y > y - e.height && e.y < y;
+  });
+};
+
+const GetTowerCoordinateFromGrid = (x, y) => {
+  return [
+    tower0Position[0] + x * towersGapX + (x > 1 ? blockGap : 0),
+    tower0Position[1] + y * towersGapY,
+  ];
+};
