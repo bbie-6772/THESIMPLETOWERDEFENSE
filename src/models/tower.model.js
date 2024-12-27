@@ -2,6 +2,14 @@ import { getGameAssets } from "../init/assets.js";
 
 const towers = [];
 
+//0,0 좌표의 타워
+const tower0Position = [200, 200];
+// 타워끼리의 거리
+const towersGapX = 200;
+const towersGapY = 200;
+// 블럭과의 거리
+const blockGap = 200;
+
 const tier_scale_damage = 1;
 const tier_scale_target = 1;
 const tier_scale_range = 1;

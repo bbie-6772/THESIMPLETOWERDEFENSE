@@ -1,0 +1,26 @@
+{
+    "name": "gamebutton",
+    "version": "1.0.0",
+    "data": [
+      {
+        "id": 1,
+        "text": "랜덤타워",
+        "X": 1600,
+        "Y": 900,
+        "width": 180,
+        "height": 90,
+        "marginX": 25,
+        "marginY": 60
+      },
+      {
+        "id": 2,
+        "text": "타워판매",
+        "X": 1600,
+        "Y": 800,
+        "width": 180,
+        "height": 90,
+        "marginX": 25,
+        "marginY": 60
+      }
+    ]
+  }
