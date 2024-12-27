@@ -64,42 +64,70 @@ export const handleDisconnect = (socket, uuid) => {
 }
 
 export const handlerEvent = (io, socket, data) => {
+    try {
+        console.log(data)
+        //클라이언트 버전 확인
+        if (!CLIENT_VERSION.includes(data.clientVersion)) {
+            socket.emit('response', { 
+                status: "fail",
+                message: "Client version not found"
+            });
+            return;
+        }
 
-    console.log(data)
-    //클라이언트 버전 확인
-    if (!CLIENT_VERSION.includes(data.clientVersion)) {
-        socket.emit('response', { 
+        const [tokenType, token] = data.token.split(' ');
+        // token이 비어있거나(없는 경우) tokenType이 Bearer가 아닌경우
+        if (!token || tokenType !== 'Bearer') {
+            socket.emit('connection', {
+                status: "fail",
+                message: "Not a valid account"
+            });
+            return;
+        }
+
+        // 토큰 검증
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        if (data.userId !== decoded.id) {
+            socket.emit('response', {
+                status: "fail",
+                message: "Not valid Id"
+            });
+            return;
+        }
+        const user = getUser(data.userId)
+        if (!user) {
+            socket.emit('response', {
+                status: "fail",
+                message: "User not found"
+            });
+            return;
+        }
+
+        const handler = handlerMappings[data.handlerId]
+        if (!handler) {
+            socket.emit('response', {
+                status : "fail",
+                message: "Handler not found"
+            })
+            return;
+        }
+
+        const response = handler(data.userId, data.payload);
+
+        // 서버 전 유저에게 알림
+        if (response.broadcast) {
+            io.emit('response', response);
+            return;
+        }
+        // 대상 유저에게만 보냄
+        socket.emit('response', [data.handlerId, response]);
+    } catch (err) {
+        console.log(err)
+        socket.emit('connection', {
             status: "fail",
-            message: "Client version not found"
+            message: "Not a valid token"
         });
         return;
     }
-
-    const user = getUser(data.userId)
-    if (!user) {
-        socket.emit('response', {
-            status: "fail",
-            message: "User not found"
-        });
-        return;
-    }
-
-    const handler = handlerMappings[data.handlerId]
-    if (!handler) {
-        socket.emit('response', {
-            status : "fail",
-            message: "Handler not found"
-        })
-        return;
-    }
-
-    const response = handler(data.userId, data.payload);
-
-    // 서버 전 유저에게 알림
-    if (response.broadcast) {
-        io.emit('response', response);
-        return;
-    }
-    // 대상 유저에게만 보냄
-    socket.emit('response', [data.handlerId, response]);
+        
 }
