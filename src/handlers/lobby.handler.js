@@ -1,10 +1,11 @@
 import { addRoom, getRoom, getRooms, joinRoom } from "../models/gameRoom.model.js";
 
-
-export const enterRoom = (userId, payload) => {
+export const enterRoom = (userId, payload, socket) => {
     
-    //방 중복 참여 검증
-    if (getRooms().some((e) => e.userId1 === userId || e.userId2 === userId)) return {
+    console.log(payload?.roomId)
+
+    //방 중복 참여 검증 + 참여한 방 재참가인지 확인
+    if (getRooms().some((e) => (e.userId1 === userId || e.userId2 === userId) && e.gameId !== payload?.roomId )) return {
         status: "fail",
         message: "이미 참여 중인 방이 있습니다!"
     }
@@ -18,14 +19,35 @@ export const enterRoom = (userId, payload) => {
         }
     }
     // 방 생성 시 성공 여부
-    else if (!addRoom(userId, payload.gameName, payload.password, payload.type)) return {
+    else if (!addRoom(userId, payload.gameName, payload.password, payload.type, socket)) return {
         status: "fail", 
         message: "방 생성에 실패하였습니다."
     }
     
-    return { status: "success", room: getRoom(userId) }
+    // 필요없는 값 삭제
+    let room = getRoom(userId)
+    delete room.score
+    delete room.startTime
+    delete room.monsterCount
+    delete room.gameOverTimer
+
+    socket.join(payload.roomId)
+
+    return { status: "success", room: room }
 };
 
 export const loadRoom = () => {
-    return { status: "success", rooms: getRooms() }
+    // 값 변환
+    const rooms = getRooms().map((e) => {
+        return {
+            gameId: e.gameId,
+            gameName: e.gameName,
+            userId1: e.userId1,
+            userId2: e.userId2,
+            difficult: e.difficult,
+            password: e.password ? true : false
+        }
+    })
+
+    return { status: "success", rooms }
 }

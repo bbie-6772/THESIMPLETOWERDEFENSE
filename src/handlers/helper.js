@@ -60,7 +60,6 @@ export const handleConnection = async (socket) => {
         })
 
         //유저와 연결되면 클라이언트에게 인터페이스 용 값 전달
-        socket.emit('connection', [loginUser.id, loginUser.nickname, loginUser.highScoreS, loginUser.highScoreM])
         socket.emit('connection', [loginUser.id, loginUser.nickname, loginUser.highScoreS, loginUser.highScoreM, rooms])
 
     } catch (err) {
@@ -126,7 +125,7 @@ export const handlerEvent = (io, socket, data) => {
             return;
         }
 
-        const response = handler(data.userId, data.payload);
+        const response = handler(data.userId, data.payload, socket);
 
         // 서버 전 유저에게 알림
         if (response.broadcast) {

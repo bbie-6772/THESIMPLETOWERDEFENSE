@@ -58,6 +58,7 @@ export const joinRoom = (gameId, userId) => {
     if (roomIdx === -1) return false     
     // 방이 꽉 차 있는지 확인
     if (gameRooms[roomIdx].userId2) return false
-    else gameRooms[roomIdx].userId2 = userId
+    // 유저 Id가 재 참가가 아닐시 에만 userId2 에 추가
+    else if (gameRooms[roomIdx].userId1 !== userId ) gameRooms[roomIdx].userId2 = userId
     return true
 }
