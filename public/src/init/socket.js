@@ -1,5 +1,6 @@
 import { CLIENT_VERSION } from "./constants.js";
 import { updateRooms } from "../../lobby.js"
+import { updateRoomInfo, updateUser } from "../../room.js";
 
 let userId = null;
 let nickname = null;
@@ -36,10 +37,12 @@ socket.on("response", (data) => {
     console.log(data)
 
     if (data?.status === "fail") return alert(data.message)
-    // 방 생성 핸들러
+    // 방 입장 핸들러
     if (data[0] === 1001 ) {
-        // 방 생성 성공 시 게임 페이지로 이동
-        window.location.href = "game.html";
+        // 방 생성 성공 시 room 페이지로 이동
+        window.location.href = "room.html";
+        updateRoomInfo(data[1].room)
+        updateUser(data[1].room)
     }   
     // 방 로딩 핸들러
     if (data[0] === 1002) {
@@ -51,6 +54,7 @@ socket.on("response", (data) => {
 export const sendEvent = (handlerId, payload) => {
     socket.emit('event', {
         userId,
+        token,
         handlerId,
         clientVersion: CLIENT_VERSION,
         payload

@@ -1,8 +1,8 @@
-import { makeRoom, loadRoom } from "./lobby.handler.js";
+import { enterRoom, loadRoom } from "./lobby.handler.js";
 
 
 const handlerMappings = {
-    1001: makeRoom,
+    1001: enterRoom,
     1002: loadRoom
 };
 
