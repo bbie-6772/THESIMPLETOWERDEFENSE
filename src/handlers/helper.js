@@ -93,7 +93,8 @@ export const handlerEvent = (io, socket, data) => {
         return;
     }
 
-    const response = handler(data.userId, data.payload);
+    // 서버의 클라이언트 전송위해 io 파라미터 추가
+    const response = handler(data.userId, data.payload, io);
 
     // 서버 전 유저에게 알림
     if (response.broadcast) {
