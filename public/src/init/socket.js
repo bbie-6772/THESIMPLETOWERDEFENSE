@@ -67,8 +67,6 @@ export const sendEvent = async (handlerId, payload) => {
             return resolve(true)
         })
 
-
-        
         setTimeout(reject,2000)
     })
     return log
