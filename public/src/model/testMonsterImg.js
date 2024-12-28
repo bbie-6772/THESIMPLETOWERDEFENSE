@@ -16,37 +16,37 @@ const monsterAnimations = {
 // 몬스터 애니메이션 이미지 로드.
 export function loadMonsterImages() {
   // 개미 몬스터 애니메이션 이미지.
-  this.loadImages("ant", 8);
+  loadImages("ant", 8);
 
   // 박쥐 몬스터 애니메이션 이미지.
-  this.loadImages("bat", 3);
+  loadImages("bat", 3);
   
   // 곰 몬스터 애니메이션 이미지.
-  this.loadImages("bear", 4);
+  loadImages("bear", 4);
 
   // 딱정벌래 애미메이션 이미지.
-  this.loadImages("bettle", 4);
+  loadImages("bettle", 4);
 
   // 토끼 몬스터 애니메이션 이미지.
-  this.loadImages("bunny", 3);
+  loadImages("bunny", 3);
 
   // 공룡 몬스터 애니메이션 이미지.
-  this.loadImages("dino", 7);
+  loadImages("dino", 7);
 
   // 개 몬스터 애니메이션 이미지.
-  this.loadImages("dog", 4);
+  loadImages("dog", 4);
 
   // 독수리 몬스터 애니메이션 이미지.
-  this.loadImages("eagle", 4);
+  loadImages("eagle", 4);
 
   // 악어 몬스터 애니메이션 이미지.
-  this.loadImages("gator", 4);
+  loadImages("gator", 4);
 
   // 유령 몬스터 애니메이션 이미지.
-  this.loadImages("ghost", 6);
+  loadImages("ghost", 6);
 
   // 용 몬스터 애니메이션 이미지.
-  this.loadImages("dragon", 9);
+  loadImages("dragon", 9);
 
 }
 
