@@ -203,8 +203,9 @@ function placeBase() {
   base.draw(ctx, baseImage);
 }
 
-function spawnMonster() {
-  monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
+export function spawnMonster(monster) {
+  //monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
+  monsters.push(monster);
 }
 
 function gameLoop() {
@@ -254,6 +255,8 @@ function gameLoop() {
         location.reload();
       }
       monster.draw(ctx);
+      // 이곳에 애니 메이션 추가하자.
+
     } else {
       /* 몬스터가 죽었을 때 */
       monsters.splice(i, 1);
