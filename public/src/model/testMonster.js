@@ -13,7 +13,12 @@ export class TestMonster {
     // 이미지
     this.width = 80; // 몬스터 이미지 가로 길이
     this.height = 80; // 몬스터 이미지 세로 길이
-    this.animation = monsterAnimations[this.name]; // 몬스터 애니메이션
+
+    // 애니메이션
+    this.animation = monsterAnimations; // 몬스터 애니메이션
+    this.currentFrame = 0;  // 현재 프레임
+    this.frameTime = 0;     // 프레임 변경 주기
+    this.animationSpeed = 5; // 애니메이션 속도 (프레임마다 몇 번에 하나씩 변경)
     
     // 몬스터 정보
     this.uuid = data.uuid
@@ -61,9 +66,25 @@ export class TestMonster {
     this.y = targetY;//this.lerp(this.y, targetY, this.speed);
   }
 
+  updateAnimation(){
+    this.frameTime++;
+
+    if(this.frameTime >= this.animationSpeed) {
+      this.frameTime = 0;
+      this.currentFrame++;
+
+      // 현재프레임이 애니메이션 크기보다 크다면 현재프레임으로 0으로 만든다.
+      if(this.currentFrame >= this.animation.length){
+        this.currentFrame = 0;
+      }
+    }
+  }
+
 
   draw(ctx) {
-    ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    const width = this.animation[this.currentFrame].width * 2;
+    const height = this.animation[this.currentFrame].height * 2;
+    ctx.drawImage(this.animation[this.currentFrame], this.x, this.y, width, height);
     ctx.font = "12px Arial";
     ctx.fillStyle = "white";
     ctx.fillText(

@@ -71,13 +71,6 @@
       "speed": 2,
       "gold": 100,
       "score": 100
-    },
-    {
-      "name": "dragon",
-      "health": 100,
-      "speed": 2,
-      "gold": 100,
-      "score": 100
     }
   ]
 }

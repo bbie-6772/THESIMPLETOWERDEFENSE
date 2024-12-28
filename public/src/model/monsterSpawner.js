@@ -10,7 +10,7 @@ export default class Monsters {
 
     // 변수
     this.path = [];
-    this.data = {};
+    this.info = {};
     this.wave = 1;
 
     // 메시지 연결
@@ -50,31 +50,42 @@ export default class Monsters {
     });
   }
 
-  // 정보 가져오기 - 테스트입니다
-  infoMessage() {
-    this.socket.emit("monsterInfoMessage", {
-      message: {
-        gameId: this.gameId,
-      },
-    });
-  }
-
   // 서버 -> 클라 메세지.
   receiveMonsterMessage() {
     this.socket.on(this.gameId, (data) => {
+      
       // 몬스터 스폰.
       if (data.message.eventName === "spawnMonster") {
-        const data = data.message.info;
-        const monsterAnimation = GetMonsterAnimation(data.name);
-        const test = new TestMonster(this.path, monsterAnimation, data, this.wave);
-        spawnMonster(test);
 
-        // 정보 - 테스트입니다 지울예정
-        if (data.message.eventName === "monsterInfoMessage") {
-          this.data = Object.keys(data.message.data).length !== 0 ? data.message.data : {};
-          this.wave = this.data.wave;
-        }
+        const monsterInfo = data.message.info;
+        const monsterAnimation = GetMonsterAnimation(monsterInfo.name);
+        const test = new TestMonster(
+          this.path,
+          monsterAnimation,
+          monsterInfo,
+          this.wave,
+        );
+        spawnMonster(test);
       }
     });
+
+    this.socket.on("monsterInfoMessage", (data) => {
+      this.info =
+        Object.keys( data.info).length !== 0
+          ? data.info
+          : {};
+      this.wave = this.info.wave;
+
+    });
+
+
+    // 핑퐁
+    this.socket.on("respawnPing", () => {
+      this.socket.emit("respawnPong"); // 서버에게 pong 전송
+    });
+  }
+
+  getInfo(){
+    return this.info;
   }
 }

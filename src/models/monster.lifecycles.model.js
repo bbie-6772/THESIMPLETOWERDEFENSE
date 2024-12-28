@@ -47,7 +47,7 @@ export default class MonsterLifecycles {
       kills: 0,
       score: 0,
       gold: 0,
-      wave: 0,
+      wave: 1,
     };
 
     // 정보 데이터 생성.
@@ -76,7 +76,6 @@ export default class MonsterLifecycles {
       if (!this.isMonsterSpawnActive) {
         //// 4. 스폰 카운터가 0 이거나 서버 연결이 중지 된다면 종료한다.
         if (this.spawnCount <= 0 || this.pingPong === 0) {
-          console.log("리스폰을 종료합니다!");
           this.terminateRespawn();
           return;
         }
@@ -88,7 +87,7 @@ export default class MonsterLifecycles {
         const uuid = uuidv4(); // 몬스터 마다 uuid 생성.
 
         // 6-1. 몬스터 랜덤 지정 (json 파일에 저장 되어있는 정보를 가져온다).
-        const monsterList = this.monstersAssets();
+        const monsterList = this.monstersAssets;
         const monsterListLengtht = Object.keys(monsterList).length;
         const randomIdex = Math.floor(Math.random() * monsterListLengtht);
 
@@ -122,12 +121,12 @@ export default class MonsterLifecycles {
 
         //// 9. 정보 업데이트
         this.spawnCount--; // 스폰 카운터 (조건용.)
-        this.info.totalCount += 1; // 토탈 카운터 (표시용.)
+        const {totalCount} = this.monsterStorage.getInfo(this.eventName);
 
         //// 10. monsterStorage 추가/ 업데이트
         this.monsterStorage.addMonster(this.eventName, uuid, monsterInfo);
         this.monsterStorage.updateInfo(this.eventName, {
-          totalCount: this.info.totalCount,
+          totalCount: totalCount + 1,
         });
 
 
@@ -139,8 +138,7 @@ export default class MonsterLifecycles {
           const monstersSize = Object.keys(this.monsterStorage.getMonsters(this.eventName)).length;
           const roomSize = Object.keys(this.monsterStorage.test()).length;
           
-          console.log(`[${this.eventName}]번방 몬스터가 생성되었습니다.`);
-          console.log(`rooms : [${roomSize}] / monsters : [${monstersSize}]`)
+          console.log(`[${this.eventName}]번방 몬스터가 생성되었습니다. (rooms : [${roomSize}] / monsters : [${monstersSize}])`);
 
         }, 2000); // 2초마다 한번만 메시지 전송
       }
@@ -153,7 +151,6 @@ export default class MonsterLifecycles {
 
     this.socket.on("respawnPong", () => {
       this.pingPong = this.pingPongCount; // 클라이언트 응답 받으면 카운트 리셋
-      console.log("클라이언트 응답 받음!");
     });
 
     const interval = setInterval(() => {
@@ -171,9 +168,13 @@ export default class MonsterLifecycles {
   //====[리스폰 종료 처리]====//
   terminateRespawn() {
     clearInterval(this.spawnInterval);
-    this.spawnInterval = null;
-    console.log("응답 없음. 리스폰 종료.");
-    this.socket.emit("respawnFailed", `응답이 없어 [${this.eventName}]번 방 리스폰을 종료합니다.`);
+    this.spawnInterval = null;    
+    this.monsterStorage.removeInfo(this.eventName);
+    this.monsterStorage.removeMonsters(this.eventName);
+
+    const roomSize = Object.keys(this.monsterStorage.test()).length;
+    console.log(`응답이 없어 [${this.eventName}]번 방 리스폰을 종료합니다. (rooms : [${roomSize}])`);
+  
   }
 
   //====[몬스터 체력 업데이트]====// 
@@ -204,6 +205,11 @@ export default class MonsterLifecycles {
   removeMonster(monster) {
     if (monster.stat.health <= 0) {
 
+      const monsterScore = monster.score;
+      const monstergoid = monster.gold;
+
+      
+
       // 몬스터 삭제.
       this.monsterStorage.removeMonster(this.eventName, monster.uuid);
 
@@ -211,23 +217,20 @@ export default class MonsterLifecycles {
       const { kills, score, gold, wave } = this.monsterStorage.getInfo(this.eventName);
       const aliveCount = Object.keys(this.monsterStorage.getMonsters(this.eventName)).length;
 
-      this.info.gold += gold * wave;
-      this.info.score += score * wave;
-      this.info.kills = kills + 1;
-      this.info.aliveCount = aliveCount;
-      
       // 정보 업데이트.
       this.monsterStorage.updateInfo(this.eventName, {
-        aliveCount: this.info.aliveCount,
-        kills: this.info.kills,
-        score: this.info.score,
-        gold: this.info.gold,
+        aliveCount: aliveCount,
+        kills: kills + 1,
+        score: score + (monsterScore * wave),
+        gold: gold  + (monstergoid * wave),
+      });
+
+      this.socket.emit("monsterInfoMessage", {
+        info: this.monsterStorage.getInfo(this.eventName),
       });
 
       // 콘솔로그
-      const roomSize = Object.keys(this.monsterStorage.test()).length;
-      console.log(`[${this.eventName}]번방 몬스터가 생성되었습니다.`);
-      console.log(`rooms : [${roomSize}] / monsters : [${aliveCount}]`)    
+      console.log(`[${this.eventName}]번방 몬스터가 제거되었습니다.`);
     }
   }
 

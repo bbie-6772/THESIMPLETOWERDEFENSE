@@ -4,6 +4,10 @@ import { Tower, GetTowerFromCoordinate } from "./model/tower.js";
 import { Button, getButtons, setButton } from "./model/buttons.model.js";
 import { canvasMouseEventinit, drawmousePoint } from "./event/canvasMouseEvent.js";
 import { loadGameAssets } from "./init/assets.js";
+
+import {} from "./init/socket.js"
+import Monsters from "./model/monsterSpawner.js";
+import {loadMonsterImages, GetMonsterAnimation} from "./model/monsterAnimations.model.js"
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
@@ -52,28 +56,7 @@ baseImage.src = "../assets/images/base.png";
 const pathImage = new Image();
 pathImage.src = "../assets/images/path.png";
 
-const monsterImages = [];
 
-const img01 = new Image();
-const img02 = new Image();
-const img03 = new Image();
-const img04 = new Image();
-
-img01.src = "../assets/images/ant.png";
-img02.src = "../assets/images/bat.png";
-img03.src = "../assets/images/bear.png";
-img04.src = "../assets/images/bettle.png";
-
-monsterImages.push(img01);
-monsterImages.push(img02);
-monsterImages.push(img03);
-monsterImages.push(img04);
-
-// for (let i = 1; i <= NUM_OF_MONSTERS; i++) {
-//   const img = new Image();
-//   img.src = `../assets/images/monster${i}.png`;
-//   monsterImages.push(img);
-// }
 
 let monsterPath;
 
@@ -115,7 +98,10 @@ function drawPath() {
   const imageHeight = 60; // 몬스터 경로 이미지 높이
   const gap = 5; // 몬스터 경로 이미지 겹침 방지를 위한 간격
 
-  for (let i = 0; i < monsterPath.length - 1; i++) {
+  //console.log(monsterPath);
+  const test = monsterPath.length;
+
+  for (let i = 0; i < test - 1; i++) {
     const startX = monsterPath[i].x;
     const startY = monsterPath[i].y;
     const endX = monsterPath[i + 1].x;
@@ -211,7 +197,33 @@ export function spawnMonster(monster) {
 function gameLoop() {
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
-  drawPath(monsterPath); // 경로 다시 그리기
+  
+
+  // monsterPath가 존재하고 유효한 경우에만 경로를 그리기
+  if (Array.isArray(monsterPath) && monsterPath.length > 0) {
+    drawPath(); // 경로 다시 그리기
+  } else {
+    console.warn("monsterPath가 유효하지 않습니다.");
+  }
+
+  console.log(Object.keys(Monsters.getInstance().getInfo()).length);
+
+  // 점수 바꾸자 
+  if(Object.keys(Monsters.getInstance().getInfo()).length !== 0){
+    score = Monsters.getInstance().getInfo().score;
+    userGold = Monsters.getInstance().getInfo().gold;
+    monsterLevel = Monsters.getInstance().getInfo().wave;
+    console.log(Monsters.getInstance().getInfo().score);
+  }
+  
+
+  /**
+   * 
+   * score: 0,
+      gold: 0,
+      wave: 0,
+   * 
+   */
 
   ctx.font = "25px Times New Roman";
   ctx.fillStyle = "skyblue";
@@ -245,21 +257,27 @@ function gameLoop() {
   base.draw(ctx, baseImage);
   drawmousePoint(ctx);
 
-  for (let i = monsters.length - 1; i >= 0; i--) {
-    const monster = monsters[i];
-    if (monster.hp > 0) {
-      const isDestroyed = monster.move(base);
-      if (isDestroyed) {
-        /* 게임 오버 */
-        alert("게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ");
-        location.reload();
+  // 리스폰되기전에 돌던문제.
+  // 배열, 길이가 0 이상일때만 반복문 도는것을 허용.
+  if(Array.isArray(monsters) && monsters.length > 0){
+    for (let i = monsters.length - 1; i >= 0; i--) {
+      const monster = monsters[i];
+      if (monster.hp > 0) {
+        const isDestroyed = monster.move(base);
+        if (isDestroyed) {
+          /* 게임 오버 */
+          alert("게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ");
+          location.reload();
+        }
+  
+        monster.draw(ctx);
+        // 이곳에 애니 메이션 추가하자.
+        monster.updateAnimation();
+  
+      } else {
+        /* 몬스터가 죽었을 때 */
+        monsters.splice(i, 1);
       }
-      monster.draw(ctx);
-      // 이곳에 애니 메이션 추가하자.
-
-    } else {
-      /* 몬스터가 죽었을 때 */
-      monsters.splice(i, 1);
     }
   }
 
@@ -285,12 +303,33 @@ async function initGame() {
 
   canvasMouseEventinit(canvas);
 
+  // 몬스터 추가
+  Monsters.getInstance().initialization(monsterPath);
+  Monsters.getInstance().sendMonsterMessage(monsterPath[0].x, monsterPath[0].y);
+
   // 설정된 몬스터 생성 주기마다 몬스터 생성
-  setInterval(spawnMonster, monsterSpawnInterval); 
+  // setInterval(spawnMonster, monsterSpawnInterval); 
   // 게임 루프 최초 실행
+  
   gameLoop(); 
   isInitGame = true;
 }
+
+
+// 테스트
+loadMonsterImages();
+
+// 애니메이션 
+const ant  = GetMonsterAnimation("ant");
+const bat  = GetMonsterAnimation("bat");
+const bear  = GetMonsterAnimation("bear");
+const bettle  = GetMonsterAnimation("bettle");
+const bunny  = GetMonsterAnimation("bunny");
+const dino  = GetMonsterAnimation("dino");
+const dog  = GetMonsterAnimation("dog");
+const eagle  = GetMonsterAnimation("eagle");
+const gator  = GetMonsterAnimation("gator");
+const ghost  = GetMonsterAnimation("ghost");
 
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
@@ -298,7 +337,34 @@ Promise.all([
   new Promise((resolve) => (towerImage.onload = resolve)),
   new Promise((resolve) => (baseImage.onload = resolve)),
   new Promise((resolve) => (pathImage.onload = resolve)),
-  ...monsterImages.map(
+  ...ant.map(
+    (img) => new Promise((resolve) => (img.onload = resolve))
+  ),
+  ...bat.map(
+    (img) => new Promise((resolve) => (img.onload = resolve))
+  ),
+  ...bear.map(
+    (img) => new Promise((resolve) => (img.onload = resolve))
+  ),
+  ...bettle.map(
+    (img) => new Promise((resolve) => (img.onload = resolve))
+  ),
+  ...bunny.map(
+    (img) => new Promise((resolve) => (img.onload = resolve))
+  ),
+  ...dino.map(
+    (img) => new Promise((resolve) => (img.onload = resolve))
+  ),
+  ...dog.map(
+    (img) => new Promise((resolve) => (img.onload = resolve))
+  ),
+  ...eagle.map(
+    (img) => new Promise((resolve) => (img.onload = resolve))
+  ),
+  ...gator.map(
+    (img) => new Promise((resolve) => (img.onload = resolve))
+  ),
+  ...ghost.map(
     (img) => new Promise((resolve) => (img.onload = resolve))
   ),
 ])
@@ -317,6 +383,6 @@ buyTowerButton.style.cursor = "pointer";
 buyTowerButton.addEventListener("click", placeNewTower);
 document.body.appendChild(buyTowerButton);
 
-requestAnimationFrame(gameLoop)
+//requestAnimationFrame(gameLoop)
 
 

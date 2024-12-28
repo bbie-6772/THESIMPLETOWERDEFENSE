@@ -10,7 +10,6 @@ const monsterAnimations = {
   eagle: [],
   gator: [],
   ghost: [],
-  dragon: [],
 };
 
 // 몬스터 애니메이션 이미지 로드.
@@ -45,8 +44,6 @@ export function loadMonsterImages() {
   // 유령 몬스터 애니메이션 이미지.
   loadImages("ghost", 6);
 
-  // 용 몬스터 애니메이션 이미지.
-  loadImages("dragon", 9);
 
 }
 
@@ -95,10 +92,6 @@ function loadImages(name, frame) {
       case "ghost":
         img.src = `../../assets/images/monsters/ghost/ghost-${i}.png`
         monsterAnimations.ghost.push(img);
-        break;
-      case "dragon":
-        img.src = `../../assets/images/monsters/bose.dragon/dragon-${i}.png`
-        monsterAnimations.dragon.push(img);
         break;
     }
   }
