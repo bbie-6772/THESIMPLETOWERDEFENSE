@@ -1,5 +1,3 @@
-//import {generateBox} from '../testGame.js'
-import {spawnMonster, A, B, C} from '../game.js'
 export default class Monsters {
   constructor(socket,gameId) {
     // 소캣 연결
@@ -18,7 +16,6 @@ export default class Monsters {
   static getInstance = (socket = null, gameId = null) => {
     if (!Monsters.instance) {
       Monsters.instance = new Monsters(socket, gameId);
-      console.log("생성");
     }
     return Monsters.instance;
   };
@@ -71,9 +68,6 @@ export default class Monsters {
         
         const index = data.message.info.uuid;
         this.monsters[index] = data.message.info;
-
-        // 테스트용 - 테스트입니다 지울예정
-        spawnMonster(A(),B(),C(), index);
 
       }
 
