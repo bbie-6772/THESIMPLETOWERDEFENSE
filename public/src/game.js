@@ -21,7 +21,7 @@ window.addEventListener('resize', () => {
   scaleY = canvas.height / canvasRect.height; // 세로 스케일
 })
 
-const NUM_OF_MONSTERS = 5; // 몬스터 개수
+const NUM_OF_MONSTERS = 4; // 몬스터 개수
 
 let userGold = 0; // 유저 골드
 let base; // 기지 객체
@@ -53,11 +53,27 @@ const pathImage = new Image();
 pathImage.src = "../assets/images/path.png";
 
 const monsterImages = [];
-for (let i = 1; i <= NUM_OF_MONSTERS; i++) {
-  const img = new Image();
-  img.src = `../assets/images/monster${i}.png`;
-  monsterImages.push(img);
-}
+
+const img01 = new Image();
+const img02 = new Image();
+const img03 = new Image();
+const img04 = new Image();
+
+img01.src = "../assets/images/ant.png";
+img02.src = "../assets/images/bat.png";
+img03.src = "../assets/images/bear.png";
+img04.src = "../assets/images/bettle.png";
+
+monsterImages.push(img01);
+monsterImages.push(img02);
+monsterImages.push(img03);
+monsterImages.push(img04);
+
+// for (let i = 1; i <= NUM_OF_MONSTERS; i++) {
+//   const img = new Image();
+//   img.src = `../assets/images/monster${i}.png`;
+//   monsterImages.push(img);
+// }
 
 let monsterPath;
 
@@ -68,14 +84,12 @@ function generateRandomMonsterPath() {
 
   path.push({ x: currentX, y: currentY });
 
-  while (currentX < canvas.width) {
-    currentX += Math.floor(Math.random() * 100) + 50; // 50 ~ 150 범위의 x 증가
-    // x 좌표에 대한 clamp 처리
-    if (currentX > canvas.width) {
-      currentX = canvas.width;
-    }
+  const stepX = canvas.width / 8; // 8개의 패스를 만들기 위해 X축을 8등분
 
+  for (let i = 1; i <= 8; i++) {
+    currentX = i * stepX; // 각 패스의 X 좌표를 균등하게 증가시킴
     currentY += Math.floor(Math.random() * 200) - 100; // -100 ~ 100 범위의 y 변경
+
     // y 좌표에 대한 clamp 처리
     if (currentY < 0) {
       currentY = 0;
