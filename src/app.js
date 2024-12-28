@@ -4,11 +4,15 @@ import initSocket from "./init/socket.js";
 import { loadGameAssets } from "./init/assets.js";
 import userRouter from "./routes/user.router.js";
 import cors from 'cors'
+import MonsterStorage from "./models/monsterStorage.model.js"
 
 const app = express();
 const server = createServer(app);
 
 const PORT = 3000;
+
+// MonsterStorage 인스턴스 연결.
+MonsterStorage.getInstance();
 
 app.use(cors({
   origin: "*",
