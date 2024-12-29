@@ -1,6 +1,6 @@
 import { TestMonster } from "./testMonster.js";
 import { GetMonsterAnimation } from "./monsterAnimations.model.js";
-import { spawnMonster } from "../game.js";
+import { spawnMonster, deleteMonster } from "../game.js";
 
 export default class Monsters {
   constructor(socket, gameId) {
@@ -53,10 +53,8 @@ export default class Monsters {
   // 서버 -> 클라 메세지.
   receiveMonsterMessage() {
     this.socket.on(this.gameId, (data) => {
-      
       // 몬스터 스폰.
       if (data.message.eventName === "spawnMonster") {
-
         const monsterInfo = data.message.info;
         const monsterAnimation = GetMonsterAnimation(monsterInfo.name);
         const test = new TestMonster(
@@ -67,25 +65,35 @@ export default class Monsters {
         );
         spawnMonster(test);
       }
+
+      // 몬스터 삭제
+      this.socket.on(this.gameId, (data) => {
+        if (data.message.eventName === "deleteMonster") {
+          deleteMonster(data.message.monster);
+        }
+      });
+
+      // 핑퐁
+      this.socket.on(this.gameId, (data) => {
+        if (data.message.eventName === "respawnPing") {
+          this.socket.emit(this.gameId, {
+            message: { eventName: "respawnPong" },
+          });
+        }
+      });
+
+      // 정보
+      this.socket.on(this.gameId, (data) => {
+        if (data.message.eventName === "monsterInfoMessage") {
+          this.info = Object.keys(data.message.info).length !== 0 ? data.message.info : {};
+          this.wave = this.info.wave;
+        }
+      });
     });
 
-    this.socket.on("monsterInfoMessage", (data) => {
-      this.info =
-        Object.keys( data.info).length !== 0
-          ? data.info
-          : {};
-      this.wave = this.info.wave;
-
-    });
-
-
-    // 핑퐁
-    this.socket.on("respawnPing", () => {
-      this.socket.emit("respawnPong"); // 서버에게 pong 전송
-    });
   }
 
-  getInfo(){
+  getInfo() {
     return this.info;
   }
 }

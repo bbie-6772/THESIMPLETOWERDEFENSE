@@ -109,6 +109,10 @@ export default class MonsterStorage {
 
   // 데이터 조회(단일 몬스터) - 특정 게임의 특정 몬스터 데이터를 가져옵니다.
   getMonster(id, monsterUuid) {
+    if(!this.monsters[id]) {
+      return; 
+    }
+
     // 찾는 데이터가 존재하지않는다면
     if (!this.monsters[id][monsterUuid]) {
       console.log("데이터가 존재하지 않습니다.");

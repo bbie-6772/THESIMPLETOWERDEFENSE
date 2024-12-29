@@ -11,7 +11,7 @@ const registerHandler = (io) => {
     handleConnection(socket);
 
     // 테스트용도.
-    const monsterLifecycles = new MonsterLifecycles(io, socket);
+    //const monsterLifecycles = new MonsterLifecycles(io, socket);
     receiveMonsterMessage(io, socket);
 
     // '이벤트' 발생 시 맵핑 실행

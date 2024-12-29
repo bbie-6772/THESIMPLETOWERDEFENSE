@@ -39,7 +39,7 @@ export default class MonsterLifecycles {
     this.eventName = data.message.gameId;
     this.spawnCount = 0;
     this.x = data.message.x;
-    this.t = data.message.y;
+    this.y = data.message.y;
 
     const info = {
       totalCount: 0,
@@ -149,12 +149,23 @@ export default class MonsterLifecycles {
   sendRespawnPing() {
     this.pingPong = this.pingPongCount;
 
-    this.socket.on("respawnPong", () => {
-      this.pingPong = this.pingPongCount; // 클라이언트 응답 받으면 카운트 리셋
-    });
+    // this.socket.on("respawnPong", () => {
+    //   this.pingPong = this.pingPongCount; // 클라이언트 응답 받으면 카운트 리셋
+    // });
+
+    this.socket.on(this.eventName, (data) => {
+      if(data.message.eventName === "respawnPong") {
+        
+        this.pingPong = this.pingPongCount; // 클라이언트 응답 받으면 카운트 리셋
+      }
+    })
 
     const interval = setInterval(() => {
-      this.socket.emit("respawnPing"); // 클라이언트에게 ping 전송
+      //this.socket.emit("respawnPing"); // 클라이언트에게 ping 전송
+
+      this.io.emit(this.eventName, {
+        message: { eventName: "respawnPing" }
+      }); // 클라이언트에게 ping 전송
 
       if (this.pingPong > 0) {
         this.pingPong--; // 응답 대기 중이면 카운트 감소
@@ -179,6 +190,7 @@ export default class MonsterLifecycles {
 
   //====[몬스터 체력 업데이트]====// 
   updateMonsterHealth(monsterUuid, data) {
+
     let monster = this.monsterStorage.getMonster(this.eventName, monsterUuid);
 
     // 몬스터 유효성 검사.
@@ -208,7 +220,13 @@ export default class MonsterLifecycles {
       const monsterScore = monster.score;
       const monstergoid = monster.gold;
 
-      
+      // 싱글이면 상관없지만 멀티 모드일때 다른유저에게 삭제요청.
+      this.io.emit(this.eventName, {
+        message: { 
+          eventName: "deleteMonster",
+          monster: monster.uuid 
+        }
+      }); // 클라이언트에게 ping 전송
 
       // 몬스터 삭제.
       this.monsterStorage.removeMonster(this.eventName, monster.uuid);
@@ -225,10 +243,14 @@ export default class MonsterLifecycles {
         gold: gold  + (monstergoid * wave),
       });
 
-      this.socket.emit("monsterInfoMessage", {
-        info: this.monsterStorage.getInfo(this.eventName),
-      });
-
+      // 정보 클라에 전송.
+      this.io.emit(this.eventName, {
+        message: { 
+          eventName: "monsterInfoMessage",
+          info: this.monsterStorage.getInfo(this.eventName)
+        }
+      }); 
+      
       // 콘솔로그
       console.log(`[${this.eventName}]번방 몬스터가 제거되었습니다.`);
     }

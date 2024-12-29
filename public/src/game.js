@@ -194,6 +194,13 @@ export function spawnMonster(monster) {
   monsters.push(monster);
 }
 
+export function deleteMonster(uuid) {
+  const index = monsters.findIndex(obj => obj.uuid === uuid);
+  if (index !== -1) {
+    monsters.splice(index, 1); // 해당 인덱스의 객체를 삭제
+  }
+}
+
 function gameLoop() {
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
@@ -206,24 +213,16 @@ function gameLoop() {
     console.warn("monsterPath가 유효하지 않습니다.");
   }
 
-  console.log(Object.keys(Monsters.getInstance().getInfo()).length);
 
   // 점수 바꾸자 
   if(Object.keys(Monsters.getInstance().getInfo()).length !== 0){
     score = Monsters.getInstance().getInfo().score;
     userGold = Monsters.getInstance().getInfo().gold;
     monsterLevel = Monsters.getInstance().getInfo().wave;
-    console.log(Monsters.getInstance().getInfo().score);
   }
   
 
-  /**
-   * 
-   * score: 0,
-      gold: 0,
-      wave: 0,
-   * 
-   */
+ 
 
   ctx.font = "25px Times New Roman";
   ctx.fillStyle = "skyblue";

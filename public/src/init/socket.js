@@ -41,7 +41,7 @@ socket.on("response", (data) => {
 
 // 테스트
 const randomInt = Math.floor(Math.random() * 101);
-Monsters.getInstance(socket, "randomInt");
+Monsters.getInstance(socket, randomInt);
 
 // // 클라이언트에서 총합적으로 server에 보내주는걸 관리
 // export const sendEvent = async (handlerId, payload) => {
