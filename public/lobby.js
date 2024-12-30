@@ -14,6 +14,7 @@ let selectedRoomDetails = null;
 let confirmRoomSelection = null;
 let refreshButton = null;
 let gameFrame = null;
+let singlePlayButton = null;
 
 let roomName = null;
 let roomType = null;
@@ -46,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     confirmRoomSelection = document.getElementById('confirmRoomSelection');
     refreshButton = document.getElementById('refreshButton');
     gameFrame = document.getElementById('gameFrame')
+    singlePlayButton = document.getElementById('singlePlayButton')
 
     roomName = document.getElementById('roomName')
     roomType = document.getElementById('roomType')
@@ -137,6 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 준비 완료, 시작 이벤트
     playButton.addEventListener('click', function () {
         ready(roomId)
+    });
+
+    // 싱글 플레이 이벤트
+    singlePlayButton.addEventListener('click', function () {
+        gameStart()
     });
 
     // 강퇴 이벤트
