@@ -38,6 +38,7 @@ export const loadRoom = () => {
             gameName: e.gameName,
             userId1: e.userId1,
             userId2: e.userId2,
+            startTime: e.startTime,
             difficult: e.difficult,
             password: e.password ? true : false
         }

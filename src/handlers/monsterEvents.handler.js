@@ -18,7 +18,4 @@ export const receiveMonsterMessage = (io, socket) => {
     monsters.updateMonsterHealth(data.uuid, data.damage);
   });
 
-  
-
-
 };

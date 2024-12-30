@@ -106,6 +106,7 @@ export const handleConnection = async (socket) => {
                 userId1: e.userId1,
                 userId2: e.userId2,
                 difficult: e.difficult,
+                startTime: e.startTime,
                 password: e.password ? true : false
             }
         })
@@ -132,7 +133,7 @@ export const ready = (io, socket, data) => {
     // 기본 검증
     if (!Auth(data)) return
 
-    const status = gameReady(data.roomId, data.userId)
+    const status = gameReady(data.roomId, data.userId, data.single)
     
     switch (status) {
         case false:

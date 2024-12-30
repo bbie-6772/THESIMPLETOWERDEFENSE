@@ -64,7 +64,7 @@ export const joinRoom = (gameId, userId) => {
     return true
 }
 
-export const gameReady = (gameId, userId) => {
+export const gameReady = (gameId, userId, single) => {
     const roomIdx = gameRooms.findIndex((e) => e.gameId === gameId)
     // 방이 서버에 있는 확인
     if (roomIdx === -1) return false
@@ -74,7 +74,10 @@ export const gameReady = (gameId, userId) => {
         gameRooms[roomIdx].ready = !gameRooms[roomIdx].ready
         return "ready"
     // 호스트의 시작이 성공했을 경우
-    } else if (gameRooms[roomIdx].userId1 === userId && gameRooms[roomIdx].ready) return "start"
+    } else if ((gameRooms[roomIdx].userId1 === userId && gameRooms[roomIdx].ready) || single) {
+        gameRooms[roomIdx].startTime = Date.now();
+        return "start"
+    }
 
     return "notReady"
 }
