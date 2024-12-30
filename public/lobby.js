@@ -1,4 +1,7 @@
 import { sendEvent, ready } from "./src/init/socket.js"
+//import Monsters from "./src/model/monsterSpawner.js";
+//import { getSocket, getRoom } from "./src/init/socket.js";
+//import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 let rooms = [];
 let selectedRoom = null;
@@ -139,11 +142,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // 준비 완료, 시작 이벤트
     playButton.addEventListener('click', function () {
         ready(roomId)
+        console.log(roomId);
     });
 
     // 싱글 플레이 이벤트
     singlePlayButton.addEventListener('click', function () {
         gameStart()
+        //Monsters.getInstance(getSocket(),"test");
     });
 
     // 강퇴 이벤트
