@@ -1,6 +1,6 @@
-import towerModel from "../models/tower.model";
+import towerModel from "../models/tower.model.js";
 
-// 타워 합성 핸들러
+// 타워 합성 핸들러, handlerID : 3001
 export const TowerMerge = (uuid, payload) => {
     const { x1, y1, x2, y2 } = payload;
 
@@ -14,6 +14,7 @@ export const TowerMerge = (uuid, payload) => {
     return response;
 }
 
+// 타워 강화 핸들러, handlerID : 3002
 export const TowerUpgrade = (uuid, payload) => {
     const { towerId } = payload;
 

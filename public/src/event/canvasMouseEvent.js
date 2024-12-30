@@ -1,5 +1,6 @@
 import { GetTowerFromCoordinate } from "../model/tower.js";
 import { getButtons } from "../model/buttons.model.js";
+import { sendEvent } from "../init/socket.js";
 
 //마우스 이벤트 초기 설정
 export const canvasMouseEventinit = (canvas) => {
@@ -19,6 +20,9 @@ let mousePosition = [0, 0];
 const Canvas = document.getElementById("gameCanvas");
 const ctx = Canvas.getContext("2d");
 const canvasRect = Canvas.getBoundingClientRect();
+
+// 타워 선택 정보
+var currentTower = null;
 
 //클릭 함수(디버그 캔버스에 그림 그리는중)
 function handleClick(event) {
@@ -61,10 +65,33 @@ function handleMousedown(event) {
       }
     }
   }
+
+  const scaleX = Canvas.width / canvasRect.width; // 가로 스케일
+  const scaleY = Canvas.height / canvasRect.height; // 세로 스케일
+
+  var x = (event.clientX - canvasRect.left) * scaleX;
+  var y = (event.clientY - canvasRect.top) * scaleY;
+  currentTower = GetTowerFromCoordinate(x, y);
+  if(currentTower){
+    isHolding = true;
+  }
 }
 //마우스 버튼을 땐 경우
 function handleMouseup(event) {
   if ("button" in holdingicon) {
+  }
+
+  // 타워가 선택된 경우, 마우스를 뗀 곳에서 합성
+  if(isHolding && currentTower){
+    const scaleX = Canvas.width / canvasRect.width; // 가로 스케일
+    const scaleY = Canvas.height / canvasRect.height; // 세로 스케일
+    
+    var x = (event.clientX - canvasRect.left) * scaleX;
+    var y = (event.clientY - canvasRect.top) * scaleY;
+    var targetTower = GetTowerFromCoordinate(x, y);
+
+    // { oneID, otherID }
+    sendEvent(3001, { oneID : currentTower.oid, otherID : targetTower.oid});
   }
   isHolding = false;
   holdingicon = {};
