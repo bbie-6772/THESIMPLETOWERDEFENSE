@@ -88,12 +88,13 @@ export const sendEvent = async (handlerId, payload) => {
 };
 
 // 준비 신호
-export const ready = (roomId) => {
+export const ready = (roomId, single) => {
     socket.emit("ready", {
         userId,
         token,
         clientVersion: CLIENT_VERSION,
-        roomId
+        roomId,
+        single
     })
 }
 

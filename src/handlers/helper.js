@@ -133,7 +133,7 @@ export const ready = (io, socket, data) => {
     // 기본 검증
     if (!Auth(data)) return
 
-    const status = gameReady(data.roomId, data.userId)
+    const status = gameReady(data.roomId, data.userId, data.single)
     
     switch (status) {
         case false:
