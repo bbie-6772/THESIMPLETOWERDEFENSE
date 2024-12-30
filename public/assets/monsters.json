@@ -5,34 +5,72 @@
     {
       "name": "ant",
       "health": 100,
-      "speed": 1,
+      "speed": 2,
       "gold": 100,
-      "score": 100,
-      "image": "../assets/images/ant.png"
+      "score": 100
     },
     {
       "name": "bat",
       "health": 100,
-      "speed": 1,
+      "speed": 2,
       "gold": 100,
-      "score": 100,
-      "image": "../assets/images/bat.png"
+      "score": 100
     },
     {
       "name": "bear",
       "health": 100,
-      "speed": 1,
+      "speed": 2,
       "gold": 100,
-      "score": 100,
-      "image": "../assets/images/bear.png"
+      "score": 100
     },
     {
       "name": "bettle",
       "health": 100,
-      "speed": 1,
+      "speed": 2,
       "gold": 100,
-      "score": 100,
-      "image": "../assets/images/bettle.png"
+      "score": 100
+    },
+    {
+      "name": "bunny",
+      "health": 100,
+      "speed": 2,
+      "gold": 100,
+      "score": 100
+    },
+    {
+      "name": "dino",
+      "health": 100,
+      "speed": 2,
+      "gold": 100,
+      "score": 100
+    },
+    {
+      "name": "dog",
+      "health": 100,
+      "speed": 2,
+      "gold": 100,
+      "score": 100
+    },
+    {
+      "name": "eagle",
+      "health": 100,
+      "speed": 2,
+      "gold": 100,
+      "score": 100
+    },
+    {
+      "name": "gator",
+      "health": 100,
+      "speed": 2,
+      "gold": 100,
+      "score": 100
+    },
+    {
+      "name": "ghost",
+      "health": 100,
+      "speed": 2,
+      "gold": 100,
+      "score": 100
     }
   ]
 }

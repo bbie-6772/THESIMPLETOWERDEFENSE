@@ -1,3 +1,5 @@
+import Monsters from "./monsterSpawner.js";
+
 var towers = [];
 
 
@@ -39,6 +41,8 @@ export class Tower {
       this.cooldown = 180; // 3초 쿨타임 (초당 60프레임)
       this.beamDuration = 30; // 광선 지속 시간 (0.5초)
       this.target = monster; // 광선의 목표 설정
+
+      Monsters.getInstance().sendMonsterDamageMessage(monster.uuid, this.attackPower);
     }
   }
 
