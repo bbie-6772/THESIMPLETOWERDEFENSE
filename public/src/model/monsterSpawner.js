@@ -1,6 +1,6 @@
 import { TestMonster } from "./testMonster.js";
 import { GetMonsterAnimation } from "./monsterAnimations.model.js";
-//import { spawnMonster, deleteMonster } from "../game.js";
+// import { spawnMonster, deleteMonster } from "../game.js";
 
 export default class Monsters {
   constructor(socket, gameId) {
@@ -32,16 +32,16 @@ export default class Monsters {
 
   // 필요한 시점에만 동적으로 import() 하여 로딩
   // 모듈을 동적으로 불러오는 메소드
-  async loadGameModule() {
-    console.log("와주세요..");
-    // 이미 로드된 경우, 다시 로드하지 않음
-    if (!this.spawnMonster || !this.deleteMonster) {
-      const module = await import("../game.js");
-      this.spawnMonster = module.spawnMonster;
-      this.deleteMonster = module.deleteMonster;
-      console.log("Game module dynamically loaded!");
-    }
-  }
+  // async loadGameModule() {
+  //   console.log("와주세요..");
+  //   // 이미 로드된 경우, 다시 로드하지 않음
+  //   if (!this.spawnMonster || !this.deleteMonster) {
+  //     const module = await import("../game.js");
+  //     this.spawnMonster = module.spawnMonster;
+  //     this.deleteMonster = module.deleteMonster;
+  //     console.log("Game module dynamically loaded!");
+  //   }
+  // }
 
   // 초기화
   async initialization() {
@@ -58,9 +58,6 @@ export default class Monsters {
 
       console.log( this.info.path);
     });
-
-    // 한번만 임포트.
-    await this.loadGameModule();
   }
 
   // 패스 가져오기
@@ -90,7 +87,7 @@ export default class Monsters {
           monsterInfo,
           this.wave,
         );
-        this.spawnMonster(test);
+        spawnMonster(test);
       }
 
       // 몬스터 삭제

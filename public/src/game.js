@@ -298,13 +298,8 @@ async function initGame() {
     //return;
   }
 
-  try {
-    Monsters.getInstance(getSocket(),"getRoom()");
-    await Monsters.getInstance().initialization();
-    console.log('Game initialized');
-  } catch (error) {
-    console.log('Error initializing game:', error);
-  }
+  Monsters.getInstance(getSocket(), "getRoom()");
+  Monsters.getInstance().initialization();
 
   gameAssets = await loadGameAssets();
   console.log(gameAssets);
