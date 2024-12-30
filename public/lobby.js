@@ -17,7 +17,6 @@ let selectedRoomDetails = null;
 let confirmRoomSelection = null;
 let refreshButton = null;
 let gameFrame = null;
-let singlePlayButton = null;
 
 let roomName = null;
 let roomType = null;
@@ -50,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
     confirmRoomSelection = document.getElementById('confirmRoomSelection');
     refreshButton = document.getElementById('refreshButton');
     gameFrame = document.getElementById('gameFrame')
-    singlePlayButton = document.getElementById('singlePlayButton')
 
     roomName = document.getElementById('roomName')
     roomType = document.getElementById('roomType')
@@ -130,14 +128,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log("비번있음")
             }
             
-            if (await sendEvent(1001, { roomId: selectedRoom.id })) {
-                alert(`${selectedRoom.name}방으로 입장합니다`);
-
+            if (await sendEvent(1001, { roomId: selectedRoom.gameId })) {
+                alert(`${selectedRoom.gameName}방으로 입장합니다`);
+                roomId = selectedRoom.gameId
                 roomSelectionModal.hide();
 
                 waitRoomName.append(name);
                 waitRoomType.append(type);
                 waitRoomPassword.append(password);
+                
 
                 waitRoom.show()
             }
@@ -150,12 +149,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 강퇴 이벤트
-    kickButton.addEventListener('click', function () {
+    kickButton.addEventListener('click', async function () {
+        await sendEvent(1004, { roomId })
     });
 
     // 나가기 이벤트
-    exitButton.addEventListener('click', function () {
-        waitRoom.hide()
+    exitButton.addEventListener('click', async function () {
+        await sendEvent(1003, {roomId})
     });
 
 })
@@ -206,13 +206,13 @@ function selectRoom(room) {
     });
 
     // 선택된 카드에 selected 클래스 추가  
-    const selectedCard = document.querySelector(`.room-card[data-room-id="${room.id}"]`);
+    const selectedCard = document.querySelector(`.room-card[data-room-id="${room.gameId}"]`);
     selectedCard.classList.add('selected');
 
     // 모달에 방 정보 표시  
     selectedRoomDetails.innerHTML = `  
-            <p><strong>방 이름:</strong> ${selectedRoom.name}</p>  
-            <p><strong>난이도: </strong> ${getRoomTypeLabel(selectedRoom.type)}</p>  
+            <p><strong>방 이름:</strong> ${selectedRoom.gameName}</p>  
+            <p><strong>난이도: </strong> ${getRoomTypeLabel(selectedRoom.difficult)}</p>  
             <p><strong>인원:</strong> ${room.userId2 ? 2 : 1} / 2명</p>  
             `;
 
@@ -230,10 +230,24 @@ export const updateRoomInfo = (roomInfo) => {
 
 // 대기방 유저 업데이트 함수
 export const updateUser = (roomInfo) => {
-    host.innerText = roomInfo.userId1
-    entry.innerText = roomInfo.userId2 || "비어 있음"
+    if(roomInfo) {
+        host.innerText = roomInfo.userId1
+        entry.innerText = roomInfo.userId2 || "비어 있음"
+    } else {
+
+    }
 }
 
+// 대기방 나가기
+export const exitRoom = () => {
+    selectedRoom = null
+    roomId = null
+    waitRoom.hide()
+    // 방 대기열 요청
+    sendEvent(1002);
+}
+
+// 대기열 방 업데이트
 export const updateRooms = (roomsInfo) => {
     rooms = []
     if(Array.isArray(roomsInfo)){
@@ -242,6 +256,7 @@ export const updateRooms = (roomsInfo) => {
     renderRooms()
 }
 
+// 게임 시작 
 export const gameStart = () => {
     waitRoom.hide()
     import("./src/game.js")
