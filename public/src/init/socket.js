@@ -1,8 +1,10 @@
 import { CLIENT_VERSION } from "./constants.js";
 import { updateRooms, updateRoomInfo, updateUser, gameStart } from "../../lobby.js"
-import Monsters from "../model/monsterSpawner.js";
 
 let userId = null;
+let nickname = null;
+let highScoreS = null;
+let highScoreM = null;
 let room = null;
 
 const token = localStorage.getItem("access-Token")
@@ -48,33 +50,43 @@ socket.on('room', (data) => {
 
 // 테스트
 const randomInt = Math.floor(Math.random() * 101);
-Monsters.getInstance(socket, randomInt);
 
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
 export const sendEvent = async (handlerId, payload) => {
 
-    const loadError = setTimeout(() => {
-        alert("서버와 연결이 원할하지 않습니다")
-        return reject(false)
-    }, 2000)
+    const log = await new Promise((resolve, reject) => {
 
-    socket.once('response', (data) => {
-        if (data[1]?.status === "fail") {
-            alert(data[1].message)
+        socket.emit('event', {
+            userId,
+            token,
+            handlerId,
+            clientVersion: CLIENT_VERSION,
+            payload
+        });
+        
+        const loadError = setTimeout(() => {
+            alert("서버와 연결이 원할하지 않습니다")
+            return reject(false)
+        }, 2000)
+
+        socket.once('response', (data) => {
+            if (data[1]?.status === "fail") {
+                alert(data[1].message)
+                clearTimeout(loadError)
+                return resolve(false)
+            }
+            // 방 입장 핸들러
+            if (data[0] === 1001) {
+                updateRoomInfo(data[1].room)
+                updateUser(data[1].room)
+            }
+            // 방 로딩 핸들러
+            if (data[0] === 1002) {
+                updateRooms(data[1].rooms)
+            }
             clearTimeout(loadError)
-            return resolve(false)
-        }
-        // 방 입장 핸들러
-        if (data[0] === 1001) {
-            updateRoomInfo(data[1].room)
-            updateUser(data[1].room)
-        }
-        // 방 로딩 핸들러
-        if (data[0] === 1002) {
-            updateRooms(data[1].rooms)
-        }
-        clearTimeout(loadError)
-        return resolve(true)
+            return resolve(true)
+        })
     })
     return log
 };

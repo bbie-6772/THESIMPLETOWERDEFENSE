@@ -5,7 +5,6 @@ import { Button, getButtons, setButton } from "./model/buttons.model.js";
 import { canvasMouseEventinit, drawmousePoint } from "./event/canvasMouseEvent.js";
 import { loadGameAssets } from "./init/assets.js";
 
-import {} from "./init/socket.js"
 import Monsters from "./model/monsterSpawner.js";
 import {loadMonsterImages, GetMonsterAnimation} from "./model/monsterAnimations.model.js"
 /* 
