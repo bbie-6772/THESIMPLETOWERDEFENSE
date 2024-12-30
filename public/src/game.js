@@ -38,7 +38,7 @@ let towerCost = 0; // 타워 구입 비용
 let numOfInitialTowers = 3; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
-const monsters = [];
+let monsters = [];
 const towers = [];
 
 let gameAssets = null;
@@ -199,22 +199,10 @@ function placeBase() {
   base.draw(ctx, baseImage);
 }
 
-export function spawnMonster(monster) {
-  //monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
-  monsters.push(monster);
-}
-
-export function deleteMonster(uuid) {
-  const index = monsters.findIndex(obj => obj.uuid === uuid);
-  if (index !== -1) {
-    monsters.splice(index, 1); // 해당 인덱스의 객체를 삭제
-  }
-}
-
 function gameLoop() {
+  monsters = Monsters.getInstance().getMonsters()
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
-  
 
   // monsterPath가 존재하고 유효한 경우에만 경로를 그리기
   if (Array.isArray(monsterPath) && monsterPath.length > 0) {
@@ -230,9 +218,6 @@ function gameLoop() {
   //   userGold = Monsters.getInstance().getInfo().gold;
   //   monsterLevel = Monsters.getInstance().getInfo().wave;
   // }
-  
-
- 
 
   ctx.font = "25px Times New Roman";
   ctx.fillStyle = "skyblue";
@@ -334,7 +319,6 @@ async function initGame() {
   gameLoop();
   isInitGame = true;
 }
-
 
 // 테스트
 loadMonsterImages();
