@@ -159,15 +159,16 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderRooms() {
     roomList.innerHTML = '';
     rooms.forEach(room => {
+        console.log(room)
         const roomCard = document.createElement('div');
         roomCard.className = 'col-md-4 mb-3';
         roomCard.innerHTML = `  
-                <div class="card room-card" data-room-id="${room.id}">  
+                <div class="card room-card" data-room-id="${room.gameId}">  
                     <div class="card-body">  
-                        <h3 class="card-title">${room.name}</h5>  
+                        <h3 class="card-title">${room.gameName}</h5>  
                         <p class="card-text">  
-                            난이도: ${getRoomTypeLabel(room.type)}<br>  
-                            인원: ${room.userId2 ? 2 : 1} / ${!room.userId2 && room.startTime > 0 ? 1 : 2} 명<br>
+                            난이도: ${getRoomTypeLabel(room.difficult)}<br>  
+                            인원: ${room.userId2 ? 2 : 1} / ${room.userId2 === null && room.startTime > 0 ? 1 : 2} 명<br>
                             상태: ${room.startTime > 0 ? "진행중" : "대기중"}
                         </p>  
                     </div>  
@@ -231,12 +232,7 @@ export const updateUser = (roomInfo) => {
 export const updateRooms = (roomsInfo) => {
     rooms = []
     if(Array.isArray(roomsInfo)){
-        roomsInfo.forEach((e) => rooms.push({
-            id: e.gameId,
-            name: e.gameName,
-            type: e.difficult,
-            password: e.password ? true : false
-        }))
+        roomsInfo.forEach((e) => rooms.push(e))
     }
     renderRooms()
 }
