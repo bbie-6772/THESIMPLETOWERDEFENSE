@@ -130,8 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log("비번있음")
             }
             
-            if (await sendEvent(1001, { roomId: selectedRoom.id })) {
-                alert(`${selectedRoom.name}방으로 입장합니다`);
+            if (await sendEvent(1001, { roomId: selectedRoom.gameId })) {
+                alert(`${selectedRoom.gameName}방으로 입장합니다`);
 
                 roomSelectionModal.hide();
 
@@ -207,13 +207,13 @@ function selectRoom(room) {
     });
 
     // 선택된 카드에 selected 클래스 추가  
-    const selectedCard = document.querySelector(`.room-card[data-room-id="${room.id}"]`);
+    const selectedCard = document.querySelector(`.room-card[data-room-id="${room.gameId}"]`);
     selectedCard.classList.add('selected');
 
     // 모달에 방 정보 표시  
     selectedRoomDetails.innerHTML = `  
-            <p><strong>방 이름:</strong> ${selectedRoom.name}</p>  
-            <p><strong>난이도: </strong> ${getRoomTypeLabel(selectedRoom.type)}</p>  
+            <p><strong>방 이름:</strong> ${selectedRoom.gameName}</p>  
+            <p><strong>난이도: </strong> ${getRoomTypeLabel(selectedRoom.difficult)}</p>  
             <p><strong>인원:</strong> ${room.userId2 ? 2 : 1} / 2명</p>  
             `;
 
