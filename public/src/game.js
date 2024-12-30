@@ -5,8 +5,9 @@ import { Button, getButtons, setButton } from "./model/buttons.model.js";
 import { canvasMouseEventinit, drawmousePoint } from "./event/canvasMouseEvent.js";
 import { loadGameAssets } from "./init/assets.js";
 
-import Monsters from "./model/monsterSpawner.js";
+// import Monsters from "./model/monsterSpawner.js";
 import {loadMonsterImages, GetMonsterAnimation} from "./model/monsterAnimations.model.js"
+import { tmpGeneratePath } from "./utils/client.pathGenerator.js";
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
@@ -214,11 +215,11 @@ function gameLoop() {
 
 
   // 점수 바꾸자 
-  if(Object.keys(Monsters.getInstance().getInfo()).length !== 0){
-    score = Monsters.getInstance().getInfo().score;
-    userGold = Monsters.getInstance().getInfo().gold;
-    monsterLevel = Monsters.getInstance().getInfo().wave;
-  }
+  // if(Object.keys(Monsters.getInstance().getInfo()).length !== 0){
+  //   score = Monsters.getInstance().getInfo().score;
+  //   userGold = Monsters.getInstance().getInfo().gold;
+  //   monsterLevel = Monsters.getInstance().getInfo().wave;
+  // }
   
 
  
@@ -289,7 +290,7 @@ async function initGame() {
   gameAssets = await loadGameAssets();
   console.log(gameAssets);
   // 몬스터 경로 생성
-  monsterPath = generateRandomMonsterPath(); 
+  monsterPath = tmpGeneratePath();//generateRandomMonsterPath(); 
   // 맵 초기화 (배경, 몬스터 경로 그리기)
   initMap(); 
   // 설정된 초기 타워 개수만큼 사전에 타워 배치
@@ -302,8 +303,8 @@ async function initGame() {
   canvasMouseEventinit(canvas);
 
   // 몬스터 추가
-  Monsters.getInstance().initialization(monsterPath);
-  Monsters.getInstance().sendMonsterMessage(monsterPath[0].x, monsterPath[0].y);
+  // Monsters.getInstance().initialization(monsterPath);
+  // Monsters.getInstance().sendMonsterMessage(monsterPath[0].x, monsterPath[0].y);
 
   // 설정된 몬스터 생성 주기마다 몬스터 생성
   // setInterval(spawnMonster, monsterSpawnInterval); 

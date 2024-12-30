@@ -294,6 +294,10 @@ export class Monster {
             return isDestroyed;
         }
     }
+
+    getStunned(duration = 500){
+        
+    }
 }
 
 
