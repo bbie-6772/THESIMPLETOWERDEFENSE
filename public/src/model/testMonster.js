@@ -13,6 +13,7 @@ export class TestMonster {
     // 이미지
     this.width = 80; // 몬스터 이미지 가로 길이
     this.height = 80; // 몬스터 이미지 세로 길이
+    this.isFlipped = false; 
 
     // 애니메이션
     this.animation = monsterAnimations; // 몬스터 애니메이션
@@ -29,6 +30,7 @@ export class TestMonster {
     this.hp = this.maxHp; // 몬스터의 현재 HP
     this.attackPower = 10 + 1 * level; // 몬스터의 공격력 (기지에 가해지는 데미지)
 
+
   }
 
   move(base) {
@@ -36,6 +38,10 @@ export class TestMonster {
       const nextPoint = this.path[this.currentIndex + 1];
       const deltaX = nextPoint.x - this.x;
       const deltaY = nextPoint.y - this.y;
+      
+      // 좌우 반전 상태 결정
+      this.isFlipped = deltaX < 0; // deltaX가 음수면 왼쪽으로 이동 중이므로 반전
+      
       // 2차원 좌표계에서 두 점 사이의 거리를 구할 땐 피타고라스 정리를 활용하면 됩니다! a^2 = b^2 + c^2니까 루트를 씌워주면 되죠!
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
@@ -84,6 +90,16 @@ export class TestMonster {
   draw(ctx) {
     const width = this.animation[this.currentFrame].width * 2;
     const height = this.animation[this.currentFrame].height * 2;
+
+    ctx.save(); // 캔버스 상태 저장
+
+    // 좌우 반전 처리
+    if (this.isFlipped) {
+      ctx.translate(this.x + width / 2, this.y + height / 2); // 중심으로 이동
+      ctx.scale(-1, 1); // X축 반전
+      ctx.translate(-this.x - width / 2, -this.y - height / 2); // 원래 위치로 복귀
+  }
+
     ctx.drawImage(this.animation[this.currentFrame], this.x, this.y, width, height);
     ctx.font = "12px Arial";
     ctx.fillStyle = "white";
@@ -92,7 +108,9 @@ export class TestMonster {
       this.x,
       this.y - 5
     );
+
+    ctx.restore(); // 캔버스 상태 복구
   }
 
-
+  
 }

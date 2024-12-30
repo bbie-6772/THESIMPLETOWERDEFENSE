@@ -283,7 +283,7 @@ async function initGame() {
     //return;
   }
 
-  Monsters.getInstance(getSocket(), "getRoom()");
+  Monsters.getInstance(getSocket(), getRoom());
   Monsters.getInstance().initialization();
 
   gameAssets = await loadGameAssets();
