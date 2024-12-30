@@ -1,5 +1,4 @@
 import { CLIENT_VERSION } from "./constants.js";
-
 import {
   updateRooms,
   updateRoomInfo,
@@ -42,14 +41,22 @@ socket.once("connection", (data) => {
   }
 });
 
-socket.on("response", (data) => {});
+socket.on("response", (data) => {
+  //타워 배치
+  if (data.handlerId == "towerPlacement") {
+    console.log("서버로부터 수신된 타워배치 데이터:", data.data.toString());
+  }
+});
 
 socket.on("ready", (data) => {
-    alert(data.message)
-    if (data.status === "start") gameStart()
-})
+  alert(data.message);
+  if (data.status === "start") gameStart();
+});
 
-
+socket.on("room", (data) => {
+  console.log(data);
+  updateUser(data.room);
+});
 
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
 export const sendEvent = async (handlerId, payload) => {
