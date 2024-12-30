@@ -90,7 +90,7 @@ export default class Monsters {
           monsterInfo,
           this.wave,
         );
-        spawnMonster(test);
+        this.spawnMonster(test);
       }
 
       // 몬스터 삭제

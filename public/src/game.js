@@ -2,10 +2,7 @@ import { Base } from "./model/base.js";
 import { Monster } from "./model/monster.js";
 import { Tower, GetTowerFromCoordinate } from "./model/tower.js";
 import { Button, getButtons, setButton } from "./model/buttons.model.js";
-import {
-  canvasMouseEventinit,
-  drawmousePoint,
-} from "./event/canvasMouseEvent.js";
+import { canvasMouseEventinit, drawmousePoint } from "./event/canvasMouseEvent.js";
 import { loadGameAssets } from "./init/assets.js";
 import { getSocket, getRoom } from "./init/socket.js";
 import Monsters from "./model/monsterSpawner.js";
@@ -61,8 +58,6 @@ baseImage.src = "../assets/images/base.png";
 
 const pathImage = new Image();
 pathImage.src = "../assets/images/path.png";
-
-
 
 let monsterPath;
 
