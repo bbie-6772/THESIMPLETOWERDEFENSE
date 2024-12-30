@@ -10,6 +10,7 @@ const currentChannelHeader = document.getElementById('currentChannel'); // 현�
 // 채널 목록 요청
 socket.emit('getChannels');
 
+
 // 채널 목록 수신
 socket.on('channelList', (channels) => {
     channelListDiv.innerHTML = ''; // 채널 목록 초기화

@@ -19,6 +19,8 @@ body {
     overflow-y: auto; /* 세로 스크롤 가능 */
 }
 
+
+
 .channels-list h2 {
     margin-top: 0; /* 상단 여백 제거 */
     padding-bottom: 10px; /* 하단 패딩 설정 */

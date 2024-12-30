@@ -20,6 +20,7 @@ export class ChatChannel {
         return message; // 추가된 메시지 반환
     }
 
+
     // 사용자 추가
     addUser(userId) {
         this.users.add(userId); // Set에 사용자 ID 추가
