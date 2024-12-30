@@ -129,7 +129,7 @@ export const merge = (uuid, x1, y1, x2, y2) => {
   addTower(uuid, x2, y2, randomTower, newtier);
 
   // 생성된 타워에 대한 정보를 반환한다(클라이언트에 전달해야함)
-  return { randomTower, newtier, x2, y2 };
+  return { uuid: uuid, type: randomTower, tier: newtier, x: x2, y: y2 };
 }
 
 export const upgrade = (uuid, towerId) => {
