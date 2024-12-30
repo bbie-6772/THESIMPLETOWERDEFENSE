@@ -1,7 +1,8 @@
-import { sendEvent } from "./src/init/socket.js"
+import { sendEvent, ready } from "./src/init/socket.js"
 
 let rooms = [];
 let selectedRoom = null;
+let roomId = null;
 
 let roomCreationForm = null;
 let enableCheckbox = null;
@@ -11,8 +12,9 @@ let roomList = null;
 let roomSelectionModal = null;
 let selectedRoomDetails = null;
 let confirmRoomSelection = null;
-let createButton = null;
 let refreshButton = null;
+let gameFrame = null;
+let singlePlayButton = null;
 
 let roomName = null;
 let roomType = null;
@@ -43,8 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
     roomSelectionModal = new bootstrap.Modal(document.getElementById('roomSelectionModal'));
     selectedRoomDetails = document.getElementById('selectedRoomDetails');
     confirmRoomSelection = document.getElementById('confirmRoomSelection');
-    createButton = document.getElementById('playButton');
     refreshButton = document.getElementById('refreshButton');
+    gameFrame = document.getElementById('gameFrame')
+    singlePlayButton = document.getElementById('singlePlayButton')
 
     roomName = document.getElementById('roomName')
     roomType = document.getElementById('roomType')
@@ -81,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         e.preventDefault();
 
-        // 방 생성, 참가 요청 실패 시 기존 방으로
+        // 방 생성 성공 여부 확인 후 연결
         if (await sendEvent(1001, { gameName: roomName.value, type: roomType.value, password: passwordInput.value })) {
             
             waitRoomName.append(name);
@@ -93,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         this.reset();
     });
 
+    // 새로고침 버튼
     refreshButton.addEventListener("click", function () {
         // 버튼 비활성화  
         this.disabled = true;
@@ -109,6 +113,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 방 선택 후 확인버튼 이벤트  
     confirmRoomSelection.addEventListener('click', async function () {
         if (selectedRoom) {
+            waitRoomName = document.getElementById('waitRoomName')
+            waitRoomType = document.getElementById('waitRoomType')
+            waitRoomPassword = document.getElementById('waitRoomPassword')
+
             // 비밀번호가 있는 방일 시,
             if (selectedRoom.password){
                 console.log("비번있음")
@@ -130,6 +138,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 준비 완료, 시작 이벤트
     playButton.addEventListener('click', function () {
+        ready(roomId)
+    });
+
+    // 싱글 플레이 이벤트
+    singlePlayButton.addEventListener('click', function () {
+        gameStart()
     });
 
     // 강퇴 이벤트
@@ -138,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 나가기 이벤트
     exitButton.addEventListener('click', function () {
+        waitRoom.hide()
     });
 
 })
@@ -200,6 +215,7 @@ function selectRoom(room) {
 
 // 대기방 업데이트 함수  
 export const updateRoomInfo = (roomInfo) => {
+    roomId = roomInfo.gameId
     // 방 정보 업데이트
     name.innerText = roomInfo.gameName
     type.innerText = getRoomTypeLabel(roomInfo.difficult)
@@ -208,7 +224,6 @@ export const updateRoomInfo = (roomInfo) => {
 
 // 대기방 유저 업데이트 함수
 export const updateUser = (roomInfo) => {
-    console.log(roomInfo)
     host.innerText = roomInfo.userId1
     entry.innerText = roomInfo.userId2 || "비어 있음"
 }
@@ -226,6 +241,10 @@ export const updateRooms = (roomsInfo) => {
     renderRooms()
 }
 
-
-
-
+export const gameStart = () => {
+    waitRoom.hide()
+    gameFrame.innerHTML = `
+        <iframe src="game.html" width="100%" height="100%"></iframe>
+    `
+    gameFrame.style.display = "block"
+}
