@@ -141,15 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 준비 완료, 시작 이벤트
     playButton.addEventListener('click', function () {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        ready(roomId)
-=======
         ready(roomId, false)
->>>>>>> Stashed changes
-=======
-        ready(roomId, false)
->>>>>>> Stashed changes
     });
 
     // 강퇴 이벤트

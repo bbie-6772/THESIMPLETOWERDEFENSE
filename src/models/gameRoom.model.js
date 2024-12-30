@@ -74,7 +74,11 @@ export const gameReady = (gameId, userId, single) => {
         gameRooms[roomIdx].ready = !gameRooms[roomIdx].ready
         return "ready"
     // 호스트의 시작이 성공했을 경우
-    } else if ((gameRooms[roomIdx].userId1 === userId && gameRooms[roomIdx].ready) || single) return "start"
+    } else if ((gameRooms[roomIdx].userId1 === userId && gameRooms[roomIdx].ready) || single) {
+        gameRooms[roomIdx].startTime = 
+        return "start"
+    }
+
 
     return "notReady"
 }
