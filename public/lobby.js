@@ -84,15 +84,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         e.preventDefault();
 
+        const button = e.submitter.name;
+
         // 방 생성 성공 여부 확인 후 연결
         if (await sendEvent(1001, { gameName: roomName.value, type: roomType.value, password: passwordInput.value })) {
-            
-            waitRoomName.append(name);
-            waitRoomType.append(type);
-            waitRoomPassword.append(password);
-
-            waitRoom.show()
+            // 방 생성 시
+            if (button === "createRoom"){
+                waitRoomName.append(name);
+                waitRoomType.append(type);
+                waitRoomPassword.append(password);
+                waitRoom.show()
+            // 싱글 플레이 시
+            } else if (button === "singlePlay") ready(roomId, true)
         }
+
         this.reset();
     });
 
@@ -138,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 준비 완료, 시작 이벤트
     playButton.addEventListener('click', function () {
-        ready(roomId)
+        ready(roomId, false)
     });
 
     // 싱글 플레이 이벤트
@@ -169,12 +174,14 @@ function renderRooms() {
                         <h3 class="card-title">${room.name}</h5>  
                         <p class="card-text">  
                             난이도: ${getRoomTypeLabel(room.type)}<br>  
-                            인원: 1/2명  
+                            인원: ${room.userId2 ? 2 : 1} / ${!room.userId2 && room.startTime > 0 ? 1 : 2} 명<br>
+                            상태: ${room.startTime > 0 ? "진행중" : "대기중"}
                         </p>  
                     </div>  
                 </div>  
             `;
-        roomCard.addEventListener('click', () => selectRoom(room));
+        // 게임이 실행중이지 않을 때만 선택 가능
+        roomCard.addEventListener('click', () => {if(room.startTime === 0) selectRoom(room)});
         roomList.appendChild(roomCard);
     });
 }
@@ -207,7 +214,7 @@ function selectRoom(room) {
     selectedRoomDetails.innerHTML = `  
             <p><strong>방 이름:</strong> ${selectedRoom.name}</p>  
             <p><strong>난이도: </strong> ${getRoomTypeLabel(selectedRoom.type)}</p>  
-            <p><strong>최대 인원:</strong> 2명</p>  
+            <p><strong>인원:</strong> ${room.userId2 ? 2 : 1} / 2명</p>  
             `;
 
     roomSelectionModal.show();

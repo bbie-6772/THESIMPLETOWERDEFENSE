@@ -99,14 +99,15 @@ export const sendEvent = async (handlerId, payload) => {
 };
 
 // 준비 신호
-export const ready = (roomId) => {
-  socket.emit("ready", {
-    userId,
-    token,
-    clientVersion: CLIENT_VERSION,
-    roomId,
-  });
-};
+export const ready = (roomId, single) => {
+    socket.emit("ready", {
+        userId,
+        token,
+        clientVersion: CLIENT_VERSION,
+        roomId,
+        single
+    })
+}
 
 export const getRoom = () => {
   return room;
