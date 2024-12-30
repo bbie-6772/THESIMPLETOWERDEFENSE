@@ -51,11 +51,11 @@ export class Monster {
   lerp(start, end, t) {
     return start + (end - start) * t;
   }
-  // 클라이언트에서 받은 목적지로 부드럽게 이동하는 메서드
-  moveWithLerp(targetX, targetY) {
-    // Lerp를 사용하여 부드럽게 이동
-    this.x = targetX;//this.lerp(this.x, targetX, this.speed);
-    this.y = targetY;//this.lerp(this.y, targetY, this.speed);
+  // 클라-서버 차이로 인해 부드럽게 lerp로 조정
+  moveWithLerp(targetX, targetY, deltaTime) {
+    const tmp = Math.min(deltaTime * this.speed, 1);
+    this.x = this.lerp(this.x, targetX, tmp);
+    this.y = this.lerp(this.y, targetY, tmp);
   }
 
   draw(ctx) {
