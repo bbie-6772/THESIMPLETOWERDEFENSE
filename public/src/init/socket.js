@@ -4,6 +4,7 @@ import {
   updateRoomInfo,
   updateUser,
   gameStart,
+  exitRoom,
 } from "../../lobby.js";
 import Monsters from "../model/monsterSpawner.js";
 
@@ -11,7 +12,6 @@ let userId = null;
 let nickname = null;
 let highScoreS = null;
 let highScoreM = null;
-let room = null;
 
 const token = localStorage.getItem("access-Token");
 // 로그인이 안되어있을 시 로그인 창으로
@@ -54,13 +54,19 @@ socket.on("ready", (data) => {
 });
 
 socket.on("room", (data) => {
-  console.log(data);
   updateUser(data.room);
 });
+
+// 방이 파괴되었을 시 
+socket.on('leaveRoom',(data) => {
+  exitRoom()
+  socket.emit('leaveRoom',{ roomId: data.roomId })
+})
 
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
 export const sendEvent = async (handlerId, payload) => {
   const log = await new Promise((resolve, reject) => {
+    console.log("보냄")
     socket.emit("event", {
       userId,
       token,
@@ -84,11 +90,14 @@ export const sendEvent = async (handlerId, payload) => {
       if (data[0] === 1001) {
         updateRoomInfo(data[1].room);
         updateUser(data[1].room);
-      }
       // 방 로딩 핸들러
-      if (data[0] === 1002) {
+      } else if (data[0] === 1002) {
         updateRooms(data[1].rooms);
+      // 방 나가기 핸들러
+      } else if (data[0] === 1003) {
+        exitRoom()
       }
+
       clearTimeout(loadError);
       return resolve(true);
     });
@@ -111,6 +120,3 @@ export const getSocket = () => {
   return socket;
 };
 
-export const getRoom = () => {
-  return room;
-};

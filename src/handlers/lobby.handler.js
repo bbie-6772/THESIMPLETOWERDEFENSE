@@ -30,14 +30,18 @@ export const enterRoom = (userId, payload, socket) => {
     return { status: "success", room: room }
 };
 
-export const exitRoom = (userId, payload, socket) => {
-    if(leaveRoom(payload.roomId, userId)) {
-        let room = getRoom(userId)
-        if (room) socket.leave(payload.roomId)
-        else io.leave(payload.roomId)
+export const exitRoom = (userId, payload, socket, io) => {
+    const room = leaveRoom(payload.roomId, userId)
+    console.log(room)
+    if (room) {
         // 업뎃 정보 공유
-        socket.to(room.gameId).emit('room', { room })
-    }
+        socket.to(payload.roomId).emit('room', { room })
+        // 참가자가 나갔을 시 참가자만 제외
+        socket.leave(payload.roomId)
+    // 호스트가 나갈 시 인원 전부 삭제하도록 요구
+    } else io.to(payload.roomId).emit('leaveRoom', { roomId: payload.roomId })
+
+    return { status: "success" }
 }
 
 export const loadRoom = () => {

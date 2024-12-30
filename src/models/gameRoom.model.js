@@ -45,14 +45,6 @@ export const getRooms = () => {
     return gameRooms
 }
 
-export const deleteRoom  = (userId) => {
-    // 유저가 호스트일 경우에만 파기
-    const roomIdx = gameRooms.findIndex((e) => e.userId1 === userId)
-    if (roomIdx === -1) return false        
-    gameRooms.splice(roomIdx, 1) 
-    return true
-}
-
 export const joinRoom = (gameId, userId) => {
     const roomIdx = gameRooms.findIndex((e) => e.gameId === gameId)
     // 방이 서버에 있는 확인
@@ -75,7 +67,8 @@ export const leaveRoom = (gameId, userId) => {
     } else if (gameRooms[roomIdx].userId2 === userId) {
         gameRooms[roomIdx].userId2 = null
     } else return false 
-    return true
+
+    return gameRooms[roomIdx]
 }
 
 export const gameReady = (gameId, userId, single) => {

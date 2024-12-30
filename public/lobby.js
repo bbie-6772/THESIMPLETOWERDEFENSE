@@ -17,7 +17,6 @@ let selectedRoomDetails = null;
 let confirmRoomSelection = null;
 let refreshButton = null;
 let gameFrame = null;
-let singlePlayButton = null;
 
 let roomName = null;
 let roomType = null;
@@ -50,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
     confirmRoomSelection = document.getElementById('confirmRoomSelection');
     refreshButton = document.getElementById('refreshButton');
     gameFrame = document.getElementById('gameFrame')
-    singlePlayButton = document.getElementById('singlePlayButton')
 
     roomName = document.getElementById('roomName')
     roomType = document.getElementById('roomType')
@@ -132,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (await sendEvent(1001, { roomId: selectedRoom.gameId })) {
                 alert(`${selectedRoom.gameName}방으로 입장합니다`);
-
+                roomId = selectedRoom.gameId
                 roomSelectionModal.hide();
 
                 waitRoomName.append(name);
@@ -155,8 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 나가기 이벤트
-    exitButton.addEventListener('click', function () {
-        waitRoom.hide()
+    exitButton.addEventListener('click', async function () {
+        await sendEvent(1003, {roomId})
     });
 
 })
@@ -231,10 +229,24 @@ export const updateRoomInfo = (roomInfo) => {
 
 // 대기방 유저 업데이트 함수
 export const updateUser = (roomInfo) => {
-    host.innerText = roomInfo.userId1
-    entry.innerText = roomInfo.userId2 || "비어 있음"
+    if(roomInfo) {
+        host.innerText = roomInfo.userId1
+        entry.innerText = roomInfo.userId2 || "비어 있음"
+    } else {
+
+    }
 }
 
+// 대기방 나가기
+export const exitRoom = () => {
+    selectedRoom = null
+    roomId = null
+    waitRoom.hide()
+    // 방 대기열 요청
+    sendEvent(1002);
+}
+
+// 대기열 방 업데이트
 export const updateRooms = (roomsInfo) => {
     rooms = []
     if(Array.isArray(roomsInfo)){
@@ -243,6 +255,7 @@ export const updateRooms = (roomsInfo) => {
     renderRooms()
 }
 
+// 게임 시작 
 export const gameStart = () => {
     waitRoom.hide()
     import("./src/game.js")
