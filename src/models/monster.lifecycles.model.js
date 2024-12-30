@@ -1,6 +1,7 @@
 import { getGameAssets } from "../init/assets.js";
 import { v4 as uuidv4 } from "uuid";
 import MonsterStorage from "./monsterStorage.model.js";
+import {generatePath} from "../init/pathGenerator.js"
 
 /*====[구조를 변경한 이유]====*/
 // 1. 룸 생성 -> 게임 시작 방식으로, 각 방마다 독립적인 인스턴스를 생성하는 것이 더 적합하다고 판단.
@@ -36,10 +37,12 @@ export default class MonsterLifecycles {
 
   // 초기화(리스폰 정보).
   respawnInitializer(data) {
+    const monsterPath = generatePath();
+
     this.eventName = data.message.gameId;
     this.spawnCount = 0;
-    this.x = data.message.x;
-    this.y = data.message.y;
+    this.x = monsterPath[0].x;
+    this.y = monsterPath[0].y;
 
     const info = {
       totalCount: 0,
@@ -48,10 +51,14 @@ export default class MonsterLifecycles {
       score: 0,
       gold: 0,
       wave: 1,
+      path: monsterPath,
     };
 
     // 정보 데이터 생성.
     this.monsterStorage.addInfo(this.eventName, info);
+    
+    // 초기화된 정보 클라에 보내기.
+    this.socket.emit("monsterEventInit" , this.monsterStorage.getInfo(this.eventName));
   }
 
   //====[리스폰]====//

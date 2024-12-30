@@ -5,6 +5,7 @@ import { Button, getButtons, setButton } from "./model/buttons.model.js";
 import { canvasMouseEventinit, drawmousePoint } from "./event/canvasMouseEvent.js";
 import { loadGameAssets } from "./init/assets.js";
 
+import { getSocket, getRoom } from "./init/socket.js";
 import Monsters from "./model/monsterSpawner.js";
 import {loadMonsterImages, GetMonsterAnimation} from "./model/monsterAnimations.model.js"
 /* 
@@ -286,10 +287,19 @@ async function initGame() {
   if (isInitGame) {
     //return;
   }
+
+  try {
+    Monsters.getInstance(getSocket(),"getRoom()");
+    await Monsters.getInstance().initialization();
+    console.log('Game initialized');
+  } catch (error) {
+    console.log('Error initializing game:', error);
+  }
+
   gameAssets = await loadGameAssets();
   console.log(gameAssets);
   // 몬스터 경로 생성
-  monsterPath = generateRandomMonsterPath(); 
+  monsterPath =  Monsters.getInstance().getPath(); 
   // 맵 초기화 (배경, 몬스터 경로 그리기)
   initMap(); 
   // 설정된 초기 타워 개수만큼 사전에 타워 배치
@@ -302,8 +312,10 @@ async function initGame() {
   canvasMouseEventinit(canvas);
 
   // 몬스터 추가
-  Monsters.getInstance().initialization(monsterPath);
-  Monsters.getInstance().sendMonsterMessage(monsterPath[0].x, monsterPath[0].y);
+  //console.log(getSocket().id);
+  //console.log(getRoom());
+  
+
 
   // 설정된 몬스터 생성 주기마다 몬스터 생성
   // setInterval(spawnMonster, monsterSpawnInterval); 

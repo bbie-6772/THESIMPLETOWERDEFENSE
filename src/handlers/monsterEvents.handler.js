@@ -6,8 +6,6 @@ export const receiveMonsterMessage = (io, socket) => {
   const monsters = new MonsterLifecycles(io, socket);
   // 초기화.
   socket.on("monsterEventInit", (data) => {
-
-    console.log(data);
     monsters.respawnInitializer(data);
     monsters.spawnMonster(1000);
     monsters.sendRespawnPing();
