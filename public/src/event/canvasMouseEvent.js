@@ -1,6 +1,6 @@
 import { GetTowerFromCoordinate } from "../model/tower.js";
 import { getButtons } from "../model/buttons.model.js";
-
+import { getGameCanvas } from "../model/gameCanva.model.js";
 //마우스 이벤트 초기 설정
 export const canvasMouseEventinit = (canvas) => {
   canvas.addEventListener("click", handleClick);
@@ -36,8 +36,6 @@ function handleClick(event) {
     dctx.fillStyle = "green";
     dctx.lineWidth = 3; // 테두리 두께
     dctx.strokeRect(t.x, t.y, t.width, t.height);
-    console.log(x, y);
-    console.log(t);
   }
 }
 //마우스 버튼을 누른 경우
@@ -50,13 +48,14 @@ function handleMousedown(event) {
 
       if (buttons[i].text === "랜덤타워") {
         holdingImage.src = "../assets/images/questionMark.png";
-        holdingicon = { button: buttons[i], image: holdingImage };
         isHolding = true;
-        break;
       } else if (buttons[i].text === "타워판매") {
         holdingImage.src = "../assets/images/moneyMark.png";
-        holdingicon = { button: buttons[i], image: holdingImage };
         isHolding = true;
+      }
+      if (isHolding) {
+        Canvas.classList.add("hide-cursor");
+        holdingicon = { button: buttons[i], image: holdingImage };
         break;
       }
     }
@@ -65,7 +64,12 @@ function handleMousedown(event) {
 //마우스 버튼을 땐 경우
 function handleMouseup(event) {
   if ("button" in holdingicon) {
+    if (holdingicon.button.text === "랜덤타워") {
+      console.log(localStorage.getItem("access-Token"));
+    } else if (holdingicon.button.text === "타워판매") {
+    }
   }
+  Canvas.classList.remove("hide-cursor");
   isHolding = false;
   holdingicon = {};
 }
@@ -73,11 +77,13 @@ function handleMouseup(event) {
 function handleMouseover(event) {}
 //캔버스상에서 마우스를 움직인 경우우
 function handleMousemove(event) {
-  const scaleX = Canvas.width / canvasRect.width; // 가로 스케일
-  const scaleY = Canvas.height / canvasRect.height; // 세로 스케일
 
-  mousePosition[0] = (event.clientX - canvasRect.left) * scaleX;
-  mousePosition[1] = (event.clientY - canvasRect.top) * scaleY;
+  const gameCanvas = getGameCanvas();
+  const scaleX = gameCanvas.Xscale; // 가로 스케일
+  const scaleY = gameCanvas.Yscale; // 세로 스케일
+
+  mousePosition[0] = (event.clientX - gameCanvas.left) * scaleX;
+  mousePosition[1] = (event.clientY - gameCanvas.top) * scaleY;
   const buttons = getButtons();
   for (let i = 0; i < buttons.length; i++) {
     buttons[i].checkMouseOver(mousePosition[0], mousePosition[1]);

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -15,18 +15,22 @@
         margin: 0;
         background-color: #2d2d2d;
         flex-direction: column;
+        cursor: none; /* 마우스 포인터 숨기기 */
       }
       #gameCanvas {
         border: 2px solid #000;
         display: block;
-        position:absolute;
+        position: absolute;
         z-index: 1;
       }
-      #debugCanvas{
-        display:block;
+      #debugCanvas {
+        display: block;
         position: absolute;
         z-index: 2;
         pointer-events: none;
+      }
+      .hide-cursor {
+        cursor: none; /* 마우스 포인터 숨기기 */
       }
     </style>
   </head>
@@ -34,6 +38,6 @@
     <canvas id="gameCanvas" width="1920" height="1080"></canvas>
     <canvas id="debugCanvas" width="1920" height="1080"></canvas>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-    <script type="module" src="./src/game.js"> </script>
+    <script type="module" src="./src/game.js"></script>
   </body>
 </html>
