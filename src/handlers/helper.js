@@ -106,6 +106,7 @@ export const handleConnection = async (socket) => {
                 userId1: e.userId1,
                 userId2: e.userId2,
                 difficult: e.difficult,
+                startTime: e.startTime,
                 password: e.password ? true : false
             }
         })
