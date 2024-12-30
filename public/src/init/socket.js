@@ -3,9 +3,6 @@ import { updateRooms, updateRoomInfo, updateUser, gameStart } from "../../lobby.
 import Monsters from "../model/monsterSpawner.js";
 
 let userId = null;
-let nickname = null;
-let highScoreS = null;
-let highScoreM = null;
 let room = null;
 
 const token = localStorage.getItem("access-Token")
@@ -24,17 +21,17 @@ const socket = io('http://localhost:3000', {
     },
 });
 
-// socket.once('connection', (data) => {
-//     if (data.status === "fail") {
-//         alert("다시 로그인 해주세요!")
-//         window.location.href = 'login.html';
-//     } else {
-//         // 값 저장
-//         [ userId, nickname, highScoreS, highScoreM]= data
-//         // 방 목록 업데이트
-//         updateRooms(data[4])
-//     }
-// });
+socket.once('connection', (data) => {
+    if (data.status === "fail") {
+        alert("다시 로그인 해주세요!")
+        window.location.href = 'login.html';
+    } else {
+        // 값 저장
+        [ userId, nickname, highScoreS, highScoreM ]= data
+        // 방 목록 업데이트
+        updateRooms(data[4])
+    }
+});
 
 socket.on("response", (data) => {
 })
@@ -49,11 +46,12 @@ socket.on('room', (data) => {
     updateUser(data.room)
 })
 
+// 테스트
+const randomInt = Math.floor(Math.random() * 101);
+Monsters.getInstance(socket, randomInt);
+
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
 export const sendEvent = async (handlerId, payload) => {
-// 테스트
-    const randomInt = Math.floor(Math.random() * 101);
-    Monsters.getInstance(socket, randomInt);
 
     const loadError = setTimeout(() => {
         alert("서버와 연결이 원할하지 않습니다")

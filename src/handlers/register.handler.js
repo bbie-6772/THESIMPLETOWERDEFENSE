@@ -10,7 +10,6 @@ const registerHandler = (io) => {
   io.on("connection", (socket) => {
     // 만든 유저 정보를 클라이언트로 전달
     handleConnection(socket);
-
     // '이벤트' 발생 시 맵핑 실행
     socket.on('event', (data) => handlerEvent(io, socket, data));
     // 유저가 '연결해제' 시 실행
