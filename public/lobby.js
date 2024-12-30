@@ -149,7 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 강퇴 이벤트
-    kickButton.addEventListener('click', function () {
+    kickButton.addEventListener('click', async function () {
+        await sendEvent(1004, { roomId })
     });
 
     // 나가기 이벤트

@@ -88,3 +88,13 @@ export const gameReady = (gameId, userId, single) => {
 
     return "notReady"
 }
+
+export const kick = (gameId) => {
+    const roomIdx = gameRooms.findIndex((e) => e.gameId === gameId)
+    // 방이 서버에 있는 확인
+    if (roomIdx === -1) return false
+    // 서버에서 유저(참가자) 삭제
+    gameRooms[roomIdx].userId2 = null
+    
+    return gameRooms[roomIdx]
+}

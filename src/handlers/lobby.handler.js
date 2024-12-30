@@ -1,4 +1,4 @@
-import { addRoom, getRoom, getRooms, joinRoom, leaveRoom } from "../models/gameRoom.model.js";
+import { addRoom, getRoom, getRooms, joinRoom, leaveRoom, kick } from "../models/gameRoom.model.js";
 
 export const enterRoom = (userId, payload, socket) => {
 
@@ -32,7 +32,6 @@ export const enterRoom = (userId, payload, socket) => {
 
 export const exitRoom = (userId, payload, socket, io) => {
     const room = leaveRoom(payload.roomId, userId)
-    console.log(room)
     if (room) {
         // 업뎃 정보 공유
         socket.to(payload.roomId).emit('room', { room })
@@ -40,6 +39,16 @@ export const exitRoom = (userId, payload, socket, io) => {
         socket.leave(payload.roomId)
     // 호스트가 나갈 시 인원 전부 삭제하도록 요구
     } else io.to(payload.roomId).emit('leaveRoom', { roomId: payload.roomId })
+
+    return { status: "success" }
+}
+
+export const kickUser = (userId, payload, socket) => {
+    const room = kick(payload.roomId)
+    // 참가자에게 방을 나가도록 요구
+    socket.to(payload.roomId).emit('leaveRoom', { roomId: payload.roomId })
+    // 업데이트된 값 적용
+    socket.emit('room', { room })
 
     return { status: "success" }
 }
