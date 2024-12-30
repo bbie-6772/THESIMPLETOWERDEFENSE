@@ -171,8 +171,6 @@ export const ready = (io, socket, data) => {
 
 export const handlerEvent = (io, socket, data) => {
     try {
-        console.log(data)
-
         // 기본 검증
         if(!Auth(data)) return
 
