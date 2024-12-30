@@ -138,6 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 waitRoomName.append(name);
                 waitRoomType.append(type);
                 waitRoomPassword.append(password);
+                
 
                 waitRoom.show()
             }

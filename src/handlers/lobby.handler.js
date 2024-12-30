@@ -1,4 +1,4 @@
-import { addRoom, getRoom, getRooms, joinRoom } from "../models/gameRoom.model.js";
+import { addRoom, getRoom, getRooms, joinRoom, leaveRoom } from "../models/gameRoom.model.js";
 
 export const enterRoom = (userId, payload, socket) => {
 
@@ -29,6 +29,16 @@ export const enterRoom = (userId, payload, socket) => {
 
     return { status: "success", room: room }
 };
+
+export const exitRoom = (userId, payload, socket) => {
+    if(leaveRoom(payload.roomId, userId)) {
+        let room = getRoom(userId)
+        if (room) socket.leave(payload.roomId)
+        else io.leave(payload.roomId)
+        // 업뎃 정보 공유
+        socket.to(room.gameId).emit('room', { room })
+    }
+}
 
 export const loadRoom = () => {
     // 값 변환

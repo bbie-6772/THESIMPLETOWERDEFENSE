@@ -64,6 +64,20 @@ export const joinRoom = (gameId, userId) => {
     return true
 }
 
+export const leaveRoom = (gameId, userId) => {
+    const roomIdx = gameRooms.findIndex((e) => e.gameId === gameId)
+    // 방이 서버에 있는 확인
+    if (roomIdx === -1) return false
+    // 호스트가 나갈 시 방 삭제
+    if (gameRooms[roomIdx].userId1 === userId) {
+        gameRooms.splice(roomIdx,1)
+    // 참가자가 나갈 시 userId2를 비움
+    } else if (gameRooms[roomIdx].userId2 === userId) {
+        gameRooms[roomIdx].userId2 = null
+    } else return false 
+    return true
+}
+
 export const gameReady = (gameId, userId, single) => {
     const roomIdx = gameRooms.findIndex((e) => e.gameId === gameId)
     // 방이 서버에 있는 확인
