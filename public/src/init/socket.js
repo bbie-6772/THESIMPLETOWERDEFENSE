@@ -1,5 +1,5 @@
 import { CLIENT_VERSION } from "./constants.js";
-import { updateRooms, updateRoomInfo, updateUser } from "../../lobby.js"
+import { updateRooms, updateRoomInfo, updateUser,gameStart } from "../../lobby.js"
 
 let userId = null;
 let nickname = null;
@@ -38,6 +38,16 @@ socket.once('connection', (data) => {
 socket.on("response", (data) => {
 })
 
+socket.on("ready", (data) => {
+    alert(data.message)
+    if (data.status === "start") gameStart ()
+})
+
+socket.on('room', (data) => {
+    console.log(data)
+    updateUser(data.room)
+})
+
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
 export const sendEvent = async (handlerId, payload) => {
 
@@ -50,9 +60,15 @@ export const sendEvent = async (handlerId, payload) => {
             payload
         });
 
+        const loadError = setTimeout(() => {
+            alert("서버와 연결이 원할하지 않습니다")
+            return reject(false)
+        }, 2000)
+
         socket.once('response', (data) => {
             if (data[1]?.status === "fail") {
                 alert(data[1].message)
+                clearTimeout(loadError)
                 return resolve(false)
             }
             // 방 입장 핸들러
@@ -64,13 +80,22 @@ export const sendEvent = async (handlerId, payload) => {
             if (data[0] === 1002) {
                 updateRooms(data[1].rooms)
             }
+            clearTimeout(loadError)
             return resolve(true)
         })
-
-        setTimeout(reject,2000)
     })
     return log
 };
+
+// 준비 신호
+export const ready = (roomId) => {
+    socket.emit("ready", {
+        userId,
+        token,
+        clientVersion: CLIENT_VERSION,
+        roomId
+    })
+}
 
 export const getRoom = () => {
     return room
