@@ -2,8 +2,60 @@ import { CLIENT_VERSION } from "../constant.js"
 import handlerMappings from "./handler.Mapping.js"
 import { prisma } from "../init/prisma.js";
 import { addUser,getUser } from "../models/users.model.js";
-import { getRooms } from "../models/gameRoom.model.js";
+import { getRooms, gameReady } from "../models/gameRoom.model.js";
 import jwt from "jsonwebtoken";
+
+const Auth = (data) => {
+    try {
+        //클라이언트 버전 확인
+        if (!CLIENT_VERSION.includes(data.clientVersion)) {
+            socket.emit('response', {
+                status: "fail",
+                message: "Client version not found"
+            });
+            return false;
+        }
+
+        const [tokenType, token] = data.token.split(' ');
+        // token이 비어있거나(없는 경우) tokenType이 Bearer가 아닌경우
+        if (!token || tokenType !== 'Bearer') {
+            socket.emit('connection', {
+                status: "fail",
+                message: "Not a valid account"
+            });
+            return false ;
+        }
+
+        // 토큰 + 사용자 검증
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        if (data.userId !== decoded.id) {
+            socket.emit('response', {
+                status: "fail",
+                message: "Not valid Id"
+            });
+            return false;
+        }
+
+        // 서버 접속 유무 확인
+        const user = getUser(data.userId)
+        if (!user) {
+            socket.emit('response', {
+                status: "fail",
+                message: "User not found"
+            });
+            return false;
+        }
+
+        return true
+    } catch (err) {
+        console.log(err)
+        socket.emit('connection', {
+            status: "fail",
+            message: "Not a valid token"
+        });
+        return false;
+    }
+}
 
 export const handleConnection = async (socket) => {
     try {
@@ -41,7 +93,6 @@ export const handleConnection = async (socket) => {
             });
             return; ``
         }
-
         //유저 추가
         addUser(loginUser.id, loginUser.nickname)
 
@@ -55,6 +106,7 @@ export const handleConnection = async (socket) => {
                 userId1: e.userId1,
                 userId2: e.userId2,
                 difficult: e.difficult,
+                startTime: e.startTime,
                 password: e.password ? true : false
             }
         })
@@ -76,45 +128,53 @@ export const handleDisconnect = (socket, uuid) => {
 
 }
 
+// 준비상태 확인
+export const ready = (io, socket, data) => {
+    // 기본 검증
+    if (!Auth(data)) return
+
+    const status = gameReady(data.roomId, data.userId, data.single)
+    
+    switch (status) {
+        case false:
+            socket.emit('ready', {
+                status: "fail",
+                message: "Room not found"
+            })
+            return
+        case "ready":
+            socket.emit('ready', {
+                status: "ready",
+                message: "Ready to go"
+            })
+            return
+        case "notReady":
+            io.to(data.roomId).emit('ready', {
+                status: "fail",
+                message: "Not all players are ready"
+            })
+            return
+        case "start":
+            io.to(data.roomId).emit('ready', {
+                status: "start",
+                message: "The game starts"
+            })
+            return
+        default:
+            socket.emit('ready', {
+                status: "fail",
+                message: "Error"
+            })
+            return;
+    }
+}
+
 export const handlerEvent = (io, socket, data) => {
     try {
         console.log(data)
-        //클라이언트 버전 확인
-        if (!CLIENT_VERSION.includes(data.clientVersion)) {
-            socket.emit('response', { 
-                status: "fail",
-                message: "Client version not found"
-            });
-            return;
-        }
 
-        const [tokenType, token] = data.token.split(' ');
-        // token이 비어있거나(없는 경우) tokenType이 Bearer가 아닌경우
-        if (!token || tokenType !== 'Bearer') {
-            socket.emit('connection', {
-                status: "fail",
-                message: "Not a valid account"
-            });
-            return;
-        }
-
-        // 토큰 검증
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
-        if (data.userId !== decoded.id) {
-            socket.emit('response', {
-                status: "fail",
-                message: "Not valid Id"
-            });
-            return;
-        }
-        const user = getUser(data.userId)
-        if (!user) {
-            socket.emit('response', {
-                status: "fail",
-                message: "User not found"
-            });
-            return;
-        }
+        // 기본 검증
+        if(!Auth(data)) return
 
         const handler = handlerMappings[data.handlerId]
         if (!handler) {

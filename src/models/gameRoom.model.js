@@ -21,6 +21,7 @@ export const addRoom = (userId, gameName, password, difficult) => {
             userId2: null,
             difficult: difficult,
             password: password,
+            ready: false,
             score: 0,
             startTime: 0,
             monsterCount: 0,
@@ -56,9 +57,27 @@ export const joinRoom = (gameId, userId) => {
     const roomIdx = gameRooms.findIndex((e) => e.gameId === gameId)
     // 방이 서버에 있는 확인
     if (roomIdx === -1) return false     
-    // 방이 꽉 차 있는지 확인
-    if (gameRooms[roomIdx].userId2) return false
-    // 유저 Id가 재 참가가 아닐시 에만 userId2 에 추가
-    else if (gameRooms[roomIdx].userId1 !== userId ) gameRooms[roomIdx].userId2 = userId
+    // 원래 방에 있던 인원인지 확인
+    if (gameRooms[roomIdx].userId1 === userId || gameRooms[roomIdx].userId2 === userId) return true
+    // 아닐 경우 참여
+    else gameRooms[roomIdx].userId2 = userId
     return true
+}
+
+export const gameReady = (gameId, userId, single) => {
+    const roomIdx = gameRooms.findIndex((e) => e.gameId === gameId)
+    // 방이 서버에 있는 확인
+    if (roomIdx === -1) return false
+
+    // 참가자가 준비완료/취소 했을 경우
+    if (gameRooms[roomIdx].userId2 === userId) {
+        gameRooms[roomIdx].ready = !gameRooms[roomIdx].ready
+        return "ready"
+    // 호스트의 시작이 성공했을 경우
+    } else if ((gameRooms[roomIdx].userId1 === userId && gameRooms[roomIdx].ready) || single) {
+        gameRooms[roomIdx].startTime = Date.now();
+        return "start"
+    }
+
+    return "notReady"
 }

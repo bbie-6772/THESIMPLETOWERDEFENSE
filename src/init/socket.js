@@ -2,9 +2,6 @@ import { Server as SocketIO } from 'socket.io';
 import registerHandler from '../handlers/register.handler.js';
 import { createChatServer } from '../chat/server.js';
 
-
-
-
 const initSocket = (server) => {
     // 서버 생성
     const io = new SocketIO()
