@@ -239,8 +239,6 @@ export const updateRooms = (roomsInfo) => {
 
 export const gameStart = () => {
     waitRoom.hide()
-    gameFrame.innerHTML = `
-        <iframe src="game.html" width="100%" height="100%"></iframe>
-    `
+    import("./src/game.js")
     gameFrame.style.display = "block"
 }

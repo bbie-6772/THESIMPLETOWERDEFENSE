@@ -86,11 +86,28 @@
             z-index: 1;
         }
 
+        #gameCanvas {
+            border: 2px solid #000;
+            display: block;
+            position:absolute;
+            z-index: 1;
+        }
+
+        #debugCanvas{
+            display:block;
+            position: absolute;
+            z-index: 2;
+            pointer-events: none;
+      }
+
     </style>
 </head>
 
 <body>
-    <div id="gameFrame" style="display:none;"></div>
+    <div id="gameFrame" style="display:none;">
+        <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+        <canvas id="debugCanvas" width="1920" height="1080"></canvas>
+    </div>
     <div class="container py-5">
         <div class="row">
             <div class="col-12">
