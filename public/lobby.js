@@ -146,11 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ready(roomId, false)
     });
 
-    // 싱글 플레이 이벤트
-    singlePlayButton.addEventListener('click', function () {
-        gameStart()
-    });
-
     // 강퇴 이벤트
     kickButton.addEventListener('click', function () {
     });
