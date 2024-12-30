@@ -7,7 +7,6 @@ import {
   drawmousePoint,
 } from "./event/canvasMouseEvent.js";
 import { loadGameAssets } from "./init/assets.js";
-
 import { getSocket, getRoom } from "./init/socket.js";
 import Monsters from "./model/monsterSpawner.js";
 import {loadMonsterImages, GetMonsterAnimation} from "./model/monsterAnimations.model.js"
