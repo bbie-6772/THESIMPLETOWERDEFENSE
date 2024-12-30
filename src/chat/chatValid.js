@@ -24,6 +24,7 @@ export async function validateMessage(message) {
             return '반려: 결과가 없습니다.'; // 유효하지 않은 경우
         }
 
+
         return result;
     } catch (error) {
         console.error('Message validation error:', error);
