@@ -1,6 +1,7 @@
 import { getGameCanvas } from "./gameCanva.model.js";
 
 let towerBase = [];
+let towerBasePosition = [];
 
 const basePoint = { x: 100, y: 100 };
 const incremWidth = (1920 * (8 / 10)) / 2;
@@ -44,6 +45,7 @@ export const towerDraw = (ctx) => {
   const scaleY = gameCanvas.Yscale; // 세로 스케일
 
   for (let i = 0; i < towerBase.length; i++) {
+    towerBasePosition[i] = towerBasePosition[i]?? [];
     for (let o = 0; o < towerBase[i].length; o++) {
       const xPosition =
         (incremWidth / 2 +
@@ -61,9 +63,17 @@ export const towerDraw = (ctx) => {
         baseImage,
         xPosition,
         yPosition,
-        towerBaseWidth,
-        towerBaseheight
+        towerBaseWidth * scaleX,
+        towerBaseheight * scaleY
       );
+
+      towerBasePosition[i][o] = {
+        xPosition,
+        yPosition,
+        towerBaseWidth: towerBaseWidth * scaleX,
+        towerBaseheight: towerBaseheight * scaleY,
+      };
+
       if (towerBase[i][o] != null) {
         const tmpTower = towerBase[i][o];
         //타워 그리기
@@ -71,10 +81,24 @@ export const towerDraw = (ctx) => {
           tmpTower.image,
           xPosition,
           yPosition,
-          tmpTower.width,
-          tmpTower.height
+          tmpTower.width * scaleX,
+          tmpTower.height * scaleY
         );
       }
+    }
+  }
+};
+export const baseColisionCheck = (x, y) => {
+  for (let i = 0; i < towerBasePosition.length; i++) {
+    for (let o = 0; o < towerBasePosition[i].length; o++) {
+      const tmpTower = towerBasePosition[i][o];
+      if (
+        x > tmpTower.xPosition &&
+        x < tmpTower.xPosition + tmpTower.towerBaseWidth &&
+        y > tmpTower.yPosition &&
+        y < tmpTower.yPosition + tmpTower.towerBaseheight
+      )
+        return { x: o, y: i };
     }
   }
 };

@@ -27,9 +27,10 @@ export const placeTower = (userId, payload, socket) => {
         const changedgold = user.gold - towers.data[getRandomTower].cost;
         addTower(userId,X,Y,towers.data[getRandomTower].id);
         setUserGold(userId, changedgold);
+
     }
     catch(err){
         return { status: 'failed', Error: err };
     }
-  return { status: 'success',towerid: towers.data[getRandomTower].id, x: X, y: Y, gold };
+  return { status: 'success',handlerId:'towerPlacement',towerid: towers.data[getRandomTower].id, x: X, y: Y, gold };
 };

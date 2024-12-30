@@ -1,6 +1,8 @@
 import { GetTowerFromCoordinate } from "../model/tower.js";
 import { getButtons } from "../model/buttons.model.js";
 import { getGameCanvas } from "../model/gameCanva.model.js";
+import { baseColisionCheck } from "../model/towerBase.model.js";
+import { sendEvent } from "../init/socket.js";
 //마우스 이벤트 초기 설정
 export const canvasMouseEventinit = (canvas) => {
   canvas.addEventListener("click", handleClick);
@@ -66,6 +68,14 @@ function handleMouseup(event) {
   if ("button" in holdingicon) {
     if (holdingicon.button.text === "랜덤타워") {
       console.log(localStorage.getItem("access-Token"));
+      const towerPosition = baseColisionCheck(
+        mousePosition[0],
+        mousePosition[1]
+      );
+      if (towerPosition) {
+        console.log(towerPosition);
+        sendEvent(4001, { X: towerPosition.x, Y: towerPosition.y });
+      }
     } else if (holdingicon.button.text === "타워판매") {
     }
   }
@@ -77,7 +87,6 @@ function handleMouseup(event) {
 function handleMouseover(event) {}
 //캔버스상에서 마우스를 움직인 경우우
 function handleMousemove(event) {
-
   const gameCanvas = getGameCanvas();
   const scaleX = gameCanvas.Xscale; // 가로 스케일
   const scaleY = gameCanvas.Yscale; // 세로 스케일
