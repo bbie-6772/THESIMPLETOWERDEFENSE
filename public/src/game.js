@@ -17,7 +17,6 @@ import { setGameCanvas } from "./model/gameCanva.model.js";
 */
 
 const canvas = document.getElementById("gameCanvas");
-const debugCanvas = document.getElementById("debugCanvas");
 const ctx = canvas.getContext("2d");
 
 var canvasRect = canvas.getBoundingClientRect();

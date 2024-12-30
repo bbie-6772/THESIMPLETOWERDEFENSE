@@ -21,6 +21,36 @@
         "height": 90,
         "marginX": 25,
         "marginY": 60
+      },
+      {
+        "id": 2,
+        "text": "단일타워강화",
+        "X": 600,
+        "Y": 100,
+        "width": 180,
+        "height": 90,
+        "marginX": 25,
+        "marginY": 60
+      },
+      {
+        "id": 2,
+        "text": "멀티타워강화",
+        "X": 800,
+        "Y": 100,
+        "width": 180,
+        "height": 90,
+        "marginX": 25,
+        "marginY": 60
+      },
+      {
+        "id": 2,
+        "text": "범위타워강화",
+        "X": 1000,
+        "Y": 100,
+        "width": 180,
+        "height": 90,
+        "marginX": 25,
+        "marginY": 60
       }
     ]
   }

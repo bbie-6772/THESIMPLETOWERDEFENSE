@@ -9,7 +9,9 @@ export const addUser = (userId, nickname) => {
         nickname: nickname,
         gold: 0,
         monsterKill: 0,
-        totalDamage:0
+        totalDamage:0,
+        upgrades : {
+        },
     }
     users.push(user)
 }
