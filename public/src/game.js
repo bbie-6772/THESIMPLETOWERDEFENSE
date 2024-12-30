@@ -213,11 +213,11 @@ function gameLoop() {
 
 
   // 점수 바꾸자 
-  // if(Object.keys(Monsters.getInstance().getInfo()).length !== 0){
-  //   score = Monsters.getInstance().getInfo().score;
-  //   userGold = Monsters.getInstance().getInfo().gold;
-  //   monsterLevel = Monsters.getInstance().getInfo().wave;
-  // }
+  if(Object.keys(Monsters.getInstance().getInfo()).length !== 0){
+    score = Monsters.getInstance().getInfo().score;
+    userGold = Monsters.getInstance().getInfo().gold;
+    monsterLevel = Monsters.getInstance().getInfo().wave;
+  }
 
   ctx.font = "25px Times New Roman";
   ctx.fillStyle = "skyblue";
@@ -269,6 +269,8 @@ function gameLoop() {
         monster.updateAnimation();
   
       } else {
+        // 테스트
+        Monsters.getInstance().sendMonsterDamageMessage(monster.uuid, 10000);
         /* 몬스터가 죽었을 때 */
         monsters.splice(i, 1);
       }
@@ -305,12 +307,7 @@ async function initGame() {
 
   canvasMouseEventinit(canvas);
 
-  // 몬스터 추가
-  //console.log(getSocket().id);
-  //console.log(getRoom());
 
-  //Monsters.getInstance().initialization(monsterPath);
-  //Monsters.getInstance().sendMonsterMessage(monsterPath[0].x, monsterPath[0].y);
 
   // 설정된 몬스터 생성 주기마다 몬스터 생성
   // setInterval(spawnMonster, monsterSpawnInterval);
