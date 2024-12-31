@@ -9,6 +9,7 @@ export default class Monsters {
     this.socket = socket;
     this.gameId = gameId;
     this.monsters = [];
+    this.vfxs = [];
     // 변수
     this.path = [];
     this.info = {};
@@ -89,6 +90,8 @@ export default class Monsters {
       // 몬스터 삭제
       if (data.message.eventName === "deleteMonster") {
         //this.deleteMonster(data.message.monster);
+
+        
       }
 
       // 핑퐁

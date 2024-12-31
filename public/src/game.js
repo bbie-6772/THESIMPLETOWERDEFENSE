@@ -6,9 +6,12 @@ import { canvasMouseEventinit, drawmousePoint } from "./event/canvasMouseEvent.j
 import { loadGameAssets } from "./init/assets.js";
 import { getSocket, getRoom } from "./init/socket.js";
 import Monsters from "./model/monsterSpawner.js";
-import {loadMonsterImages, GetMonsterAnimation} from "./model/monsterAnimations.model.js"
+import {loadMonsterImages, GetMonsterAnimation, } from "./model/monsterAnimations.model.js"
+import { loadVfxImages, GetVfxAnimation, GetVfxAnimations} from "./model/vfxAnimations.model.js";
 import { initTowerBase, towerDraw } from "./model/towerBase.model.js";
 import { setGameCanvas } from "./model/gameCanva.model.js";
+
+import { Vfx } from "./model/vfx.model.js";
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
@@ -39,6 +42,7 @@ let numOfInitialTowers = 3; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 let monsters = [];
+let vfx = [];
 const towers = [];
 
 let gameAssets = null;
@@ -201,6 +205,7 @@ function placeBase() {
 
 function gameLoop() {
   monsters = Monsters.getInstance().getMonsters()
+
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
 
@@ -267,9 +272,30 @@ function gameLoop() {
         monster.draw(ctx);
         // 이곳에 애니 메이션 추가하자.
         monster.updateAnimation();
+
+        // 이팩트 그리기
+        for(let value of vfx) {
+          value.draw(ctx);
+        }
+
+        // 이펙트 삭제 
+        if(vfx.length !== 0){
+          const index = vfx.findIndex(vfx => vfx.isFinished === true);
+      
+          if (index !== -1) {
+            // 해당 인덱스를 찾아서 배열에서 삭제
+            vfx.splice(index, 1);
+          }
+        }
+
+
   
       } else {
-        // 테스트
+        // 이펙트 추가
+        const vfxCount = Object.keys(GetVfxAnimations()).length;
+        const randomVfx = Math.floor(Math.random() * (vfxCount));
+        vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y))
+        
         Monsters.getInstance().sendMonsterDamageMessage(monster.uuid, 10000);
         /* 몬스터가 죽었을 때 */
         monsters.splice(i, 1);
@@ -319,6 +345,7 @@ async function initGame() {
 
 // 테스트
 loadMonsterImages();
+loadVfxImages();
 
 // 애니메이션 
 const ant  = GetMonsterAnimation("ant");
@@ -331,6 +358,11 @@ const dog  = GetMonsterAnimation("dog");
 const eagle  = GetMonsterAnimation("eagle");
 const gator  = GetMonsterAnimation("gator");
 const ghost  = GetMonsterAnimation("ghost");
+
+
+const vfx01 = GetVfxAnimation(0);
+const vfx02 = GetVfxAnimation(1);
+const vfx03 = GetVfxAnimation(2);
 
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
@@ -366,6 +398,15 @@ Promise.all([
     (img) => new Promise((resolve) => (img.onload = resolve))
   ),
   ...ghost.map(
+    (img) => new Promise((resolve) => (img.onload = resolve))
+  ),
+  ...vfx01.map(
+    (img) => new Promise((resolve) => (img.onload = resolve))
+  ),
+  ...vfx02.map(
+    (img) => new Promise((resolve) => (img.onload = resolve))
+  ),
+  ...vfx03.map(
     (img) => new Promise((resolve) => (img.onload = resolve))
   ),
 ]);
