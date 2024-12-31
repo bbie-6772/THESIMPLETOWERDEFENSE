@@ -15,6 +15,7 @@ import { setGameCanvas } from "./model/gameCanva.model.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+const monsterSpawner = Monsters.getInstance(getSocket(), getRoom())
 
 var canvasRect = canvas.getBoundingClientRect();
 var scaleX = canvas.width / canvasRect.width; // 가로 스케일
@@ -200,7 +201,7 @@ function placeBase() {
 }
 
 function gameLoop() {
-  monsters = Monsters.getInstance().getMonsters()
+  monsters = monsterSpawner.getMonsters();
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
 
@@ -212,10 +213,10 @@ function gameLoop() {
   }
 
   // 점수 바꾸기
-  if(Object.keys(Monsters.getInstance().getInfo()).length !== 0){
-    setScore(Monsters.getInstance().getInfo().score);
-    setUserGold(Monsters.getInstance().getInfo().gold);
-    monsterLevel = Monsters.getInstance().getInfo().wave;
+  if (Object.keys(monsterSpawner.getInfo()).length !== 0){
+    setScore(monsterSpawner.getInfo().score);
+    setUserGold(monsterSpawner.getInfo().gold);
+    monsterLevel = monsterSpawner.getInfo().wave;
   }
 
   ctx.font = "25px Times New Roman";
@@ -283,6 +284,12 @@ function gameLoop() {
         }
   
       } else {
+        // 이펙트 추가
+        const vfxCount = Object.keys(GetVfxAnimations()).length;
+        const randomVfx = Math.floor(Math.random() * (vfxCount));
+        vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y))
+        
+        monsterSpawner.sendMonsterDamageMessage(monster.uuid, 10000);
         /* 몬스터가 죽었을 때 */
         monsters.splice(i, 1);
       }
@@ -297,17 +304,18 @@ async function initGame() {
     //return;
   }
 
-  Monsters.getInstance(getSocket(), "getRoom()");
-  Monsters.getInstance().initialization();
-
   gameAssets = await loadGameAssets();
+
   console.log(gameAssets);
+  monsterSpawner.initialization();
   // 몬스터 경로 생성
-  monsterPath =  Monsters.getInstance().getPath(); 
-  // 맵 초기화 (배경, 몬스터 경로 그리기)
-  initMap(); 
-  // 설정된 초기 타워 개수만큼 사전에 타워 배치
-  //placeInitialTowers();
+  //서버 반응이 늦을경우 대기
+  while(monsterPath === undefined){
+    await sleep(100);
+    monsterPath = monsterSpawner.getPath();
+  }
+
+  console.log(monsterPath);
   // 맵 초기화 (배경, 몬스터 경로 그리기)
   initMap();
   // 기지 배치
