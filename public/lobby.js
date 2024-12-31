@@ -1,8 +1,8 @@
-import { sendEvent, ready } from "./src/init/socket.js"
+import { sendEvent, ready, getSocket } from "./src/init/socket.js"
 //import Monsters from "./src/model/monsterSpawner.js";
 //import { getSocket, getRoom } from "./src/init/socket.js";
 //import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-// import './src/chat/chat.js';
+import { intiChat } from './src/chat/chat.js';
 
 let rooms = [];
 let selectedRoom = null;
@@ -40,6 +40,7 @@ let type = document.createElement('div');
 let password = document.createElement('div');
 
 document.addEventListener('DOMContentLoaded', () => {
+    intiChat(getSocket())
     roomCreationForm = document.getElementById('roomCreationForm');
     enableCheckbox = document.getElementById('enablePasswordInput');
     passwordInput = document.getElementById('passwordInput');
