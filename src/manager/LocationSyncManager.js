@@ -7,29 +7,47 @@
 //====================================================================================================================
 //====================================================================================================================
 
+import { generatePath } from "../init/pathGenerator.js";
 import MonsterStorage from "../models/monsterStorage.model.js";
 
 export default class LocationSyncManager {
+    static instance = null;
     // constructor
     constructor(io, socket) {
-        this.io = io;
-        this.socket = socket;
-        // MonsterStorage 싱글턴 인스턴스와 연결
-        this.monsterStorage = MonsterStorage.getInstance();
-        this.interval = null;
-        // 임시 하드코딩된 프레임레이트: 약 30fps
-        this.syncRate = 1000 / 30;
-        // 관리할 게임 id
-        this.gameId = null;
-    }
-
-    // singleton instance
-    static getInstance = () => {
         if (!LocationSyncManager.instance) {
-            LocationSyncManager.instance = new LocationSyncManager();
+            this.io = io;
+            this.socket = socket;
+            // MonsterStorage 싱글턴 인스턴스와 연결
+            this.monsterStorage = MonsterStorage.getInstance();
+            this.interval = null;
+            // 임시 하드코딩된 프레임레이트: 약 30fps
+            this.syncRate = 1000 / 30;
+            // 관리할 게임 id
+            this.gameId = null;
+            // 몬스터 경로 일단 갖기
+            this.monsterPath = generatePath();
+            // 인스턴스
+            LocationSyncManager.instance = this;
         }
         return LocationSyncManager.instance;
-    };
+    }
+    // 초기화
+    static initialize(io, socket) {
+        if (!LocationSyncManager.instance) {
+            new LocationSyncManager(io, socket);
+        } else {
+            LocationSyncManager.instance.io = io;
+            LocationSyncManager.instance.socket = socket;
+        }
+        return LocationSyncManager.instance;
+    }
+
+    static getInstance() {
+        if (!LocationSyncManager.instance) {
+            throw new Error("[LSM/Error] LocationSyncManager has not been initialized.");
+        }
+        return LocationSyncManager.instance;
+    }
 
     // 존재하는 몬스터들에 대해서 서버사이드 이동 갱신
     updateMonsterMovement(monstersCached) {
@@ -43,28 +61,40 @@ export default class LocationSyncManager {
             const updatedX = monster.x + dx;
             const updatedY = monster.y + dy;
 
-            this.monsterStorage.updateMonster(this.gameId, uuid, {
-                x: updatedX,
-                y: updatedY,
-            });
+            // 목적지에 도달한 경우 처리=> 새로운 targetX, targetY
+            const epsilon = 0.01;
+            if (Math.abs(updatedX - monster.targetX) < epsilon && Math.abs(updatedY - monster.targetY) < epsilon) {
+                console.log(`[LSM/TEST] Monster ${uuid} reached its destination`);
 
-            // 목적지에 도달한 경우 처리 (필요시)
-            if (updatedX === monster.targetX && updatedY === monster.targetY) {
-                console.log(`[LSM/TEST] check: Monster ${uuid} destination arrived`);
+                // 새로운 목적지 설정 (랜덤 좌표 예제)
+                const newCurIndex = (monster.curIndex + 1) % this.monsterPath.length;
+                const newTargetX = this.monsterPath[newCurIndex].x;
+                const newTargetY = this.monsterPath[newCurIndex].y;
+
+                // targetX와 targetY 갱신
+                this.monsterStorage.updateMonster(this.gameId, uuid, {
+                    x: updatedX,
+                    y: updatedY,
+                    targetX: newTargetX,
+                    targetY: newTargetY,
+                    curIndex: newCurIndex,
+                });
+            }
+            else {
+                this.monsterStorage.updateMonster(this.gameId, uuid, {
+                    x: updatedX,
+                    y: updatedY,
+                });
             }
         });
     }
 
-
-
     // 동기화 작업 시작
     startSync(data) {
-
-
         // 테스트 로그
-        console.log("[LSM/TEST] data.gameId", data.gameId);
+        // console.log("[LSM/TEST] data.gameId", data.message.gameId);
         // gameId 확인 및 검증
-        this.gameId = data.gameId;
+        this.gameId = data.message.gameId;
         if (!this.gameId) {
             console.error("[LSM/Invalid] gameId 유효하지 않음");
         }
@@ -77,7 +107,7 @@ export default class LocationSyncManager {
         // 인터벌 시작
         this.interval = setInterval(() => {
             //#region 전체 로그 테스트
-            console.log("[LSM/TEST] this.monsterStorage.test();:  ", this.monsterStorage.test());
+            // console.log("[LSM/TEST] this.monsterStorage.test();:  ", this.monsterStorage.test());
             //#endregion
 
             // 테스트 로그: 몬스터스토리지 유효한지
@@ -89,7 +119,6 @@ export default class LocationSyncManager {
             const monstersCached = this.monsterStorage.getMonsters(this.gameId);
             if (monstersCached == null)
                 console.log("[LSM/Empty] monstersCached null");
-            console.log("[LSM/Empty] Object.keys(monstersCached).length :" + Object.keys(monstersCached).length);
 
             // 비어있으면 동기화할 필요 없음
             if (!Object.keys(monstersCached).length) {
@@ -110,6 +139,7 @@ export default class LocationSyncManager {
                         y: monster.y,
                         targetX: monster.targetX,
                         targetY: monster.targetY,
+                        curIndex: monster.curIndex,
                     });
                 }
                 return acc;
@@ -119,12 +149,8 @@ export default class LocationSyncManager {
                 return;
             }
 
-            // 클라 전달
-            this.io.emit(this.gameId, {
-                message: {
-                    eventName: "locationSync",
-                    data: targetMonsters,
-                }
+            this.io.to(this.gameId).emit('locationSync', {
+                data: targetMonsters,
             });
 
         }, this.syncRate);
@@ -133,6 +159,7 @@ export default class LocationSyncManager {
     // 동기화 중단
     stopSync() {
         if (this.interval) {
+            console.log('[LSM] 동기화 중단.');
             clearInterval(this.interval);
             this.interval = null;
         }
