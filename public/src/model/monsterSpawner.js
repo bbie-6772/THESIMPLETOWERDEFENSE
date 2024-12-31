@@ -1,7 +1,5 @@
 import { TestMonster } from "./testMonster.js";
 import { GetMonsterAnimation } from "./monsterAnimations.model.js";
-// import { 
-// , deleteMonster } from "../game.js";
 
 export default class Monsters {
   constructor(socket, gameId) {
@@ -61,9 +59,12 @@ export default class Monsters {
 
   // 데미지 테스트 - 테스트입니다
   sendMonsterDamageMessage(uuid, damage) {
-    this.socket.emit("monsterDamageMessage", {
-      uuid: uuid,
-      damage: damage,
+    this.socket.emit(this.gameId, {
+      message: {
+        eventName: "monsterDamageMessage",
+        uuid: uuid,
+        damage: damage,
+      },
     });
   }
 
