@@ -1,29 +1,21 @@
-const socket = io(); // Socket.IO 클라이언트 인스턴스 생성
+import { getSocket } from "../init/socket";
+
+const socket = getSocket(); // Socket.IO 클라이언트 인스턴스 생성
 
 let currentChannel = null; // 현재 채널을 저장할 변수 초기화
 const messageInput = document.getElementById('messageInput'); // 메시지 입력 필드 요소 가져오기
 const sendButton = document.getElementById('sendButton'); // 전송 버튼 요소 가져오기
 const messagesDiv = document.getElementById('messages'); // 메시지 표시 영역 요소 가져오기
-const channelListDiv = document.getElementById('channelList'); // 채널 목록 표시 영역 요소 가져오기
-const currentChannelHeader = document.getElementById('currentChannel'); // 현재 채널 제목 요소 가져오기
 
 // 채널 목록 요청
 socket.emit('getChannels');
 
-
 // 채널 목록 수신
 socket.on('channelList', (channels) => {
-    channelListDiv.innerHTML = ''; // 채널 목록 초기화
-    channels.forEach(channel => {
-        const channelElement = document.createElement('div'); // 새 채널 요소 생성
-        channelElement.className = 'channel-item'; // 클래스 이름 설정
-        if (currentChannel === channel.channelId) {
-            channelElement.classList.add('active'); // 현재 채널인 경우 활성화 클래스 추가
-        }
-        channelElement.textContent = channel.name; // 채널 이름 설정
-        channelElement.onclick = () => joinChannel(channel); // 클릭 시 채널 참여 함수 호출
-        channelListDiv.appendChild(channelElement); // 채널 요소를 목록에 추가
-    });
+    // 첫 번째 채널 자동 참여
+    if (channels.length > 0) {
+        joinChannel(channels[0]); // 첫 번째 채널에 자동으로 참여
+    }
 });
 
 // 채널 참여
@@ -37,18 +29,9 @@ function joinChannel(channel) {
     socket.emit('joinChannel', { channelId: channel.channelId }); // 새 채널 참여 요청
 
     // UI 업데이트
-    currentChannelHeader.textContent = channel.name; // 현재 채널 제목 업데이트
     messageInput.disabled = false; // 메시지 입력 필드 활성화
     sendButton.disabled = false; // 전송 버튼 활성화
     messagesDiv.innerHTML = ''; // 이전 메시지 내용 초기화
-
-    // 채널 목록 UI 업데이트
-    document.querySelectorAll('.channel-item').forEach(item => {
-        item.classList.remove('active'); // 모든 채널의 활성화 클래스 제거
-        if (item.textContent === channel.name) {
-            item.classList.add('active'); // 현재 채널에 활성화 클래스 추가
-        }
-    });
 }
 
 // 메시지 전송
