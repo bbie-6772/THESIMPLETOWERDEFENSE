@@ -1,6 +1,7 @@
 import { getrooms } from "../models/rooms.model.js";
 import towerModel from "../models/tower.model";
 import MonsterStorage from "../models/monsterStorage.model.js";
+import MonsterLifecycles from "../models/monster.lifecycles.model.js";
 
 //0,0 좌표의 타워
 const tower0Position = [200, 200];
@@ -12,7 +13,6 @@ const blockGap = 200;
 
 export const towerAttackCondtorl = (deltaTime) => {
   const rooms = getrooms();
-  const monsters = []; ///몬스터들을 받아오는 내용
   for (let roomsIndex = 0; roomsIndex < rooms.length; roomsIndex++) {
     const monsters = MonsterStorage.getMonsters(rooms[roomsIndex].gameId);
 
@@ -44,7 +44,7 @@ export const towerAttackCondtorl = (deltaTime) => {
             deltaTime
           )
         ) {
-            //타워 위치 계산
+          //타워 위치 계산
           const tmpTowerPositionX =
             tower0Position[0] +
             allUsersTowers[allUsersTowersIndex].X * towersGapX +
@@ -52,10 +52,6 @@ export const towerAttackCondtorl = (deltaTime) => {
           const tmpTowerPositionY =
             tower0Position[1] +
             allUsersTowers[allUsersTowersIndex].Y * towersGapY;
-
-          //
-          const monsters = []; ///몬스터들을 받아오는 내용
-          //
 
           for (
             let monstersIndex = 0;
@@ -74,6 +70,8 @@ export const towerAttackCondtorl = (deltaTime) => {
               tmpTower.target--;
               //범위공격 타워
               if (tmpTower.type == 2) {
+                //클라이언트에 전송
+
                 for (let i = 0; i < monsters.length; i++) {
                   if (
                     distanceCheck(
@@ -84,11 +82,20 @@ export const towerAttackCondtorl = (deltaTime) => {
                     ) < 30
                   ) {
                     //데미지 함수
+                    MonsterLifecycles.updateMonsterHealth(
+                      monsters[i].uuid,
+                      tmpTower.damage
+                    );
                   }
                 }
               } //단일공격 타워를 디폴트로
               else {
-                //데미지 함수
+                    //데미지 함수
+                    MonsterLifecycles.updateMonsterHealth(
+                      monsters[monstersIndex].uuid,
+                      tmpTower.damage
+                    );
+                    
               }
             }
             if (tmpTower.target <= 0) break;

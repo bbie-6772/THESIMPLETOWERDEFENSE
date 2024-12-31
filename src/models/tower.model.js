@@ -51,9 +51,11 @@ export const getTowers = () => {
 
 // 유저 타워 조회
 export const getUsersTowers = (userId) => {
-  return towers.find((Element) => {
+  let returnValue = towers.find((Element) => {
     return Element.userId === userId;
   });
+  if(returnValue === undefined) return undefined;
+  return returnValue.data;
 };
 
 // 단일 타워 조회
