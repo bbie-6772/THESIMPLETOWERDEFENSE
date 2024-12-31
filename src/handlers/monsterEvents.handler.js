@@ -30,8 +30,9 @@ export const receiveMonsterMessage = (io, socket) => {
     //#region locationSyncManager 싱크 시작
     LocationSyncManager.getInstance().startSync(data);
     //#endregion
+
   });
 
-  
+  return monsters;
 
 };

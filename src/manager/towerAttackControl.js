@@ -1,6 +1,5 @@
 import towerModel from "../models/tower.model.js";
 import MonsterStorage from "../models/monsterStorage.model.js";
-import MonsterLifecycles from "../models/monster.lifecycles.model.js";
 import { getRooms } from "../models/gameRoom.model.js";
 import { getUser } from "../models/users.model.js";
 import { GetTowerCoordinateFromGrid } from "../../public/src/model/tower.js";
@@ -18,7 +17,7 @@ let deltaTime = 0;
 
 let isInit = false;
 let monsterStorage = MonsterStorage.getInstance(); // MonsterStorage 인스턴스 연결
-export const towerAttackCondtorl = (io) => {
+export const towerAttackCondtorl = (io, monstercycle) => {
   if (!isInit) {
     previousTime = Date.now();
     isInit = true;
@@ -91,26 +90,28 @@ export const towerAttackCondtorl = (io) => {
             console.log(
               xPosition,
               yPosition,
-              monsters[mosterkey[monstersIndex]].X,
-              monsters[mosterkey[monstersIndex]].Y
+              monsters[mosterkey[monstersIndex]].x,
+              monsters[mosterkey[monstersIndex]].y,
+              tmpTower.range
             );
-            if (
+            if (monsters[mosterkey[monstersIndex]] != undefined&&
               distanceCheck(
                 xPosition,
                 yPosition,
-                monsters[mosterkey[monstersIndex]].X,
-                monsters[mosterkey[monstersIndex]].Y
+                monsters[mosterkey[monstersIndex]].x,
+                monsters[mosterkey[monstersIndex]].y
               ) < tmpTower.range
             ) {
               //클라이언트에 전송
               allUsersSockets.forEach((Element) => {
+                if(Element !== undefined && Element !== null)
                 sendToClient(
                   Element,
                   tmpTower.type,
                   xPosition,
                   yPosition,
-                  monsters[mosterkey[monstersIndex]].X,
-                  monsters[mosterkey[monstersIndex]].Y
+                  monsters[mosterkey[monstersIndex]].x,
+                  monsters[mosterkey[monstersIndex]].y
                 );
               });
 
@@ -119,16 +120,17 @@ export const towerAttackCondtorl = (io) => {
               //범위공격 타워
               if (tmpTower.type == 2) {
                 for (let i = 0; i < mosterkey.length; i++) {
-                  if (
+                  if (monsters[mosterkey[monstersIndex]] != undefined&&
+                    monsters[mosterkey[i]] != undefined&&
                     distanceCheck(
-                      monsters[mosterkey[monstersIndex]].X,
-                      monsters[mosterkey[monstersIndex]].Y,
-                      monsters[mosterkey[i]].X,
-                      monsters[mosterkey[i]].Y
+                      monsters[mosterkey[monstersIndex]].x,
+                      monsters[mosterkey[monstersIndex]].y,
+                      monsters[mosterkey[i]].x,
+                      monsters[mosterkey[i]].y
                     ) < 30
                   ) {
                     //데미지 함수
-                    MonsterLifecycles.updateMonsterHealth(
+                    monstercycle.updateMonsterHealth(
                       monsters[mosterkey[i]].uuid,
                       tmpTower.damage
                     );
@@ -137,7 +139,7 @@ export const towerAttackCondtorl = (io) => {
               } //단일공격 타워를 디폴트로
               else {
                 //데미지 함수
-                MonsterLifecycles.updateMonsterHealth(
+                monstercycle.updateMonsterHealth(
                   monsters[mosterkey[monstersIndex]].uuid,
                   tmpTower.damage
                 );
@@ -164,7 +166,7 @@ function sendToClient(
   towerY,
   targetX,
   targetY,
-  duration
+  duration = 2000
 ) {
   socket.emit("attack", {
     type: towertype,

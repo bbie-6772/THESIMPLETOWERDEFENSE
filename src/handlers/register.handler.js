@@ -5,6 +5,7 @@ import { ready } from "./helper.js";
 import { receiveMonsterMessage } from "./monsterEvents.handler.js";
 import MonsterLifecycles from "../models/monster.lifecycles.model.js";
 import LocationSyncManager from "../manager/LocationSyncManager.js";
+import { towerAttackCondtorl } from "../manager/towerAttackControl.js";
 
 const registerHandler = (io) => {
   // 모든 유저가 '연결' 시 콜백함수 실행
@@ -22,9 +23,9 @@ const registerHandler = (io) => {
     LocationSyncManager.initialize(io, socket);
 
     //const monsterLifecycles = new MonsterLifecycles(io, socket);
-    receiveMonsterMessage(io, socket);
+    let monstercycle = receiveMonsterMessage(io, socket);
     
-    const towerAttackCondtorlIntervalId = setInterval(() => { towerAttackCondtorl(io); }, 100);
+    const towerAttackCondtorlIntervalId = setInterval(() => { towerAttackCondtorl(io, monstercycle); }, 100);
 
     // 유저가 '연결해제' 시 실행
     socket.on('disconnect', () => handleDisconnect(socket, io))
