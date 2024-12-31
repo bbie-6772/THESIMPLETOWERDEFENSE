@@ -64,9 +64,13 @@ export default class Monsters {
 
   // 데미지 테스트 - 테스트입니다
   sendMonsterDamageMessage(uuid, damage) {
-    this.socket.emit("monsterDamageMessage", {
-      uuid: uuid,
-      damage: damage,
+    console.log("여긴오니?")
+    this.socket.emit(this.gameId, {
+      message: {
+        eventName: "monsterDamageMessage",
+        uuid: uuid,
+        damage: damage,
+      },
     });
   }
 

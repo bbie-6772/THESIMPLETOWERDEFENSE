@@ -13,6 +13,15 @@ import {generatePath} from "../init/pathGenerator.js"
 // 4. 위와 같은 이유로 구조를 변경하였습니다.
 /*===========================*/
 
+// 상수
+const WAVE_CYCLE = 10;
+const ELITE_MULTIPLIER = 2; // 앨리트 몬스터 배율
+const ELITE_MONSTER_SPAWN_CYCLE = 10; // 앨리터 몬스터 등장주기
+const ELITE_MONSTER_SIZE = 4;  // 엘리트 몬스터 크기
+const NORMAL_MONSTER_SIZE = 2;  // 일반 몬스터 크기
+const MONSTER_SPEED = 1; // 몬스터 디폴트 속도 
+const MONSTER_SPAWN_CYCLE = 2000; // 리스폰 속도. (1000 === 1초)
+
 export default class MonsterLifecycles {
   // 생성자
   constructor(io, socket) {
@@ -21,6 +30,8 @@ export default class MonsterLifecycles {
     this.socket = socket; // socket
     this.gameId = null; // 통신용 이벤트네임.
     this.monsterStorage = MonsterStorage.getInstance(); // MonsterStorage 인스턴스 연결
+
+
 
     // 리스폰 - setInterval 제어용도.
     this.spawnInterval = null; // setInterval 담을 용도.
@@ -31,6 +42,8 @@ export default class MonsterLifecycles {
 
     // 에셋
     this.monstersAssets = getGameAssets().monsters.data; // 몬스터 에셋
+
+    
   }
 
   // 초기화(리스폰 정보).
@@ -49,6 +62,7 @@ export default class MonsterLifecycles {
       wave: 1,
       path: monsterPath,
       pingPong:  this.pingPongCount,
+      eliteBossUuid: "",
     };
 
     // 정보 데이터 생성.
@@ -71,6 +85,10 @@ export default class MonsterLifecycles {
     }
 
     this.spawnInterval = setInterval(() => {
+      const {eliteBossUuid} = this.monsterStorage.getInfo(this.gameId)
+
+      
+
       //// 3. 몬스터 생성이 활성화 됬는지 체크.
       if (!this.isMonsterSpawnActive) {
         //// 4. 서버 연결이 중지 된다면 종료한다.
@@ -92,24 +110,24 @@ export default class MonsterLifecycles {
         const randomIdex = Math.floor(Math.random() * monsterListLengtht);
 
         //엘리트 몬스터 판단.
-        const {totalCount} = this.monsterStorage.getInfo(this.gameId);
+        const {totalCount, wave} = this.monsterStorage.getInfo(this.gameId);
         const {gold, score, health, speed } = monsterList[randomIdex];
 
-        const isEliteMonster = totalCount % 5 === 0;
+        const isEliteMonster = totalCount !== 0 && totalCount % ELITE_MONSTER_SPAWN_CYCLE === 0;
 
-        const eliteSize = isEliteMonster ? 4 : 2;
-        const eliteGold = isEliteMonster ? gold * 2 : gold;
-        const eliteScore = isEliteMonster ? score * 2 : score;
-        const eliteHealth = isEliteMonster ? health * 2 : health;
-        const eliteSpeed = isEliteMonster ? speed  : speed * 5;
+        const eliteSize = isEliteMonster ? ELITE_MONSTER_SIZE : NORMAL_MONSTER_SIZE;
+        const eliteGold = isEliteMonster ? gold * ELITE_MULTIPLIER : gold * wave;
+        const eliteScore = isEliteMonster ? score * ELITE_MULTIPLIER : score * wave;
+        const eliteHealth = isEliteMonster ? health * ELITE_MULTIPLIER : health * wave;
+        const eliteSpeed = isEliteMonster ? speed * (MONSTER_SPEED)  : speed * MONSTER_SPEED + wave;
 
         // 6-3. 몬스터 정보를 저장할 객체 생성.
         const monsterInfo = {
           gameId: this.gameId, // 게임 id
           name: monsterList[randomIdex].name, // 이름
           uuid: uuid, // uuid
-          x: null, // 몬스터 포지션 x
-          y: null, // 몬스터 포지션 y
+          x: this.x, // 몬스터 포지션 x
+          y: this.y, // 몬스터 포지션 y
           size: eliteSize,
           gold: eliteGold,
           score: eliteScore,
@@ -135,11 +153,20 @@ export default class MonsterLifecycles {
 
         //// 10. monsterStorage 추가/ 업데이트
         this.monsterStorage.addMonster(this.gameId, uuid, monsterInfo);
-        this.monsterStorage.updateInfo(this.gameId, {
-          totalCount: totalCount + 1,
-        });
 
+        // 앨리트 몬스터 출현 이면 엘리트uuid 저장
+        if(isEliteMonster) {
+          this.monsterStorage.updateInfo(this.gameId, {
+            totalCount: totalCount + 1,
+            eliteBossUuid: uuid,
+          });
+        } else {
+          this.monsterStorage.updateInfo(this.gameId, {
+            totalCount: totalCount + 1,
+          });
+        }
 
+        
         //// 11. 일정 시간 후 메시지 전송 상태를 다시 초기화 (생성 제한 용.)
         setTimeout(() => {
           this.isMonsterSpawnActive = false;
@@ -148,7 +175,7 @@ export default class MonsterLifecycles {
           const {wave, totalCount} = this.monsterStorage.getInfo(this.gameId);
           
           // 토탈 카운터 10번 기준 
-          if(totalCount % 10 === 0){
+          if(totalCount % WAVE_CYCLE === 0 && totalCount !== 0){
             this.monsterStorage.updateInfo(this.gameId, {wave : wave + 1});
           }
           
@@ -157,11 +184,9 @@ export default class MonsterLifecycles {
           const roomSize = Object.keys(this.monsterStorage.test()).length;
           
           console.log(`[${this.gameId}]번방 몬스터가 생성되었습니다. (rooms : [${roomSize}] / monsters : [${monstersSize + 1}])`);
-          console.log(this.monsterStorage.getMonster(this.gameId, uuid));
-          console.log(this.monsterStorage.getInfo(this.gameId).totalCount);
-        }, 2000); // 2초마다 한번만 메시지 전송
+        }, MONSTER_SPAWN_CYCLE); 
       }
-    }, 2000); // 1000ms = 1초
+    }, MONSTER_SPAWN_CYCLE); 
   }
 
   //====[서버 <-> 클라 연결 체크]====//
@@ -205,12 +230,24 @@ export default class MonsterLifecycles {
   
   }
 
+  //===[테스트]====//
+  monsterDamageMessage() {
+    this.socket.on(this.gameId, (data) => {
+      
+      if(data.message.eventName === "monsterDamageMessage") {
+        this.updateMonsterHealth(data.message.uuid, data.message.damage);
+      }
+    })
+  }
+
+
   //====[몬스터 체력 업데이트]====// 
   updateMonsterHealth(monsterUuid, data) {
-
+    
     let monster = this.monsterStorage.getMonster(this.gameId, monsterUuid);
+    
     // 몬스터 유효성 검사.
-    if (Object.keys(monster).length === 0) {
+    if (!monster || Object.keys(monster).length === 0) {
       return;
     }
 
@@ -248,7 +285,7 @@ export default class MonsterLifecycles {
       this.monsterStorage.removeMonster(this.gameId, monster.uuid);
 
       // 정보 수정.
-      const { kills, score, gold, wave } = this.monsterStorage.getInfo(this.gameId);
+      const { kills, score, gold, wave, eliteBossUuid} = this.monsterStorage.getInfo(this.gameId);
       const aliveCount = Object.keys(this.monsterStorage.getMonsters(this.gameId)).length;
 
       // 정보 업데이트.
@@ -266,9 +303,20 @@ export default class MonsterLifecycles {
           info: this.monsterStorage.getInfo(this.gameId)
         }
       }); 
+
+      if(eliteBossUuid === monster.uuid) {
+        this.monsterStorage.updateInfo(this.gameId, {
+          eliteBossUuid : "",
+        });
+
+        // 콘솔로그
+        console.log(`[${this.gameId}]번방 앨리트 몬스터가 제거되었습니다.`);
+      } else {
+        // 콘솔로그
+        console.log(`[${this.gameId}]번방 몬스터가 제거되었습니다.`);
+      }
       
-      // 콘솔로그
-      console.log(`[${this.gameId}]번방 몬스터가 제거되었습니다.`);
+      
     }
   }
 

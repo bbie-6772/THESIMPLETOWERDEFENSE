@@ -21,12 +21,10 @@ export const receiveMonsterMessage = (io, socket) => {
       socket.emit("monsterEventInit" , monsterStorage.getInfo(data.message.gameId));
     }
 
+    monsters.monsterDamageMessage();
     monsters.sendRespawnPing();
   });
 
-  // 데미지 체크 테스트
-  socket.on("monsterDamageMessage", (data) => {
-    monsters.updateMonsterHealth(data.uuid, data.damage);
-  });
+  
 
 };
