@@ -87,9 +87,15 @@ function handleMouseup(event) {
       if (towerPosition) {
       console.log( towerPosition.x,  towerPosition.y);
         console.log(towerPosition);
-        sendEvent(4001, { X: towerPosition.x, Y: towerPosition.y });
+        sendEvent(4001, { X: towerPosition.x, Y: towerPosition.y, tier: 1 });
       }
     } else if (holdingicon.button.text === "타워판매") {
+    }else if(holdingicon.button.text === '단일타워강화'){
+      sendEvent(3002, 0);
+    }else if(holdingicon.button.text === '멀티타워강화'){
+      sendEvent(3002, 1);
+    }else if(holdingicon.button.text === '범위타워강화'){
+      sendEvent(3002, 2);
     }
   }
   Canvas.classList.remove("hide-cursor");
@@ -103,8 +109,11 @@ function handleMouseup(event) {
     var y = (event.clientY - canvasRect.top) * scaleY;
     var targetTower = GetTowerFromCoordinate(x, y);
 
-    // { oneID, otherID }
-    sendEvent(3001, { oneID: currentTower.oid, otherID: targetTower.oid });
+    const payload = { x1 : currentTower.x, y1 : currentTower.y, x2 : targetTower.x, y2 : targetTower.y };
+    console.log(`tower merge : ${[currentTower.x, currentTower.y]} & ${[targetTower.x, targetTower.y]}`)
+    // { x1, y1, x2, y2 } : 그리드 좌표
+    sendEvent(3001, payload);
+    currentTower = null;
   }
   isHolding = false;
   holdingicon = {};
@@ -129,6 +138,14 @@ export const drawmousePoint = (ctx) => {
   if (isHolding && "image" in holdingicon) {
     ctx.drawImage(
       holdingicon.image,
+      mousePosition[0] - 25,
+      mousePosition[1] - 25,
+      50,
+      50
+    );
+  }else if(isHolding && currentTower){
+    ctx.drawImage(
+      currentTower.image,
       mousePosition[0] - 25,
       mousePosition[1] - 25,
       50,

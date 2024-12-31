@@ -37,7 +37,6 @@ export class Tower {
     this.tier = tier;
     this.beamDuration = 0; // 타워 광선 지속 시간
     this.target = null; // 타워 광선의 목표
-    towers.push(this);
   }
 
   // draw(ctx) {
@@ -113,7 +112,7 @@ export const GetTowerCoordinateFromGrid = (x, y) => {
 };
 //return { status: 'success',towerid: towers.data[getRandomTower].id, x: X, y: Y, gold };
 export const setNewTower = (data) => {
-  const { towerid, x, y, gold } = data;
+  const { towerid, x, y, gold, tier } = data;
   //const {towers} = getGameAssets();
   console.log(towerid);
   const tmpTower = getGameAssets().towers.data.find((element) => {
@@ -128,9 +127,19 @@ export const setNewTower = (data) => {
     localStorage.getItem("access-Token"),
     x,
     y,
-    tmpTowerImage
+    tmpTowerImage,
+    tier,
   );
   towers.push(newtower);
   setTowerBase(x, y, newtower);
   setUserGold(gold);
 };
+
+export const removeTower = (x, y) => {
+  var targetIdx = towers.findIndex((e) => {
+    return e.x === x && e.y === y;
+  });
+  towers.splice(targetIdx, 1);
+  console.log(towers);
+  setTowerBase(x, y, null);
+}

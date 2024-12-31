@@ -1,4 +1,5 @@
 import { getGameAssets } from "../init/assets.js";
+import { getRandomInt } from "../utils/randNumberGenerate.js";
 import { getUser } from "./users.model.js";
 
 const towers = [];
@@ -77,8 +78,8 @@ export const removeUser = (userId) => {
 
 // 배열에서 타워 삭제
 export const removeUsersTower = (userId, X, Y) => {
-  let userstowers = getUsersTowers(userId);
-  const indexoftower = userstowers.data.findIndex((Element) => {
+  let userstowers = getUsersTowers(userId).data;
+  const indexoftower = userstowers.findIndex((Element) => {
     return Element.X == X && Element.Y == Y;
   });
   if (indexoftower < 0) return false;
@@ -128,10 +129,10 @@ export const merge = (uuid, x1, y1, x2, y2) => {
   // other 자리에 무작위 상위 티어 타워를 생성한다
   const towers = getGameAssets().towers;
   const randomTower = getRandomInt(0, towers.data.length);
-  addTower(uuid, x2, y2, randomTower, newtier);
+  addTower(uuid, x2, y2, towers.data[randomTower].id, newtier);
 
   // 생성된 타워에 대한 정보를 반환한다(클라이언트에 전달해야함)
-  return { uuid: uuid, type: randomTower, tier: newtier, x: x2, y: y2 };
+  return { uuid: uuid, towerId: towers.data[randomTower].id, tier: newtier, x: x2, y: y2, rx : x1, ry : y1 };
 }
 
 export const upgrade = (uuid, towerId) => {
