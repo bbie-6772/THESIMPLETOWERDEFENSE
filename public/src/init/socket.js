@@ -108,7 +108,7 @@ export const sendEvent = async (handlerId, payload) => {
           removeTower(x, y);
           removeTower(rx, ry);
           // 상위 타워 생성
-          setNewTower({towerid : towerId, x : x, y : y, gold : 0});
+          setNewTower({towerid : towerId, x : x, y : y, gold : 0, tier: tier});
         }catch(err){
           console.log(err);
         }

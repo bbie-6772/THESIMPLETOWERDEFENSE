@@ -87,7 +87,7 @@ function handleMouseup(event) {
       if (towerPosition) {
       console.log( towerPosition.x,  towerPosition.y);
         console.log(towerPosition);
-        sendEvent(4001, { X: towerPosition.x, Y: towerPosition.y });
+        sendEvent(4001, { X: towerPosition.x, Y: towerPosition.y, tier: 1 });
       }
     } else if (holdingicon.button.text === "타워판매") {
     }else if(holdingicon.button.text === '단일타워강화'){

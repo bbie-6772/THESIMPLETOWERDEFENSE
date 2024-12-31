@@ -78,8 +78,8 @@ export const removeUser = (userId) => {
 
 // 배열에서 타워 삭제
 export const removeUsersTower = (userId, X, Y) => {
-  let userstowers = getUsersTowers(userId);
-  const indexoftower = userstowers.data.findIndex((Element) => {
+  let userstowers = getUsersTowers(userId).data;
+  const indexoftower = userstowers.findIndex((Element) => {
     return Element.X == X && Element.Y == Y;
   });
   if (indexoftower < 0) return false;
