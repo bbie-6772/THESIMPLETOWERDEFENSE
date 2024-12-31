@@ -3,6 +3,7 @@ import { sendEvent, ready } from "./src/init/socket.js"
 //import { getSocket, getRoom } from "./src/init/socket.js";
 //import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
+let game = null;
 let rooms = [];
 let selectedRoom = null;
 let roomId = null;
@@ -240,9 +241,11 @@ export const updateUser = (roomInfo) => {
 
 // 대기방 나가기
 export const exitRoom = () => {
+    console.log("나가래")
     selectedRoom = null
     roomId = null
     waitRoom.hide()
+    gameOver()
     // 방 대기열 요청
     sendEvent(1002);
 }
@@ -258,7 +261,16 @@ export const updateRooms = (roomsInfo) => {
 
 // 게임 시작 
 export const gameStart = () => {
-    waitRoom.hide()
-    import("./src/game.js")
+    waitRoom.hide();
+    import("./src/game.js").then( module => {
+        game = module
+    });
     gameFrame.style.display = "block"
+}
+
+// 게임 오버,끝
+export const gameOver = () => {
+    console.log("나갔어")
+    game = null
+    gameFrame.style.display = "none"
 }
