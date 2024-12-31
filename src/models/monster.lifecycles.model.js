@@ -25,10 +25,8 @@ export default class MonsterLifecycles {
     // 리스폰 - setInterval 제어용도.
     this.spawnInterval = null; // setInterval 담을 용도.
     this.isMonsterSpawnActive = false; // 스폰을 진행 중인가.
-    this.spawnCount = 0; // 남아있는 스폰카운터.
 
     // 통신관련 변수
-    this.pingPong = 0;
     this.pingPongCount = 3;
 
     // 에셋
@@ -38,9 +36,7 @@ export default class MonsterLifecycles {
   // 초기화(리스폰 정보).
   respawnInitializer(data) {
     const monsterPath = generatePath();
-
     this.eventName = data.message.gameId;
-    this.spawnCount = 0;
     this.x = monsterPath[0].x;
     this.y = monsterPath[0].y;
 
@@ -52,6 +48,7 @@ export default class MonsterLifecycles {
       gold: 0,
       wave: 1,
       path: monsterPath,
+      pingPong:  this.pingPongCount,
     };
 
     // 정보 데이터 생성.
@@ -61,28 +58,24 @@ export default class MonsterLifecycles {
     this.socket.emit("monsterEventInit" , this.monsterStorage.getInfo(this.eventName));
   }
 
+  eventNameInitializer(data){
+    this.eventName = data.message.gameId;
+  }
+
   //====[리스폰]====//
-  spawnMonster(conut) {
+  spawnMonster() {
     //// 1. 이벤트 네임은 반드시 존재해야합니다.
     if (this.eventName === null) {
       console.log("이벤트 네임을 지정해주세요.");
       return;
     }
 
-    //// 2. 스폰 카운터가 0이라면 스폰 카운터를 갱신합니다.
-    if (this.spawnCount === 0) {
-      this.spawnCount = conut;
-    } else {
-      // 2-1. 스폰 카운터가 0인데 이곳에 다시 돌아온다면 무언가가 문제가 발생한것.
-      console.log("이미 리스폰이 진행중입니다.");
-      return;
-    }
-
     this.spawnInterval = setInterval(() => {
       //// 3. 몬스터 생성이 활성화 됬는지 체크.
       if (!this.isMonsterSpawnActive) {
-        //// 4. 스폰 카운터가 0 이거나 서버 연결이 중지 된다면 종료한다.
-        if (this.spawnCount <= 0 || this.pingPong === 0) {
+        //// 4. 서버 연결이 중지 된다면 종료한다.
+        const pingPong = this.monsterStorage.getInfo(this.eventName).pingPong;
+        if (pingPong === 0) {
           this.terminateRespawn();
           return;
         }
@@ -106,17 +99,17 @@ export default class MonsterLifecycles {
           gameId: this.eventName, // 게임 id
           name: monsterList[randomIdex].name, // 이름
           uuid: uuid, // uuid
-          x: null, // 시작 포지션 x
-          y: null, // 시작 포지션 y
-          targetX: null, // 다음 웨어 포인트 x (웨어 포인트 정보를 가져와야함.)
-          targetY: null, // 다음 웨어 포인트 y (웨어 포인트 정보를 가져와야함.)
+          x: null, // 몬스터 포지션 x
+          y: null, // 몬스터 포지션 y
           gold: monsterList[randomIdex].gold,
           score: monsterList[randomIdex].score,
           stat: {
             health: monsterList[randomIdex].health, // 체력
-            speed: monsterList[randomIdex].speed, // 스피드
+            speed: monsterList[randomIdex].speed * 5, // 스피드
           },
         };
+
+        
 
         //// 7. 메세지를 보내자. (전체로) - 수정 해야함!!
         this.io.emit(this.eventName, {
@@ -140,12 +133,20 @@ export default class MonsterLifecycles {
         //// 11. 일정 시간 후 메시지 전송 상태를 다시 초기화 (생성 제한 용.)
         setTimeout(() => {
           this.isMonsterSpawnActive = false;
+
+          // 일정 카운터마다 레벨상승.
+          const {wave, totalCount} = this.monsterStorage.getInfo(this.eventName);
+          
+          // 토탈 카운터 10번 기준 
+          if(totalCount % 10 === 0){
+            this.monsterStorage.updateInfo(this.eventName, {wave : wave + 1});
+          }
           
           // 테스트용 로그 출력.
           const monstersSize = Object.keys(this.monsterStorage.getMonsters(this.eventName)).length;
           const roomSize = Object.keys(this.monsterStorage.test()).length;
           
-          console.log(`[${this.eventName}]번방 몬스터가 생성되었습니다. (rooms : [${roomSize}] / monsters : [${monstersSize}])`);
+          console.log(`[${this.eventName}]번방 몬스터가 생성되었습니다. (rooms : [${roomSize}] / monsters : [${monstersSize + 1}])`);
 
         }, 2000); // 2초마다 한번만 메시지 전송
       }
@@ -154,30 +155,28 @@ export default class MonsterLifecycles {
 
   //====[서버 <-> 클라 연결 체크]====//
   sendRespawnPing() {
-    this.pingPong = this.pingPongCount;
-
-    // this.socket.on("respawnPong", () => {
-    //   this.pingPong = this.pingPongCount; // 클라이언트 응답 받으면 카운트 리셋
-    // });
-
     this.socket.on(this.eventName, (data) => {
       if(data.message.eventName === "respawnPong") {
-        
-        this.pingPong = this.pingPongCount; // 클라이언트 응답 받으면 카운트 리셋
+        // 클라이언트 응답 받으면 카운트 리셋
+        this.monsterStorage.updateInfo(this.eventName, {pingPong : this.pingPongCount})
       }
     })
 
     const interval = setInterval(() => {
-      //this.socket.emit("respawnPing"); // 클라이언트에게 ping 전송
-
+      let pingPong = this.monsterStorage.getInfo(this.eventName).pingPong;
+      
       this.io.emit(this.eventName, {
-        message: { eventName: "respawnPing" }
+        message: { 
+          eventName: "respawnPing", 
+          info: this.monsterStorage.getInfo(this.eventName),
+        }
       }); // 클라이언트에게 ping 전송
 
-      if (this.pingPong > 0) {
-        this.pingPong--; // 응답 대기 중이면 카운트 감소
+      if (pingPong > 0) {
+        pingPong--; // 응답 대기 중이면 카운트 감소
+        this.monsterStorage.updateInfo(this.eventName, {pingPong : pingPong})
       }
-      if (this.pingPong === 0) {
+      if (pingPong === 0 || pingPong === undefined) {
         clearInterval(interval); // 응답 없으면 타이머 종료
       }
     }, 1000); // 1초마다 체크
@@ -191,7 +190,7 @@ export default class MonsterLifecycles {
     this.monsterStorage.removeMonsters(this.eventName);
 
     const roomSize = Object.keys(this.monsterStorage.test()).length;
-    console.log(`응답이 없어 [${this.eventName}]번 방 리스폰을 종료합니다. (rooms : [${roomSize}])`);
+    console.log(`[${this.eventName}]번 방 리스폰을 종료합니다. (rooms : [${roomSize}])`);
   
   }
 
@@ -199,7 +198,6 @@ export default class MonsterLifecycles {
   updateMonsterHealth(monsterUuid, data) {
 
     let monster = this.monsterStorage.getMonster(this.eventName, monsterUuid);
-
     // 몬스터 유효성 검사.
     if (Object.keys(monster).length === 0) {
       return;

@@ -6,7 +6,7 @@ import {
   gameStart,
   exitRoom,
 } from "../../lobby.js";
-import Monsters from "../model/monsterSpawner.js";
+
 
 let userId = null;
 let nickname = null;
@@ -114,6 +114,7 @@ export const ready = (roomId, single) => {
     roomId,
     single,
   });
+  room = roomId;
 };
 
 export const getSocket = () => {
