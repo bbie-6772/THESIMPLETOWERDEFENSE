@@ -1,4 +1,5 @@
 import { validateMessage } from "../chat/chatValid.js";
+import LocationSyncManager from "../manager/LocationSyncManager.js";
 export function setupChatHandlers(io, socket, chatService) {
     // 채널 목록 요청 처리
     socket.on('getChannels', () => {
@@ -89,6 +90,10 @@ export function setupChatHandlers(io, socket, chatService) {
     return {
         // 사용자 연결 종료 처리
         handleDisconnect: () => {
+            //#region 위치동기화 종료
+            LocationSyncManager.getInstance().stopSync();
+            //#endregion
+
             console.log('사용자가 연결을 종료했습니다:', socket.id);
             // 사용자가 참여한 모든 채널에서 나감
             chatService.channelManager.getAllChannels().forEach(channel => {

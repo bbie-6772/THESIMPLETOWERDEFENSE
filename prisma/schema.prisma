@@ -22,10 +22,10 @@ model Users {
 model Ranks {
   id      Int    @id @default(autoincrement()) @map("id")
   userId1 String @map("user_id_1")
-  userId2 String @map("user_id_2")
+  userId2 String? @map("user_id_2")
   score   Int    @map("score")
   user1   Users  @relation("User1Relation", fields: [userId1], references: [id], onDelete: Cascade)
-  user2   Users  @relation("User2Relation", fields: [userId2], references: [id], onDelete: Cascade)
+  user2   Users?  @relation("User2Relation", fields: [userId2], references: [id], onDelete: Cascade)
 
   @@index([userId1], map: "Ranks_user_id_1_fkey")
   @@index([userId2], map: "Ranks_user_id_2_fkey")

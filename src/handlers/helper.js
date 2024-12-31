@@ -111,6 +111,31 @@ export const handleConnection = async (socket) => {
             }
         })
 
+        // const soloRank = await prisma.ranks.findMany({
+        //     where: { userId2: null},
+        //     orderBy: [{
+        //         score: 'desc',
+        //     }], 
+        //     select: {
+        //         userId1: true,
+        //         score: true
+        //     },
+        //     take: 10 
+        // })
+
+        // const multiRank = await prisma.ranks.findMany({
+        //     where: { userId2: { isNot: null} },
+        //     orderBy: [{
+        //         score: 'desc',
+        //     }],
+        //     select: {
+        //         userId1: true,
+        //         userId2: true,
+        //         score: true
+        //     },
+        //     take: 10 
+        // })
+
         //유저와 연결되면 클라이언트에게 인터페이스 용 값 전달
         socket.emit('connection', [loginUser.id, loginUser.nickname, loginUser.highScoreS, loginUser.highScoreM, rooms])
 
@@ -129,17 +154,27 @@ export const handleDisconnect = (socket, io) => {
     const user = deleteUser(socket.id)
     let room = getRoom(user.userId);
     let destroyed = null;
+    let left = null
     // 참여 방 확인 + 게임 시작 여부 확인으로 방 삭제 혹은 나가기
+    console.log(room)
     if (room) {
         if (room.startTime > 0) {
             destroyed = destroyRoom(user.userId)
             io.to(room.gameId).emit('leaveRoom', { roomId: destroyed.gameId })
-        }
-        else {
-            room = leaveRoom(room.gameId, user.userId)
-            io.to(room.gameId).emit('room', { room })
+        } else {
+            left = leaveRoom(room.gameId, user.userId)
+            if (left) {
+                left.userId1 = getUser(left.userId1).nickname
+                // 업뎃 정보 공유
+                io.to(room.gameId).emit('room', left )
+                // 참가자가 나갔을 시 참가자만 제외
+                socket.emit('leaveRoom', { roomId: room.gameId })
+                // 호스트가 나갈 시 + 오류 시 인원 전부 삭제하도록 요구
+            } else io.to(room.gameId).emit('leaveRoom', { roomId: room.gameId })
         }
     }
+
+    console.log(getUsers())
 }
 
 // 준비상태 확인
@@ -204,8 +239,10 @@ export const handlerEvent = (io, socket, data) => {
             io.emit('response', response);
             return;
         }
+
         // 대상 유저에게만 보냄
         socket.emit('response', [data.handlerId, response]);
+
     } catch (err) {
         console.log(err)
         socket.emit('connection', {

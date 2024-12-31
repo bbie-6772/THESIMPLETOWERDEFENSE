@@ -7,54 +7,129 @@
 //====================================================================================================================
 //====================================================================================================================
 
-import MonsterStorage from "../models/monsterStorage.model";
+import { generatePath } from "../init/pathGenerator.js";
+import MonsterStorage from "../models/monsterStorage.model.js";
 
 export default class LocationSyncManager {
+    static instance = null;
     // constructor
     constructor(io, socket) {
-        this.io = io;
-        this.socket = socket;
-        // MonsterStorage 싱글턴 인스턴스와 연결
-        this.monsterStorage = MonsterStorage.getInstance();
-        this.interval = null;
-        // 임시 하드코딩된 프레임레이트
-        this.syncRate = 1000 / 30;
-        // 관리할 게임 id
-        this.gameId = null;
-    }
-
-    // singleton instance
-    static getInstance = () => {
         if (!LocationSyncManager.instance) {
-            LocationSyncManager.instance = new LocationSyncManager();
+            this.io = io;
+            this.socket = socket;
+            // MonsterStorage 싱글턴 인스턴스와 연결
+            this.monsterStorage = MonsterStorage.getInstance();
+            this.interval = null;
+            // 임시 하드코딩된 프레임레이트: 약 30fps
+            this.syncRate = 1000 / 30;
+            // 관리할 게임 id
+            this.gameId = null;
+            // 몬스터 경로 일단 갖기
+            this.monsterPath = generatePath();
+            // 인스턴스
+            LocationSyncManager.instance = this;
         }
         return LocationSyncManager.instance;
-    };
+    }
+    // 초기화
+    static initialize(io, socket) {
+        if (!LocationSyncManager.instance) {
+            new LocationSyncManager(io, socket);
+        } else {
+            LocationSyncManager.instance.io = io;
+            LocationSyncManager.instance.socket = socket;
+        }
+        return LocationSyncManager.instance;
+    }
+
+    static getInstance() {
+        if (!LocationSyncManager.instance) {
+            throw new Error("[LSM/Error] LocationSyncManager has not been initialized.");
+        }
+        return LocationSyncManager.instance;
+    }
+
+    // 존재하는 몬스터들에 대해서 서버사이드 이동 갱신
+    updateMonsterMovement(monstersCached) {
+        Object.entries(monstersCached).forEach(([uuid, monster]) => {
+            // 이동 로직 (간단한 랜덤 이동 예제)
+            const diffx = monster.targetX - monster.x;
+            const diffy = monster.targetY - monster.y;
+            const dx = Math.sign(diffx) * Math.min(monster.stat.speed, Math.abs(diffx));
+            const dy = Math.sign(diffy) * Math.min(monster.stat.speed, Math.abs(diffy));
+            // 현재 위치 기반 새로운 위치
+            const updatedX = monster.x + dx;
+            const updatedY = monster.y + dy;
+
+            // 목적지에 도달한 경우 처리=> 새로운 targetX, targetY
+            const epsilon = 0.01;
+            if (Math.abs(updatedX - monster.targetX) < epsilon && Math.abs(updatedY - monster.targetY) < epsilon) {
+                // console.log(`[LSM/TEST] Monster ${uuid} reached its destination`);
+
+                // 새로운 목적지 설정 (랜덤 좌표 예제)
+                const newCurIndex = (monster.curIndex + 1) % this.monsterPath.length;
+                const newTargetX = this.monsterPath[newCurIndex].x;
+                const newTargetY = this.monsterPath[newCurIndex].y;
+
+                // targetX와 targetY 갱신
+                this.monsterStorage.updateMonster(this.gameId, uuid, {
+                    x: updatedX,
+                    y: updatedY,
+                    targetX: newTargetX,
+                    targetY: newTargetY,
+                    curIndex: newCurIndex,
+                });
+            }
+            else {
+                this.monsterStorage.updateMonster(this.gameId, uuid, {
+                    x: updatedX,
+                    y: updatedY,
+                });
+            }
+        });
+    }
 
     // 동기화 작업 시작
     startSync(data) {
+        // 테스트 로그
+        // console.log("[LSM/TEST] data.gameId", data.message.gameId);
         // gameId 확인 및 검증
         this.gameId = data.message.gameId;
         if (!this.gameId) {
-            console.error("[Invalid] gameId 유효하지 않음");
+            console.error("[LSM/Invalid] gameId 유효하지 않음");
         }
-
         // 이미 실행 중인지 확인
         if (this.interval) {
-            console.warn("[Already Running] 기존 동기화 중지");
+            console.warn("[LSM/Already Running] 기존 동기화 중지");
             this.stopSync();
         }
 
-
         // 인터벌 시작
         this.interval = setInterval(() => {
+            //#region 전체 로그 테스트
+            // console.log("[LSM/TEST] this.monsterStorage.test();:  ", this.monsterStorage.test());
+            //#endregion
+
+            // 테스트 로그: 몬스터스토리지 유효한지
+            if (!this.monsterStorage)
+                console.warn("[LSM/Invalid] monsterstorage invalid");
+
+
             // monsters 변경될 수 있으니 다시 가져오기
             const monstersCached = this.monsterStorage.getMonsters(this.gameId);
+            if (monstersCached == null)
+                console.log("[LSM/Empty] monstersCached null");
+
             // 비어있으면 동기화할 필요 없음
             if (!Object.keys(monstersCached).length) {
-                console.log("No monsters to sync.");
+                console.log("[LSM/Empty] No monsters to sync.");
                 return;
             }
+
+            // 몬스터 이동 로직을 통해 위치 업데이트
+            this.updateMonsterMovement(monstersCached);
+
+
             // 이동 중인 몬스터 데이터를 추출
             const targetMonsters = Object.entries(monstersCached).reduce((acc, [uuid, monster]) => {
                 if (monster.x !== monster.targetX || monster.y !== monster.targetY) {
@@ -64,6 +139,7 @@ export default class LocationSyncManager {
                         y: monster.y,
                         targetX: monster.targetX,
                         targetY: monster.targetY,
+                        curIndex: monster.curIndex,
                     });
                 }
                 return acc;
@@ -73,25 +149,27 @@ export default class LocationSyncManager {
                 return;
             }
 
-            // 클라 전달
-            this.io.emit(this.gameId, {
-                message: {
-                    eventName: "locationSync",
-                    data: targetMonsters,
-                }
+            this.io.to(this.gameId).emit('locationSync', {
+                data: targetMonsters,
             });
 
-        }, this.syncRate); // 약 30fps로 업데이트
+        }, this.syncRate);
     }
 
     // 동기화 중단
     stopSync() {
         if (this.interval) {
+            console.log('[LSM] 동기화 중단.');
             clearInterval(this.interval);
             this.interval = null;
         }
     }
 }
+
+
+
+
+/*
 class Monster {
     constructor(path, level) {
         this.path = path;
@@ -228,4 +306,4 @@ function updateMonsterPosition(id, x, y) {
 }
 
 // 게임 루프 시작
-requestAnimationFrame(gameLoop);
+requestAnimationFrame(gameLoop);    */
