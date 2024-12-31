@@ -1,10 +1,11 @@
 export class Vfx {
-  constructor(Animations, x, y , width = 80, height = 80, animationSpeed = 20) {
+  constructor(Animations, x, y , size, width = 80, height = 80, animationSpeed = 20) {
     // 이미지 크기
     this.width = width;
     this.height = height;
     this.x = x;
     this.y = y;
+    this.size = size;
 
     // 애니메이션
     this.animation = Animations; // 애니메이션 데이터 (배열)
@@ -24,8 +25,15 @@ export class Vfx {
     if (this.isFinished) return; // 애니메이션이 끝났으면 그리지 않음
 
     const currentImage = this.animation[this.currentFrame];
-    ctx.drawImage(currentImage, this.x, this.y, this.width, this.height);
+    ctx.drawImage(
+      currentImage,
+      this.x - (this.width * this.size) / 2, // x좌표를 중심으로 조정
+      this.y - (this.height * this.size) / 2, // y좌표를 중심으로 조정
+      this.width * this.size, // 너비
+      this.height * this.size // 높이
+    );
 
+    
     // 프레임 시간 증가
     this.frameTime++;
 

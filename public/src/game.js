@@ -290,7 +290,7 @@ function gameLoop() {
         // 이펙트 추가
         const vfxCount = Object.keys(GetVfxAnimations()).length;
         const randomVfx = Math.floor(Math.random() * (vfxCount));
-        vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y))
+        vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y, monster.size))
         
         monsterSpawner.sendMonsterDamageMessage(monster.uuid, 10000);
         /* 몬스터가 죽었을 때 */
