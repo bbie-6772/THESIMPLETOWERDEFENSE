@@ -51,6 +51,16 @@ socket.on("response", (data) => {
 socket.on("ready", (data) => {
   alert(data.message);
   if (data.status === "start") gameStart();
+
+  console.log("this.room : " + room);
+  // 위치 동기화 시작
+  socket.emit("startSync", {
+    userId,
+    token,
+    clientVersion: CLIENT_VERSION,
+    // gameId: this.getRoom(),
+    gameId: room,
+  });
 });
 
 socket.on("room", (data) => {
