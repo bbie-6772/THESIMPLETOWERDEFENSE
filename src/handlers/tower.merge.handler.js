@@ -1,3 +1,4 @@
+import { getGameAssets } from "../init/assets.js";
 import { getRoom } from "../models/gameRoom.model.js";
 import towerModel from "../models/tower.model.js";
 import { getUser } from "../models/users.model.js";
@@ -25,16 +26,30 @@ export const TowerMerge = (uuid, payload) => {
 
 // 타워 강화 핸들러, handlerID : 3002
 export const TowerUpgrade = (uuid, payload) => {
-    const { towerId } = payload;
+    const towerId = payload;
 
     // 검증
     // uuid가 유효한지 검사 (uuid가 존재하는지)
     const room = getRoom(uuid);
     if (!room) return { status: 'fail', message: '유저를 찾을 수 없습니다' };
-    // 골드가 충분한지 검사
-    
-    // 타워 업그레이드가 최대 레벨인지 검사
-    if (getUser(uuid).upgrades[towerId] === towerModel.max_upgrade) return { status: 'fail', message: '타워 업그레이드가 최대 레벨입니다' };
 
-    return towerModel.upgrade(uuid, towerId);
+    // 검증하기 위한 데이터
+    const user = getUser(uuid);
+    const upgrades = getGameAssets().upgrades.data;
+    if (!user.upgrades[towerId]) {
+        user.upgrades[towerId] = 0;
+    }
+    const currentLevel = user.upgrades[towerId];
+
+    // 타워 업그레이드가 최대 레벨인지 검증
+    if (currentLevel === towerModel.max_upgrade) return { status: 'fail', message: '타워 업그레이드가 최대 레벨입니다' };
+    // 골드가 충분한지 검증
+    if (user.gold < upgrades[currentLevel]) return { status: "fail", message: "lack of money." };
+      
+    const remainGold = user.gold - upgrades[currentLevel];
+    setUserGold(uuid, remainGold);
+    
+    const response = { ...towerModel.upgrade(uuid, towerId), remainGold};
+    console.log(response);
+    return response;
 }
