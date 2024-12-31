@@ -1,3 +1,4 @@
+import LocationSyncManager from "../manager/LocationSyncManager.js";
 import MonsterLifecycles from "../models/monster.lifecycles.model.js";
 import MonsterStorage from "../models/monsterStorage.model.js";
 
@@ -5,14 +6,11 @@ import MonsterStorage from "../models/monsterStorage.model.js";
 export const receiveMonsterMessage = (io, socket) => {
   const monsterStorage = MonsterStorage.getInstance();
   const monsters = new MonsterLifecycles(io, socket);
-
+  //#region  locationSyncManager 추가
+  // const locationSyncManager = new LocationSyncManager(io, socket);
+  //#endregion
   // 초기화.
   socket.on("monsterEventInit", (data) => {
-    //#region 테스트 로그
-    console.log("[MEH/TEST] data.message.gameId: ", data.message.gameId);
-    console.log("[MEH/TEST] monsterStorage.getInfo(data.message.gameId) is null? : ", monsterStorage.getInfo(data.message.gameId) == null);
-    //#endregion
-
     const roomCount = Object.keys(monsterStorage.getInfo(data.message.gameId)).length;
     
     if (roomCount === 0) {
@@ -23,6 +21,10 @@ export const receiveMonsterMessage = (io, socket) => {
       socket.emit("monsterEventInit", monsterStorage.getInfo(data.message.gameId));
     }
     monsters.sendRespawnPing();
+
+    //#region locationSyncManager 싱크 시작
+    LocationSyncManager.getInstance().startSync(data);
+    //#endregion
   });
 
   // 데미지 체크 테스트
