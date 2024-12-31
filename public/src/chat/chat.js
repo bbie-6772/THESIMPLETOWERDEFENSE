@@ -2,9 +2,14 @@
 export const intiChat = (socket) => {
 
     let currentChannel = null; // 현재 채널을 저장할 변수 초기화
-    const messageInput = document.getElementById('messageInput'); // 메시지 입력 필드 요소 가져오기
-    const sendButton = document.getElementById('sendButton'); // 전송 버튼 요소 가져오기
-    const messagesDiv = document.getElementById('messages'); // 메시지 표시 영역 요소 가져오기
+    // 게임 모드인지 확인
+    const isGameMode = document.getElementById('gameFrame').style.display === 'block';
+
+    // 게임 모드에 따라 다른 요소 선택
+    const messageInput = document.getElementById(isGameMode ? 'game-messageInput' : 'messageInput');
+    const sendButton = document.getElementById(isGameMode ? 'game-sendButton' : 'sendButton');
+    const messagesDiv = document.getElementById(isGameMode ? 'game-messages' : 'messages');
+
 
     // 이벤트 리스너
     sendButton.onclick = sendMessage; // 전송 버튼 클릭 시 메시지 전송 함수 호출
