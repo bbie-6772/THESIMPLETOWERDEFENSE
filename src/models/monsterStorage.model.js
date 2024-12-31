@@ -6,6 +6,9 @@ export default class MonsterStorage {
         uuid: 몬스터 uuid (매게변수로 쓰인다.)
         x: 몬스터 좌표 x
         y: 몬스터 좌표 y
+        targetX: 웨어포인트 좌표 x
+        targetY: 웨어포인트 좌표 y
+        curIndex: 경로 현재 인덱스 추가!!
         score : 스코어
         gold : 골드.
         stat: {

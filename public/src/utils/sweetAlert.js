@@ -5,7 +5,7 @@
 //====================================================================================================================
 //====================================================================================================================
 // notice: icon 종류 : success, error, warning, info, question
-export function showAlert(title, text, icon = 'info', confirmButtonText = 'OK') {
+export default function showAlert(title = '알림', text, icon = 'info', confirmButtonText = 'OK') {
     Swal.fire({
         title: title,
         text: text,

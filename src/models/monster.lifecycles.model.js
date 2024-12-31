@@ -1,7 +1,7 @@
 import { getGameAssets } from "../init/assets.js";
 import { v4 as uuidv4 } from "uuid";
 import MonsterStorage from "./monsterStorage.model.js";
-import {generatePath} from "../init/pathGenerator.js"
+import { generatePath } from "../init/pathGenerator.js"
 
 /*====[구조를 변경한 이유]====*/
 // 1. 룸 생성 -> 게임 시작 방식으로, 각 방마다 독립적인 인스턴스를 생성하는 것이 더 적합하다고 판단.
@@ -35,6 +35,9 @@ export default class MonsterLifecycles {
     this.spawnInterval = null; // setInterval 담을 용도.
     this.isMonsterSpawnActive = false; // 스폰을 진행 중인가.
 
+    // 리스폰 위치 플래그 변수
+    this.isSpawnOnFirstLocation = true;
+
     // 통신관련 변수
     this.pingPongCount = 3;
 
@@ -49,6 +52,7 @@ export default class MonsterLifecycles {
     this.gameId = data.message.gameId;
     this.x = monsterPath[0].x;
     this.y = monsterPath[0].y;
+    this.curIndex = 0;
 
     const info = {
       totalCount: 0,
@@ -117,12 +121,20 @@ export default class MonsterLifecycles {
         const eliteSpeed = isEliteMonster ? speed * (MONSTER_SPEED)  : speed * MONSTER_SPEED + wave;
 
         // 6-3. 몬스터 정보를 저장할 객체 생성.
+        //#region 이동동기화 편집
+        const monsterPath = generatePath();
+        // 스폰 위치 2개 번갈아 생성위해
+        const resPathIndex = (this.isSpawnOnFirstLocation ? 0 : 4);
+        this.isSpawnOnFirstLocation = !this.isSpawnOnFirstLocation;
         const monsterInfo = {
           gameId: this.gameId, // 게임 id
           name: monsterList[randomIdex].name, // 이름
           uuid: uuid, // uuid
-          x: this.x, // 몬스터 포지션 x
-          y: this.y, // 몬스터 포지션 y
+          x: monsterPath[resPathIndex].x, // 몬스터 포지션 x
+          y: monsterPath[resPathIndex].y, // 몬스터 포지션 y
+          targetX: monsterPath[resPathIndex + 1].x,
+          targetY: monsterPath[resPathIndex + 1].y,
+          curIndex: resPathIndex,
           size: eliteSize,
           gold: eliteGold,
           score: eliteScore,
@@ -170,7 +182,7 @@ export default class MonsterLifecycles {
           if(totalCount % WAVE_CYCLE === 0 && totalCount !== 0){
             this.monsterStorage.updateInfo(this.gameId, {wave : wave + 1});
           }
-          
+
           // 테스트용 로그 출력.
           const monstersSize = Object.keys(this.monsterStorage.getMonsters(this.gameId)).length;
           const roomSize = Object.keys(this.monsterStorage.test()).length;
@@ -255,7 +267,7 @@ export default class MonsterLifecycles {
     monster = this.monsterStorage.getMonster(this.gameId, monsterUuid);
     
     // 삭제 검사. 
-    this.removeMonster(monster); 
+    this.removeMonster(monster);
   }
 
   //====[몬스터 삭제]====//
@@ -269,7 +281,7 @@ export default class MonsterLifecycles {
       this.io.emit(this.gameId, {
         message: { 
           eventName: "deleteMonster",
-          monster: monster.uuid 
+          monster: monster.uuid
         }
       }); // 클라이언트에게 ping 전송
 
@@ -285,7 +297,7 @@ export default class MonsterLifecycles {
         aliveCount: aliveCount,
         kills: kills + 1,
         score: score + (monsterScore * wave),
-        gold: gold  + (monstergoid * wave),
+        gold: gold + (monstergoid * wave),
       });
 
       // 정보 클라에 전송.
