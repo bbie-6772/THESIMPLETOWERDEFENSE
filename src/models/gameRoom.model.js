@@ -64,13 +64,13 @@ export const leaveRoom = (gameId, userId) => {
     // 호스트가 나갈 시 방 삭제
     if (gameRooms[roomIdx].userId1 === userId) {
         gameRooms.splice(roomIdx,1)
+        return false
     // 참가자가 나갈 시 userId2를 비움
     } else if (gameRooms[roomIdx].userId2 === userId) {
         gameRooms[roomIdx].userId2 = null
+        // 얕은 복사 방지
+        return { ...gameRooms[roomIdx] }
     } else return false  
-
-    // 얕은 복사 방지
-    return {...gameRooms[roomIdx]}
 }
 
 export const destroyRoom = (userId) => {
