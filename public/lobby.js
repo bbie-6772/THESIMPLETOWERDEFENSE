@@ -3,6 +3,7 @@ import { sendEvent, ready, getSocket } from "./src/init/socket.js"
 //import { getSocket, getRoom } from "./src/init/socket.js";
 //import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { intiChat } from './src/chat/chat.js';
+import showAlert from "./src/utils/sweetAlert.js";
 
 let rooms = [];
 let selectedRoom = null;
@@ -131,7 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (await sendEvent(1001, { roomId: selectedRoom.gameId })) {
-                alert(`${selectedRoom.gameName}방으로 입장합니다`);
+                // alert(`${selectedRoom.gameName}방으로 입장합니다`);
+                showAlert('알림', `${selectedRoom.gameName}방으로 입장합니다`);
+                
                 roomId = selectedRoom.gameId
                 roomSelectionModal.hide();
 
