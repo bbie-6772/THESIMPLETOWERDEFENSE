@@ -12,6 +12,7 @@ let userId = null;
 let nickname = null;
 let highScoreS = null;
 let highScoreM = null;
+let roomId = null;
 
 const token = localStorage.getItem("access-Token");
 // 로그인이 안되어있을 시 로그인 창으로

@@ -285,6 +285,9 @@ function gameLoop() {
       } else {
         /* 몬스터가 죽었을 때 */
         monsters.splice(i, 1);
+        const vfxCount = Object.keys(GetVfxAnimations()).length;
+        const randomVfx = Math.floor(Math.random() * (vfxCount));
+        vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y))
       }
     }
   }

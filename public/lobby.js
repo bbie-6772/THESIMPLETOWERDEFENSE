@@ -241,7 +241,6 @@ export const updateUser = (roomInfo) => {
 
 // 대기방 나가기
 export const exitRoom = () => {
-    console.log("나가래")
     selectedRoom = null
     roomId = null
     waitRoom.hide()
@@ -270,7 +269,6 @@ export const gameStart = () => {
 
 // 게임 오버,끝
 export const gameOver = () => {
-    console.log("나갔어")
     game = null
     gameFrame.style.display = "none"
 }

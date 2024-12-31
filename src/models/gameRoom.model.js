@@ -72,8 +72,8 @@ export const leaveRoom = (gameId, userId) => {
 }
 
 export const destroyRoom = (userId) => {
-    const roomIdx = gameRooms.findIndex((e) => e.userId1 === userId )
-    if (roomIdx) return Object.assign(...gameRooms.splice(roomIdx, 1))
+    const roomIdx = gameRooms.findIndex((e) => e.userId1 === userId || e.userId2 === userId )
+    if (roomIdx !== -1) return Object.assign(...gameRooms.splice(roomIdx, 1))
     else return false
 }
 
