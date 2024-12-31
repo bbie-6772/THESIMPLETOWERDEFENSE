@@ -21,7 +21,7 @@ const registerHandler = (io) => {
     receiveMonsterMessage(io, socket);
 
     // 유저가 '연결해제' 시 실행
-    socket.on('disconnect', () => handleDisconnect(socket))
+    socket.on('disconnect', () => handleDisconnect(socket, io))
   });
 };
 

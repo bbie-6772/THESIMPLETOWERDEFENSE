@@ -38,6 +38,6 @@ export const setUserGold = (userId, gold)=>{
 
 export const deleteUser = (socketId) => {
     const idx = users.findIndex((e) => e.socketId === socketId)
-    if (idx !== -1 ) return users.splice(idx, 1)
+    if (idx !== -1 ) return Object.assign(...users.splice(idx, 1))
     else return false
 }

@@ -34,9 +34,9 @@ export const exitRoom = (userId, payload, socket, io) => {
     const room = leaveRoom(payload.roomId, userId)
     if (room) {
         // 업뎃 정보 공유
-        socket.to(payload.roomId).emit('room', { room })
+        io.to(payload.roomId).emit('room', { room })
         // 참가자가 나갔을 시 참가자만 제외
-        socket.leave(payload.roomId)
+        socket.emit('leaveRoom', { roomId: payload.roomId })
     // 호스트가 나갈 시 인원 전부 삭제하도록 요구
     } else io.to(payload.roomId).emit('leaveRoom', { roomId: payload.roomId })
 
