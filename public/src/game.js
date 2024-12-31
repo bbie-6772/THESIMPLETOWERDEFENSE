@@ -10,11 +10,12 @@ import {
 import { loadGameAssets } from "./init/assets.js";
 import { getSocket, getRoom } from "./init/socket.js";
 import Monsters from "./model/monsterSpawner.js";
-import {loadMonsterImages, GetMonsterAnimation, } from "./model/monsterAnimations.model.js"
-import { loadVfxImages, GetVfxAnimation, GetVfxAnimations} from "./model/vfxAnimations.model.js";
+import { loadMonsterImages, GetMonsterAnimation, } from "./model/monsterAnimations.model.js"
+import { loadVfxImages, GetVfxAnimation, GetVfxAnimations } from "./model/vfxAnimations.model.js";
 import { initTowerBase, towerDraw } from "./model/towerBase.model.js";
 import { setGameCanvas } from "./model/gameCanva.model.js";
 import { getUserGold, getScore, getHighScore, setScore, setUserGold } from "./model/userInterface.model.js";
+import { intiChat } from "./chat/chat.js";
 
 
 import { Vfx } from "./model/vfx.model.js";
@@ -227,7 +228,7 @@ function gameLoop() {
   }
 
   // 점수 바꾸기
-  if (Object.keys(monsterSpawner.getInfo()).length !== 0){
+  if (Object.keys(monsterSpawner.getInfo()).length !== 0) {
     setScore(monsterSpawner.getInfo().score);
     setUserGold(monsterSpawner.getInfo().gold);
     monsterLevel = monsterSpawner.getInfo().wave;
@@ -272,26 +273,26 @@ function gameLoop() {
         monster.updateAnimation();
 
         // 이팩트 그리기
-        for(let value of vfx) {
+        for (let value of vfx) {
           value.draw(ctx);
         }
 
         // 이펙트 삭제 
-        if(vfx.length !== 0){
+        if (vfx.length !== 0) {
           const index = vfx.findIndex(vfx => vfx.isFinished === true);
-      
+
           if (index !== -1) {
             // 해당 인덱스를 찾아서 배열에서 삭제
             vfx.splice(index, 1);
           }
         }
-  
+
       } else {
         // 이펙트 추가
         const vfxCount = Object.keys(GetVfxAnimations()).length;
         const randomVfx = Math.floor(Math.random() * (vfxCount));
         vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y))
-        
+
         monsterSpawner.sendMonsterDamageMessage(monster.uuid, 10000);
         /* 몬스터가 죽었을 때 */
         monsters.splice(i, 1);
@@ -311,9 +312,10 @@ async function initGame() {
 
   console.log(gameAssets);
   monsterSpawner.initialization();
+  intiChat(getSocket());
   // 몬스터 경로 생성
   //서버 반응이 늦을경우 대기
-  while(monsterPath === undefined){
+  while (monsterPath === undefined) {
     await sleep(100);
     monsterPath = monsterSpawner.getPath();
   }
