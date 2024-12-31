@@ -7,7 +7,7 @@
       "type": 0,
       "damage": 100,
       "target": 1,
-      "range": 100,
+      "range": 500,
       "cost": 100,
       "cooldown": 500,
       "image": "../assets/images/towerSingle.png"
@@ -17,7 +17,7 @@
       "type": 1,
       "damage": 100,
       "target": 2,
-      "range": 50,
+      "range": 250,
       "cost": 100,
       "cooldown": 500,
       "image": "../assets/images/towerMulti.png"
@@ -27,7 +27,7 @@
       "type": 2,
       "damage": 50,
       "target": 1,
-      "range": 100,
+      "range": 500,
       "cost": 100,
       "cooldown": 500,
       "image": "../assets/images/towerSplash.png"

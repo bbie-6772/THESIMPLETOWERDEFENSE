@@ -1,7 +1,8 @@
-import { getrooms } from "../models/rooms.model.js";
-import towerModel from "../models/tower.model";
+import towerModel from "../models/tower.model.js";
 import MonsterStorage from "../models/monsterStorage.model.js";
-
+import { getRooms } from "../models/gameRoom.model.js";
+import { getUser } from "../models/users.model.js";
+import { GetTowerCoordinateFromGrid } from "../../public/src/model/tower.js";
 //0,0 좌표의 타워
 const tower0Position = [200, 200];
 // 타워끼리의 거리
@@ -10,21 +11,48 @@ const towersGapY = 200;
 // 블럭과의 거리
 const blockGap = 200;
 
-export const towerAttackCondtorl = (deltaTime) => {
-  const rooms = getrooms();
-  const monsters = []; ///몬스터들을 받아오는 내용
-  for (let roomsIndex = 0; roomsIndex < rooms.length; roomsIndex++) {
-    const monsters = MonsterStorage.getMonsters(rooms[roomsIndex].gameId);
+let previousTime = 0;
+let currentTime = 0;
+let deltaTime = 0;
 
-    if (monsters.length > 0) {
+let isInit = false;
+let monsterStorage = MonsterStorage.getInstance(); // MonsterStorage 인스턴스 연결
+export const towerAttackCondtorl = (io, monstercycle) => {
+  if (!isInit) {
+    previousTime = Date.now();
+    isInit = true;
+  }
+  currentTime = Date.now();
+  deltaTime = currentTime - previousTime;
+  previousTime = currentTime;
+
+  const rooms = getRooms();
+  for (let roomsIndex = 0; roomsIndex < rooms.length; roomsIndex++) {
+    const monsters = monsterStorage.getMonsters(rooms[roomsIndex].gameId);
+    if (Object.values(monsters).length > 0) {
       let allUsersTowers = [];
-      allUsersTowers.push(
-        ...towerModel.getUsersTowers(rooms[roomsIndex].userId1)
+      let allUsersSockets = [];
+
+      let user1towers = towerModel.getUsersTowers(rooms[roomsIndex].userId1);
+
+      if (user1towers != undefined && user1towers.length > 0) {
+        allUsersTowers.push(...user1towers);
+      }
+
+      allUsersSockets.push(
+        io.sockets.sockets.get(getUser(rooms[roomsIndex].userId1).socketId)
       );
-      if (rooms[roomsIndex].userId2 != null)
-        allUsersTowers.push(
-          ...towerModel.getUsersTowers(rooms[roomsIndex].userId2)
+      if (rooms[roomsIndex].userId2 != null) {
+        let user2towers = towerModel.getUsersTowers(rooms[roomsIndex].userId1);
+
+        if (user2towers != undefined && user2towers.length > 0) {
+          allUsersTowers.push(...user2towers);
+        }
+
+        allUsersSockets.push(
+          io.sockets.sockets.get(getUser(rooms[roomsIndex].userId1).socketId)
         );
+      }
       for (
         let allUsersTowersIndex = 0;
         allUsersTowersIndex < allUsersTowers.length;
@@ -32,7 +60,9 @@ export const towerAttackCondtorl = (deltaTime) => {
       ) {
         //타워 현재 스탯을 가져온다.
         const tmpTower = towerModel.currentTowerStat(
-          allUsersTowers[allUsersTowersIndex].userid,
+          allUsersTowersIndex < user1towers.length
+            ? rooms[roomsIndex].userId1
+            : rooms[roomsIndex].userId2,
           allUsersTowers[allUsersTowersIndex].X,
           allUsersTowers[allUsersTowersIndex].Y
         );
@@ -44,51 +74,75 @@ export const towerAttackCondtorl = (deltaTime) => {
             deltaTime
           )
         ) {
-            //타워 위치 계산
-          const tmpTowerPositionX =
-            tower0Position[0] +
-            allUsersTowers[allUsersTowersIndex].X * towersGapX +
-            (allUsersTowers[allUsersTowersIndex].X > 1 ? blockGap : 0);
-          const tmpTowerPositionY =
-            tower0Position[1] +
-            allUsersTowers[allUsersTowersIndex].Y * towersGapY;
-
-          //
-          const monsters = []; ///몬스터들을 받아오는 내용
-          //
-
+          //타워 위치 계산
+          const { xPosition, yPosition } = GetTowerCoordinateFromGrid(
+            allUsersTowers[allUsersTowersIndex].X,
+            allUsersTowers[allUsersTowersIndex].Y
+          );
+          console.log(monsters
+          );
+          const mosterkey = Object.keys(monsters);
           for (
             let monstersIndex = 0;
-            monstersIndex < monsters.length;
+            monstersIndex < mosterkey.length;
             monstersIndex++
           ) {
-            if (
+            console.log(
+              xPosition,
+              yPosition,
+              monsters[mosterkey[monstersIndex]].x,
+              monsters[mosterkey[monstersIndex]].y,
+              tmpTower.range
+            );
+            if (monsters[mosterkey[monstersIndex]] != undefined&&
               distanceCheck(
-                tmpTowerPositionX,
-                tmpTowerPositionY,
-                monsters[monstersIndex].X,
-                monsters[monstersIndex].Y
+                xPosition,
+                yPosition,
+                monsters[mosterkey[monstersIndex]].x,
+                monsters[mosterkey[monstersIndex]].y
               ) < tmpTower.range
             ) {
+              //클라이언트에 전송
+              allUsersSockets.forEach((Element) => {
+                if(Element !== undefined && Element !== null)
+                sendToClient(
+                  Element,
+                  tmpTower.type,
+                  xPosition,
+                  yPosition,
+                  monsters[mosterkey[monstersIndex]].x,
+                  monsters[mosterkey[monstersIndex]].y
+                );
+              });
+
               //공격회수 차감
               tmpTower.target--;
               //범위공격 타워
               if (tmpTower.type == 2) {
-                for (let i = 0; i < monsters.length; i++) {
-                  if (
+                for (let i = 0; i < mosterkey.length; i++) {
+                  if (monsters[mosterkey[monstersIndex]] != undefined&&
+                    monsters[mosterkey[i]] != undefined&&
                     distanceCheck(
-                      monsters[monstersIndex].X,
-                      monsters[monstersIndex].Y,
-                      monsters[i].X,
-                      monsters[i].Y
+                      monsters[mosterkey[monstersIndex]].x,
+                      monsters[mosterkey[monstersIndex]].y,
+                      monsters[mosterkey[i]].x,
+                      monsters[mosterkey[i]].y
                     ) < 30
                   ) {
                     //데미지 함수
+                    monstercycle.updateMonsterHealth(
+                      monsters[mosterkey[i]].uuid,
+                      tmpTower.damage
+                    );
                   }
                 }
               } //단일공격 타워를 디폴트로
               else {
                 //데미지 함수
+                monstercycle.updateMonsterHealth(
+                  monsters[mosterkey[monstersIndex]].uuid,
+                  tmpTower.damage
+                );
               }
             }
             if (tmpTower.target <= 0) break;
@@ -100,7 +154,24 @@ export const towerAttackCondtorl = (deltaTime) => {
 };
 
 function distanceCheck(objectAX, objectAY, objectBX, objectBY) {
-  return (distance = Math.sqrt(
+  return Math.sqrt(
     Math.pow(objectAX - objectBX, 2) + Math.pow(objectAY - objectBY, 2)
-  ));
+  );
+}
+
+function sendToClient(
+  socket,
+  towertype,
+  towerX,
+  towerY,
+  targetX,
+  targetY,
+  duration = 2000
+) {
+  socket.emit("attack", {
+    type: towertype,
+    tower: { towerX, towerY },
+    target: { targetX, targetY },
+    duration,
+  });
 }

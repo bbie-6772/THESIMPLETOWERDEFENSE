@@ -10,9 +10,9 @@ import {
 import { loadGameAssets } from "./init/assets.js";
 import { getSocket, getRoom } from "./init/socket.js";
 import Monsters from "./model/monsterSpawner.js";
-import { loadMonsterImages, GetMonsterAnimation, } from "./model/monsterAnimations.model.js"
-import { loadVfxImages, GetVfxAnimation, GetVfxAnimations } from "./model/vfxAnimations.model.js";
-import { initTowerBase, towerDraw } from "./model/towerBase.model.js";
+import {loadMonsterImages, GetMonsterAnimation, } from "./model/monsterAnimations.model.js"
+import { loadVfxImages, GetVfxAnimation, GetVfxAnimations} from "./model/vfxAnimations.model.js";
+import { initTowerBase, towerDraw, setBaseImage } from "./model/towerBase.model.js";
 import { setGameCanvas } from "./model/gameCanva.model.js";
 import { getUserGold, getScore, getHighScore, setScore, setUserGold } from "./model/userInterface.model.js";
 import { intiChat } from "./chat/chat.js";
@@ -366,6 +366,7 @@ async function initGame() {
   placeBase();
   // 버튼 배치
   placeInitButtons();
+  setBaseImage();
   //타워 배치 설정
   initTowerBase();
 
