@@ -1,4 +1,5 @@
 import { addRoom, getRoom, getRooms, joinRoom, leaveRoom, kick } from "../models/gameRoom.model.js";
+import { getUser } from "../models/users.model.js";
 
 export const enterRoom = (userId, payload, socket) => {
 
@@ -22,12 +23,13 @@ export const enterRoom = (userId, payload, socket) => {
     }
     
     let room = getRoom(userId)
+    // 아이디 대신 닉네임으로 변환
+    room = { ...room, userId1: getUser(room.userId1).nickname, userId2: getUser(room.userId2)?.nickname }
 
-    socket.to(room.gameId).emit('room', { room })
-
+    socket.to(room.gameId).emit('room', room)
     socket.join(room.gameId)
 
-    return { status: "success", room: room }
+    return { status: "success", room }
 };
 
 export const exitRoom = (userId, payload, socket, io) => {

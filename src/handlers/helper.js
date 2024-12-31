@@ -129,15 +129,22 @@ export const handleDisconnect = (socket, io) => {
     const user = deleteUser(socket.id)
     let room = getRoom(user.userId);
     let destroyed = null;
+    let left = null
     // 참여 방 확인 + 게임 시작 여부 확인으로 방 삭제 혹은 나가기
+    console.log(room)
     if (room) {
         if (room.startTime > 0) {
             destroyed = destroyRoom(user.userId)
             io.to(room.gameId).emit('leaveRoom', { roomId: destroyed.gameId })
-        }
-        else {
-            room = leaveRoom(room.gameId, user.userId)
-            io.to(room.gameId).emit('room', { room })
+        } else {
+            left = leaveRoom(room.gameId, user.userId)
+            if (left) {
+                // 업뎃 정보 공유
+                io.to(room.gameId).emit('room', { room: left })
+                // 참가자가 나갔을 시 참가자만 제외
+                socket.emit('leaveRoom', { roomId: room.gameId })
+                // 호스트가 나갈 시 인원 전부 삭제하도록 요구
+            } else io.to(room.gameId).emit('leaveRoom', { roomId: room.gameId })
         }
     }
 }
