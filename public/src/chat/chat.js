@@ -3,9 +3,17 @@ import { getSocket } from "../init/socket";
 const socket = getSocket(); // Socket.IO 클라이언트 인스턴스 생성
 
 let currentChannel = null; // 현재 채널을 저장할 변수 초기화
-const messageInput = document.getElementById('messageInput'); // 메시지 입력 필드 요소 가져오기
-const sendButton = document.getElementById('sendButton'); // 전송 버튼 요소 가져오기
-const messagesDiv = document.getElementById('messages'); // 메시지 표시 영역 요소 가져오기
+let messageInput = null
+let sendButton = null
+let messagesDiv = null
+
+document.addEventListener('DOMContentLoaded', () => {
+    messageInput = document.getElementById('messageInput'); // 메시지 입력 필드 요소 가져오기
+    sendButton = document.getElementById('sendButton'); // 전송 버튼 요소 가져오기
+    messagesDiv = document.getElementById('messages'); // 메시지 표시 영역 요소 가져오기
+    // 이벤트 리스너
+    sendButton.onclick = sendMessage; // 전송 버튼 클릭 시 메시지 전송 함수 호출
+})
 
 // 채널 목록 요청
 socket.emit('getChannels');
@@ -105,8 +113,6 @@ function displayMessage(message) {
     messagesDiv.scrollTop = messagesDiv.scrollHeight; // 메시지 영역 스크롤 최하단으로 이동
 }
 
-// 이벤트 리스너
-sendButton.onclick = sendMessage; // 전송 버튼 클릭 시 메시지 전송 함수 호출
 
 messageInput.onkeypress = (e) => { // 메시지 입력 시
     if (e.key === 'Enter') { // Enter 키가 눌리면

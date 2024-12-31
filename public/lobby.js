@@ -2,7 +2,7 @@ import { sendEvent, ready } from "./src/init/socket.js"
 //import Monsters from "./src/model/monsterSpawner.js";
 //import { getSocket, getRoom } from "./src/init/socket.js";
 //import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import './src/chat/chat.js';
+// import './src/chat/chat.js';
 
 let rooms = [];
 let selectedRoom = null;

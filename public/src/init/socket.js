@@ -7,7 +7,6 @@ import {
   exitRoom,
 } from "../../lobby.js";
 
-
 let userId = null;
 let nickname = null;
 let highScoreS = null;
@@ -114,10 +113,13 @@ export const ready = (roomId, single) => {
     roomId,
     single,
   });
-  room = roomId;
 };
 
 export const getSocket = () => {
   return socket;
 };
+
+export const getRoom = () => {
+  return roomId
+}
 
