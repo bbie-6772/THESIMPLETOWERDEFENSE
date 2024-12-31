@@ -1,7 +1,8 @@
-import { sendEvent, ready } from "./src/init/socket.js"
+import { sendEvent, ready, getSocket } from "./src/init/socket.js"
 //import Monsters from "./src/model/monsterSpawner.js";
 //import { getSocket, getRoom } from "./src/init/socket.js";
 //import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { intiChat } from './src/chat/chat.js';
 
 let rooms = [];
 let selectedRoom = null;
@@ -17,7 +18,6 @@ let selectedRoomDetails = null;
 let confirmRoomSelection = null;
 let refreshButton = null;
 let gameFrame = null;
-let singlePlayButton = null;
 
 let roomName = null;
 let roomType = null;
@@ -40,6 +40,7 @@ let type = document.createElement('div');
 let password = document.createElement('div');
 
 document.addEventListener('DOMContentLoaded', () => {
+    intiChat(getSocket())
     roomCreationForm = document.getElementById('roomCreationForm');
     enableCheckbox = document.getElementById('enablePasswordInput');
     passwordInput = document.getElementById('passwordInput');
@@ -50,14 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
     confirmRoomSelection = document.getElementById('confirmRoomSelection');
     refreshButton = document.getElementById('refreshButton');
     gameFrame = document.getElementById('gameFrame')
-    singlePlayButton = document.getElementById('singlePlayButton')
 
     roomName = document.getElementById('roomName')
     roomType = document.getElementById('roomType')
     roomPassword = document.getElementById('roomPassword')
     waitRoom = new bootstrap.Modal(document.getElementById('waitRoom'), {
         backdrop: 'static',
-        keyboard: false  
+        keyboard: false
     });
 
     chatBox = document.getElementById('chatBox');
@@ -92,12 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // 방 생성 성공 여부 확인 후 연결
         if (await sendEvent(1001, { gameName: roomName.value, type: roomType.value, password: passwordInput.value })) {
             // 방 생성 시
-            if (button === "createRoom"){
+            if (button === "createRoom") {
                 waitRoomName.append(name);
                 waitRoomType.append(type);
                 waitRoomPassword.append(password);
                 waitRoom.show()
-            // 싱글 플레이 시
+                // 싱글 플레이 시
             } else if (button === "singlePlay") ready(roomId, true)
         }
 
@@ -114,9 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 일정 시간 후 버튼 다시 활성화  
         setTimeout(() => {
             this.disabled = false;
-        // 2초 후 다시 활성화 
-        }, 2000); 
-    });  
+            // 2초 후 다시 활성화 
+        }, 2000);
+    });
 
     // 방 선택 후 확인버튼 이벤트  
     confirmRoomSelection.addEventListener('click', async function () {
@@ -126,18 +126,19 @@ document.addEventListener('DOMContentLoaded', () => {
             waitRoomPassword = document.getElementById('waitRoomPassword')
 
             // 비밀번호가 있는 방일 시,
-            if (selectedRoom.password){
+            if (selectedRoom.password) {
                 console.log("비번있음")
             }
-            
-            if (await sendEvent(1001, { roomId: selectedRoom.id })) {
-                alert(`${selectedRoom.name}방으로 입장합니다`);
 
+            if (await sendEvent(1001, { roomId: selectedRoom.gameId })) {
+                alert(`${selectedRoom.gameName}방으로 입장합니다`);
+                roomId = selectedRoom.gameId
                 roomSelectionModal.hide();
 
                 waitRoomName.append(name);
                 waitRoomType.append(type);
                 waitRoomPassword.append(password);
+
 
                 waitRoom.show()
             }
@@ -150,12 +151,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 강퇴 이벤트
-    kickButton.addEventListener('click', function () {
+    kickButton.addEventListener('click', async function () {
+        await sendEvent(1004, { roomId })
     });
 
     // 나가기 이벤트
-    exitButton.addEventListener('click', function () {
-        waitRoom.hide()
+    exitButton.addEventListener('click', async function () {
+        await sendEvent(1003, { roomId })
     });
 
 })
@@ -180,7 +182,7 @@ function renderRooms() {
                 </div>  
             `;
         // 게임이 실행중이지 않을 때만 선택 가능
-        roomCard.addEventListener('click', () => {if(room.startTime === 0) selectRoom(room)});
+        roomCard.addEventListener('click', () => { if (room.startTime === 0) selectRoom(room) });
         roomList.appendChild(roomCard);
     });
 }
@@ -206,13 +208,13 @@ function selectRoom(room) {
     });
 
     // 선택된 카드에 selected 클래스 추가  
-    const selectedCard = document.querySelector(`.room-card[data-room-id="${room.id}"]`);
+    const selectedCard = document.querySelector(`.room-card[data-room-id="${room.gameId}"]`);
     selectedCard.classList.add('selected');
 
     // 모달에 방 정보 표시  
     selectedRoomDetails.innerHTML = `  
-            <p><strong>방 이름:</strong> ${selectedRoom.name}</p>  
-            <p><strong>난이도: </strong> ${getRoomTypeLabel(selectedRoom.type)}</p>  
+            <p><strong>방 이름:</strong> ${selectedRoom.gameName}</p>  
+            <p><strong>난이도: </strong> ${getRoomTypeLabel(selectedRoom.difficult)}</p>  
             <p><strong>인원:</strong> ${room.userId2 ? 2 : 1} / 2명</p>  
             `;
 
@@ -230,20 +232,35 @@ export const updateRoomInfo = (roomInfo) => {
 
 // 대기방 유저 업데이트 함수
 export const updateUser = (roomInfo) => {
-    host.innerText = roomInfo.userId1
-    entry.innerText = roomInfo.userId2 || "비어 있음"
+    if (roomInfo) {
+        host.innerText = roomInfo.userId1
+        entry.innerText = roomInfo.userId2 || "비어 있음"
+    } else {
+
+    }
 }
 
+// 대기방 나가기
+export const exitRoom = () => {
+    selectedRoom = null
+    roomId = null
+    waitRoom.hide()
+    // 방 대기열 요청
+    sendEvent(1002);
+}
+
+// 대기열 방 업데이트
 export const updateRooms = (roomsInfo) => {
     rooms = []
-    if(Array.isArray(roomsInfo)){
+    if (Array.isArray(roomsInfo)) {
         roomsInfo.forEach((e) => rooms.push(e))
     }
     renderRooms()
 }
 
+// 게임 시작 
 export const gameStart = () => {
-    waitRoom.hide()
-    import("./src/game.js")
+    waitRoom.hide();
+    import("./src/game.js");
     gameFrame.style.display = "block"
 }

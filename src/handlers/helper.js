@@ -171,8 +171,6 @@ export const ready = (io, socket, data) => {
 
 export const handlerEvent = (io, socket, data) => {
     try {
-        console.log(data)
-
         // 기본 검증
         if(!Auth(data)) return
 
@@ -185,7 +183,7 @@ export const handlerEvent = (io, socket, data) => {
             return;
         }
 
-        const response = handler(data.userId, data.payload, socket);
+        const response = handler(data.userId, data.payload, socket, io);
 
         // 서버 전 유저에게 알림
         if (response.broadcast) {

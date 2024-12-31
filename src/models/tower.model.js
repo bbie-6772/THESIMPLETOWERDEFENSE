@@ -25,7 +25,7 @@ export const addTower = (userId, X, Y, towerId, tier) => {
   const gameAssetsTowers = getGameAssets().towers;
 
   let currentTower = gameAssetsTowers.data.find((Element) => {
-    return Element.id == tower.towerId;
+    return Element.id == towerId;
   });
 
   const user = towers.find((Element) => {
@@ -53,12 +53,14 @@ export const getTowers = () => {
 export const getUsersTowers = (userId) => {
   return towers.find((Element) => {
     return Element.userId === userId;
-  }).data;
+  });
 };
 
 // 단일 타워 조회
 export const getUsersTower = (userId, X, Y) => {
-  return getUsersTowers(userId).find((Element) => {
+  const userstowers = getUsersTowers(userId);
+  if(userstowers === undefined) return undefined;
+  return userstowers.data.find((Element) => {
     return Element.X == X && Element.Y == Y;
   });
 };
@@ -76,7 +78,7 @@ export const removeUser = (userId) => {
 // 배열에서 타워 삭제
 export const removeUsersTower = (userId, X, Y) => {
   let userstowers = getUsersTowers(userId);
-  const indexoftower = userstowers.findIndex((Element) => {
+  const indexoftower = userstowers.data.findIndex((Element) => {
     return Element.X == X && Element.Y == Y;
   });
   if (indexoftower < 0) return false;
@@ -84,7 +86,7 @@ export const removeUsersTower = (userId, X, Y) => {
   return true;
 };
 
-//타워 스탯 확인인
+//타워 스탯 확인
 export const currentTowerStat = (userId, X, Y) => {
   const gameAssetsTowers = getGameAssets().towers;
 
