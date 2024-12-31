@@ -1,6 +1,5 @@
 import { TestMonster } from "./testMonster.js";
 import { GetMonsterAnimation } from "./monsterAnimations.model.js";
-import sleep from "../utils/sleep.js";
 // import { 
 // , deleteMonster } from "../game.js";
 
@@ -9,7 +8,8 @@ export default class Monsters {
     // 소캣 연결
     this.socket = socket;
     this.gameId = gameId;
-    this.monsters = []
+    this.monsters = [];
+    this.vfxs = [];
     // 변수
     this.path = [];
     this.info = {};
@@ -39,13 +39,11 @@ export default class Monsters {
     // 서버 수신.
     this.socket.on("monsterEventInit", (data) => {
       this.info = Object.keys(data).length !== 0 ? data : {};
-
-      console.log( this.info.path);
     });
   }
 
   // 패스 가져오기
-  getPath(){
+  getPath() {
     return this.info.path;
   }
 
@@ -54,14 +52,14 @@ export default class Monsters {
   }
 
   deleteMonster(uuid) {
-    const index = monsters.findIndex(obj => obj.uuid === uuid);
+    const index = monsters.findIndex((obj) => obj.uuid === uuid);
     if (index !== -1) {
       this.monsters.splice(index, 1); // 해당 인덱스의 객체를 삭제
     }
   }
 
-  getMonsters(){
-    return this.monsters
+  getMonsters() {
+    return this.monsters;
   }
 
   // 데미지 테스트 - 테스트입니다
@@ -90,31 +88,29 @@ export default class Monsters {
       }
 
       // 몬스터 삭제
-      this.socket.on(this.gameId, (data) => {
-        if (data.message.eventName === "deleteMonster") {
-          this.deleteMonster(data.message.monster);
-        }
-      });
+      if (data.message.eventName === "deleteMonster") {
+        //this.deleteMonster(data.message.monster);
+
+        
+      }
 
       // 핑퐁
-      this.socket.on(this.gameId, (data) => {
-        if (data.message.eventName === "respawnPing") {
-          this.socket.emit(this.gameId, {
-            message: { eventName: "respawnPong" },
-          });
-        }
-      });
+      if (data.message.eventName === "respawnPing") {
+        this.info = data.message.info;
+        this.wave = this.info.wave;
+        this.socket.emit(this.gameId, {
+          message: {
+            eventName: "respawnPong",
+          },
+        });
+      }
 
       // 정보
-      this.socket.on(this.gameId, (data) => {
-        if (data.message.eventName === "monsterInfoMessage") {
-          this.info =
-            Object.keys(data.message.info).length !== 0
-              ? data.message.info
-              : {};
-          this.wave = this.info.wave;
-        }
-      });
+      if (data.message.eventName === "monsterInfoMessage") {
+        this.info =
+          Object.keys(data.message.info).length !== 0 ? data.message.info : {};
+        this.wave = this.info.wave;
+      }
     });
   }
 
