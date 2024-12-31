@@ -59,6 +59,7 @@ socket.on("room", (data) => {
 
 // 방이 파괴되었을 시 
 socket.on('leaveRoom',(data) => {
+  roomId = null
   exitRoom()
   socket.emit('leaveRoom',{ roomId: data.roomId })
 })
@@ -93,9 +94,9 @@ export const sendEvent = async (handlerId, payload) => {
       // 방 로딩 핸들러
       } else if (data[0] === 1002) {
         updateRooms(data[1].rooms);
-      // 방 나가기 핸들러
-      } else if (data[0] === 1003) {
-        exitRoom()
+      // 타워 핸들러
+      } else if(data[0] === 4001){
+        setNewTower(data[1]);
       }
 
       clearTimeout(loadError);

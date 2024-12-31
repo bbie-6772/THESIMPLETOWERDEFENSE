@@ -1,6 +1,28 @@
 import Monsters from "./monsterSpawner.js";
-
+import { getGameAssets } from "../init/assets.js";
+import { setTowerBase } from "./towerBase.model.js";
+import { setUserGold } from "./userInterface.model.js";
+import { gettowerBaseWidth, gettowerBaseheight } from "./towerBase.model.js";
+import { getGameCanvas } from "./gameCanva.model.js";
 var towers = [];
+
+const basePoint = { x: 100, y: 100 };
+const incremWidth = (1920 * (8 / 10)) / 2;
+const incremHeight = 1080 * (8 / 10);
+
+//0,0 좌표의 타워 (basePoint에 + 해서 계산)
+const tower0Position = [50, 230];
+// 타워끼리의 거리
+const towersGapX = 350;
+const towersGapY = 200;
+// 블럭과의 거리
+const blockGap = 200;
+
+const towerBaseWidth = gettowerBaseWidth();
+const towerBaseheight = gettowerBaseheight();
+
+const width = 78; // 타워 이미지 가로 길이 (이미지 파일 길이에 따라 변경 필요하며 세로 길이와 비율을 맞춰주셔야 합니다!)
+const height = 150; // 타워 이미지 세로 길이
 
 
 export class Tower {
@@ -9,8 +31,8 @@ export class Tower {
     this.uuid = uuid;
     this.x = x; // 타워 이미지 x 좌표
     this.y = y; // 타워 이미지 y 좌표
-    this.width = 78; // 타워 이미지 가로 길이 (이미지 파일 길이에 따라 변경 필요하며 세로 길이와 비율을 맞춰주셔야 합니다!)
-    this.height = 150; // 타워 이미지 세로 길이
+    this.width = width; // 타워 이미지 가로 길이 (이미지 파일 길이에 따라 변경 필요하며 세로 길이와 비율을 맞춰주셔야 합니다!)
+    this.height = height; // 타워 이미지 세로 길이
     this.image = image;
     this.tier = tier;
     this.beamDuration = 0; // 타워 광선 지속 시간
@@ -43,7 +65,10 @@ export class Tower {
       this.beamDuration = 30; // 광선 지속 시간 (0.5초)
       this.target = monster; // 광선의 목표 설정
 
-      Monsters.getInstance().sendMonsterDamageMessage(monster.uuid, this.attackPower);
+      Monsters.getInstance().sendMonsterDamageMessage(
+        monster.uuid,
+        this.attackPower
+      );
     }
   }
 
@@ -55,14 +80,57 @@ export class Tower {
 }
 
 export const GetTowerFromCoordinate = (x, y) => {
+  
+  const gameCanvas = getGameCanvas();
+  const scaleX = gameCanvas.Xscale; // 가로 스케일
+  const scaleY = gameCanvas.Yscale; // 세로 스케일
+
+  console.log(x, y);
   return towers.find((e) => {
-    return e.x > x - e.width && e.x < x && e.y > y - e.height && e.y < y;
+    const { xPosition, yPosition } = GetTowerCoordinateFromGrid(e.x, e.y);
+    console.log(e.x, e.y, xPosition, yPosition);
+    return (
+      xPosition * scaleX < x &&
+      xPosition * scaleX > x - e.width &&
+      yPosition * scaleY < y &&
+      yPosition * scaleY > y - e.height
+    );
   });
 };
 
-const GetTowerCoordinateFromGrid = (x, y) => {
-  return [
-    tower0Position[0] + x * towersGapX + (x > 1 ? blockGap : 0),
-    tower0Position[1] + y * towersGapY,
-  ];
+export const GetTowerCoordinateFromGrid = (x, y) => {
+  return {
+    xPosition:
+      tower0Position[0] +
+      incremWidth / 2 +
+      ((x % 2) * towersGapX - towersGapX / 2) +
+      (x > 1 ? incremWidth : 0) + towerBaseWidth /2 - width /2,
+    yPosition:
+      tower0Position[1] +
+      incremHeight / 2 +
+      (y * towersGapY - towersGapY / 2 - towersGapY - towerBaseheight),
+  };
+};
+//return { status: 'success',towerid: towers.data[getRandomTower].id, x: X, y: Y, gold };
+export const setNewTower = (data) => {
+  const { towerid, x, y, gold } = data;
+  //const {towers} = getGameAssets();
+  console.log(towerid);
+  const tmpTower = getGameAssets().towers.data.find((element) => {
+    return element.id === towerid;
+  });
+  console.log(tmpTower);
+
+  const tmpTowerImage = new Image();
+  tmpTowerImage.src = tmpTower.image;
+
+  const newtower = new Tower(
+    localStorage.getItem("access-Token"),
+    x,
+    y,
+    tmpTowerImage
+  );
+  towers.push(newtower);
+  setTowerBase(x, y, newtower);
+  setUserGold(gold);
 };

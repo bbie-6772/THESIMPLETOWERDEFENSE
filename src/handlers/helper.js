@@ -1,8 +1,8 @@
 import { CLIENT_VERSION } from "../constant.js"
 import handlerMappings from "./handler.Mapping.js"
 import { prisma } from "../init/prisma.js";
-import { addUser,getUser } from "../models/users.model.js";
-import { getRooms, gameReady } from "../models/gameRoom.model.js";
+import { addUser, getUser, getUsers, deleteUser } from "../models/users.model.js";
+import { getRooms, gameReady, destroyRoom } from "../models/gameRoom.model.js";
 import jwt from "jsonwebtoken";
 
 const Auth = (data) => {
@@ -94,7 +94,7 @@ export const handleConnection = async (socket) => {
             return; ``
         }
         //유저 추가
-        addUser(loginUser.id, loginUser.nickname)
+        addUser(loginUser.id, loginUser.nickname, socket.id)
 
         console.log(loginUser.id, "접속")
 
@@ -124,8 +124,19 @@ export const handleConnection = async (socket) => {
     }
 }
 
-export const handleDisconnect = (socket, uuid) => {
-
+export const handleDisconnect = (socket) => {
+    // 유저 존재 확인
+    const user = deleteUser(socket.id)
+    let room = null;
+    // 참여 방 존재 확인 + 파괴
+    if (user) room = destroyRoom(user.userId)
+    // 방 파괴가 성공적이면 유저들도 내쫓음
+    if (room) {
+        socket.leave(room.gameId)
+        socket.to(room.gameId).emit('leaveRoom', { roomId: room.gameId })
+        console.log("요청보냄")
+    }
+    console.log(room.gameId, room)
 }
 
 // 준비상태 확인

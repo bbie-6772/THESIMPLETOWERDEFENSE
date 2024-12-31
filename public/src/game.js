@@ -211,13 +211,12 @@ function gameLoop() {
     console.warn("monsterPath가 유효하지 않습니다.");
   }
 
-
-  // 점수 바꾸자 
-  // if(Object.keys(Monsters.getInstance().getInfo()).length !== 0){
-  //   score = Monsters.getInstance().getInfo().score;
-  //   userGold = Monsters.getInstance().getInfo().gold;
-  //   monsterLevel = Monsters.getInstance().getInfo().wave;
-  // }
+  // 점수 바꾸기
+  if(Object.keys(Monsters.getInstance().getInfo()).length !== 0){
+    setScore(Monsters.getInstance().getInfo().score);
+    setUserGold(Monsters.getInstance().getInfo().gold);
+    monsterLevel = Monsters.getInstance().getInfo().wave;
+  }
 
   ctx.font = "25px Times New Roman";
   ctx.fillStyle = "skyblue";
@@ -267,6 +266,21 @@ function gameLoop() {
         monster.draw(ctx);
         // 이곳에 애니 메이션 추가하자.
         monster.updateAnimation();
+
+        // 이팩트 그리기
+        for(let value of vfx) {
+          value.draw(ctx);
+        }
+
+        // 이펙트 삭제 
+        if(vfx.length !== 0){
+          const index = vfx.findIndex(vfx => vfx.isFinished === true);
+      
+          if (index !== -1) {
+            // 해당 인덱스를 찾아서 배열에서 삭제
+            vfx.splice(index, 1);
+          }
+        }
   
       } else {
         /* 몬스터가 죽었을 때 */
@@ -323,17 +337,21 @@ async function initGame() {
 // 테스트
 loadMonsterImages();
 
-// 애니메이션 
-const ant  = GetMonsterAnimation("ant");
-const bat  = GetMonsterAnimation("bat");
-const bear  = GetMonsterAnimation("bear");
-const bettle  = GetMonsterAnimation("bettle");
-const bunny  = GetMonsterAnimation("bunny");
-const dino  = GetMonsterAnimation("dino");
-const dog  = GetMonsterAnimation("dog");
-const eagle  = GetMonsterAnimation("eagle");
-const gator  = GetMonsterAnimation("gator");
-const ghost  = GetMonsterAnimation("ghost");
+// 애니메이션
+const ant = GetMonsterAnimation("ant");
+const bat = GetMonsterAnimation("bat");
+const bear = GetMonsterAnimation("bear");
+const bettle = GetMonsterAnimation("bettle");
+const bunny = GetMonsterAnimation("bunny");
+const dino = GetMonsterAnimation("dino");
+const dog = GetMonsterAnimation("dog");
+const eagle = GetMonsterAnimation("eagle");
+const gator = GetMonsterAnimation("gator");
+const ghost = GetMonsterAnimation("ghost");
+
+const vfx01 = GetVfxAnimation(0);
+const vfx02 = GetVfxAnimation(1);
+const vfx03 = GetVfxAnimation(2);
 
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
