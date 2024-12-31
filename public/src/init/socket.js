@@ -7,7 +7,7 @@ import {
   exitRoom,
 } from "../../lobby.js";
 import Monsters from "../model/monsterSpawner.js";
-import { setNewTower } from "../model/tower.js";
+import { removeTower, setNewTower } from "../model/tower.js";
 
 let userId = null;
 let nickname = null;
@@ -96,8 +96,29 @@ export const sendEvent = async (handlerId, payload) => {
       } else if (data[0] === 1003) {
         roomId = null
         exitRoom()
+      }
+      if(data[0] === 3001){
+        try{
+          // 타워 합성 핸들러
+          // data[1] : { uuid, type, tier, x, y, removeX, removeY }
+          const payload = data[1];
+          console.log(payload);
+          const { uuid, towerId, tier, x, y, rx, ry } = data[1];
+          // 기존 타워 삭제
+          removeTower(x, y);
+          removeTower(rx, ry);
+          // 상위 타워 생성
+          setNewTower({towerid : towerId, x : x, y : y, gold : 0});
+        }catch(err){
+          console.log(err);
+        }
+      }else if(data[0] === 3002){
+        // 타워 강화 핸들러
+        // data[1] : {}
+        console.log(data[1]);
+      }
       // 타워 핸들러
-      } else if(data[0] === 4001){
+      if(data[0] === 4001){
         setNewTower(data[1]);
       }
       clearTimeout(loadError);
