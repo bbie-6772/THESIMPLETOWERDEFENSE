@@ -26,6 +26,9 @@ export default class MonsterLifecycles {
     this.spawnInterval = null; // setInterval 담을 용도.
     this.isMonsterSpawnActive = false; // 스폰을 진행 중인가.
 
+    // 리스폰 위치 플래그 변수
+    this.isSpawnOnFirstLocation = true;
+
     // 통신관련 변수
     this.pingPongCount = 3;
 
@@ -92,34 +95,20 @@ export default class MonsterLifecycles {
         const monsterListLengtht = Object.keys(monsterList).length;
         const randomIdex = Math.floor(Math.random() * monsterListLengtht);
 
-        // 6-2. 경로 지정 (패스? 웨어포인트?)
-        // 이 부분은 논의 후에 작성하겠습니다.
-
-        // 6-3. 몬스터 정보를 저장할 객체 생성.
-        // const monsterInfo = {
-        //   gameId: this.eventName, // 게임 id
-        //   name: monsterList[randomIdex].name, // 이름
-        //   uuid: uuid, // uuid
-        //   x: null, // 몬스터 포지션 x
-        //   y: null, // 몬스터 포지션 y
-        //   gold: monsterList[randomIdex].gold,
-        //   score: monsterList[randomIdex].score,
-        //   stat: {
-        //     health: monsterList[randomIdex].health, // 체력
-        //     speed: monsterList[randomIdex].speed * 5, // 스피드
-        //   },
-        // };
         //#region 이동동기화 편집
         const monsterPath = generatePath();
+        // 스폰 위치 2개 번갈아 생성위해
+        const resPathIndex = (this.isSpawnOnFirstLocation ? 0 : 4);
+        this.isSpawnOnFirstLocation = !this.isSpawnOnFirstLocation;
         const monsterInfo = {
           gameId: this.eventName, // 게임 id
           name: monsterList[randomIdex].name, // 이름
           uuid: uuid, // uuid
-          x: monsterPath[0].x, // 몬스터 포지션 x
-          y: monsterPath[0].y, // 몬스터 포지션 y
-          targetX: monsterPath[1].x,
-          targetY: monsterPath[1].y,
-          curIndex: 0,
+          x: monsterPath[resPathIndex].x, // 몬스터 포지션 x
+          y: monsterPath[resPathIndex].y, // 몬스터 포지션 y
+          targetX: monsterPath[resPathIndex + 1].x,
+          targetY: monsterPath[resPathIndex + 1].y,
+          curIndex: resPathIndex,
           gold: monsterList[randomIdex].gold,
           score: monsterList[randomIdex].score,
           stat: {
