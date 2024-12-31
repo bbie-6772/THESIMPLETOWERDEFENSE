@@ -82,7 +82,7 @@ export default class Monsters {
           this.info.path,
           monsterAnimation,
           monsterInfo,
-          this.wave,
+          this.wave
         );
         this.spawnMonster(test);
       }
