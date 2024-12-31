@@ -20,6 +20,8 @@ import {
   getUserGold,
   getScore,
   getHighScore,
+  setScore,
+  setUserGold
 } from "./model/userInterface.model.js";
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
@@ -228,8 +230,8 @@ function gameLoop() {
 
   // 점수 바꾸자 
   if(Object.keys(Monsters.getInstance().getInfo()).length !== 0){
-    score = Monsters.getInstance().getInfo().score;
-    userGold = Monsters.getInstance().getInfo().gold;
+    setScore(Monsters.getInstance().getInfo().score);
+    setUserGold(Monsters.getInstance().getInfo().gold);
     monsterLevel = Monsters.getInstance().getInfo().wave;
   }
 
