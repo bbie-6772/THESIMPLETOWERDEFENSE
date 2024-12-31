@@ -5,8 +5,10 @@ import {
   updateUser,
   gameStart,
   exitRoom,
+  updateUserInfo,
 } from "../../lobby.js";
 import Monsters from "../model/monsterSpawner.js";
+import { settingAttack } from "../model/towerBase.model.js";
 import { removeTower, setNewTower } from "../model/tower.js";
 import { setUserGold } from "../model/userInterface.model.js";
 
@@ -41,6 +43,7 @@ socket.once("connection", (data) => {
     [userId, nickname, highScoreS, highScoreM] = data;
     // 방 목록 업데이트
     updateRooms(data[4]);
+    updateUserInfo(nickname,highScoreS,highScoreM)
   }
 });
 
@@ -52,14 +55,21 @@ socket.on("ready", (data) => {
   if (data.status === "start") gameStart();
 });
 
+// #endregion
+
 socket.on("room", (data) => {
-  updateUser(data.room);
+  updateUser(data);
+});
+
+socket.on("attack", (data) => {
+  settingAttack(data);
 });
 
 // 방이 파괴되었을 시 
 socket.on('leaveRoom',(data) => {
+  roomId = null
   exitRoom()
-  socket.emit('leaveRoom',{ roomId: data.roomId })
+  socket.emit('leaveRoom', { roomId: data.roomId })
 })
 
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
@@ -90,13 +100,9 @@ export const sendEvent = async (handlerId, payload) => {
         updateRoomInfo(data[1].room);
         updateUser(data[1].room);
         roomId = data[1].room.gameId
-      // 방 로딩 핸들러
+        // 방 로딩 핸들러
       } else if (data[0] === 1002) {
         updateRooms(data[1].rooms);
-      // 방 나가기 핸들러
-      } else if (data[0] === 1003) {
-        roomId = null
-        exitRoom()
       }
       if(data[0] === 3001){
         try{
@@ -124,7 +130,7 @@ export const sendEvent = async (handlerId, payload) => {
       // 타워 핸들러
       if(data[0] === 4001){
         setNewTower(data[1]);
-      }
+      } 
       clearTimeout(loadError);
       return resolve(true);
     });

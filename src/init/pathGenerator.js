@@ -50,7 +50,7 @@ export const generatePath = () => {
     for (let point of processedSequence) {
         path.push(point);
         // 테스트 로그
-        console.log("Sequence : ", JSON.stringify(point));
+        // console.log("Sequence : ", JSON.stringify(point));
     }
     return path;
 }

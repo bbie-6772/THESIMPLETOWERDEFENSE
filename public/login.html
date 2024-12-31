@@ -68,12 +68,14 @@
         const result = await response.json();
         if (response.ok) {
           alert(result.message);
+          // showAlert("알림", result.message);
           // 로컬 스토리지에 적용  
           localStorage.setItem('access-Token', response.headers.get("authorization"));
 
           window.location.href = "lobby.html";
         } else {
-          alert(result.errorMessage)
+          // alert(result.errorMessage);
+          showAlert("알림", result.message);
         }
 
       } catch (error) {

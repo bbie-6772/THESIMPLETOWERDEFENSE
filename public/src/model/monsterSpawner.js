@@ -1,7 +1,5 @@
 import { TestMonster } from "./testMonster.js";
 import { GetMonsterAnimation } from "./monsterAnimations.model.js";
-// import { 
-// , deleteMonster } from "../game.js";
 
 export default class Monsters {
   constructor(socket, gameId) {
@@ -18,13 +16,10 @@ export default class Monsters {
     this.receiveMonsterMessage();
   }
 
-  // 싱글턴
+  // 싱글턴(아님)
   static getInstance = (socket = null, gameId = null) => {
     //console.log(`접속한 소켓 : ${socket.id} `)
-    if (!Monsters.instance) {
-      Monsters.instance = new Monsters(socket, gameId);
-    }
-    return Monsters.instance;
+    return new Monsters(socket, gameId)
   };
 
   // 초기화
@@ -64,15 +59,17 @@ export default class Monsters {
 
   // 데미지 테스트 - 테스트입니다
   sendMonsterDamageMessage(uuid, damage) {
-    this.socket.emit("monsterDamageMessage", {
-      uuid: uuid,
-      damage: damage,
+    this.socket.emit(this.gameId, {
+      message: {
+        eventName: "monsterDamageMessage",
+        uuid: uuid,
+        damage: damage,
+      },
     });
   }
 
   // 서버 -> 클라 메세지.
   receiveMonsterMessage() {
-    console.log(this.gameId);
     this.socket.on(this.gameId, (data) => {
       // 몬스터 스폰.
       if (data.message.eventName === "spawnMonster") {
@@ -89,9 +86,7 @@ export default class Monsters {
 
       // 몬스터 삭제
       if (data.message.eventName === "deleteMonster") {
-        //this.deleteMonster(data.message.monster);
-
-        
+        this.deleteMonster(data.message.monster);
       }
 
       // 핑퐁

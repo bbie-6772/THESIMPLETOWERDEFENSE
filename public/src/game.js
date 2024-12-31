@@ -12,10 +12,10 @@ import { getSocket, getRoom } from "./init/socket.js";
 import Monsters from "./model/monsterSpawner.js";
 import {loadMonsterImages, GetMonsterAnimation, } from "./model/monsterAnimations.model.js"
 import { loadVfxImages, GetVfxAnimation, GetVfxAnimations} from "./model/vfxAnimations.model.js";
-import { initTowerBase, towerDraw } from "./model/towerBase.model.js";
+import { initTowerBase, towerDraw, setBaseImage } from "./model/towerBase.model.js";
 import { setGameCanvas } from "./model/gameCanva.model.js";
 import { getUserGold, getScore, getHighScore, setScore, setUserGold } from "./model/userInterface.model.js";
-
+import { intiChat } from "./chat/chat.js";
 
 import { Vfx } from "./model/vfx.model.js";
 /* 
@@ -23,6 +23,22 @@ import { Vfx } from "./model/vfx.model.js";
 */
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+const monsterSpawner = Monsters.getInstance(getSocket(), getRoom())
+
+// #region 위치동기화 받기
+monsterSpawner.socket.on("locationSync", (data) => {
+  // validation
+  if (!data || !Array.isArray(data.data)) {
+    console.error("[LocationSync/Error] Invalid data format.");
+    return;
+  }
+  // 몬스터 데이터
+  const monsters = data.data;
+  //console.log("[LocationSync/Received] monsters: ", monsters);
+
+  // 게임 로직으로 위치 동기화
+  updateLocationSync(monsters);
+});
 
 var canvasRect = canvas.getBoundingClientRect();
 var scaleX = canvas.width / canvasRect.width; // 가로 스케일
@@ -74,6 +90,31 @@ const pathImage = new Image();
 pathImage.src = "../assets/images/path.png";
 
 let monsterPath;
+
+function updateLocationSync(monsters) {
+  monsters.forEach((monster) => {
+    //console.log(`[LocationSync] 몬스터 UUID: ${monster.uuid} x: ${monster.x}, y: ${monster.y}`);
+
+    // x, y 값이 null일 때 예외 처리
+    if (monster.x === null || monster.y === null) {
+      console.warn(`[LocationSync/Warning] Monster with UUID ${monster.uuid} has invalid position: x: ${monster.x}, y: ${monster.y}`);
+      return;
+    }
+
+    // 위치 업데이트 로직
+    const targetMonster = monsterSpawner.getMonsters().find(m => m.uuid === monster.uuid);
+    if (targetMonster) {
+      targetMonster.x = monster.x;
+      targetMonster.y = monster.y;
+      targetMonster.targetX = monster.targetX;
+      targetMonster.targetY = monster.targetY;
+      targetMonster.curIndex = monster.curIndex;
+      //console.log(`[LocationSync] 업데이트:  ${targetMonster.x}, ${targetMonster.y}, , ${targetMonster.targetX}, , ${targetMonster.targetY}, , ${targetMonster.curIndex}`);
+    } else {
+      //console.log(`[LocationSync] 몬스터 UUID ${monster.uuid}을(를) 찾을 수 없습니다.`);
+    }
+  });
+}
 
 function generateRandomMonsterPath() {
   const path = [];
@@ -214,7 +255,7 @@ function placeBase() {
 }
 
 function gameLoop() {
-  monsters = Monsters.getInstance().getMonsters();
+  monsters = monsterSpawner.getMonsters();
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
 
@@ -225,11 +266,11 @@ function gameLoop() {
     console.warn("monsterPath가 유효하지 않습니다.");
   }
 
-  // 점수 바꾸자 
-  if(Object.keys(Monsters.getInstance().getInfo()).length !== 0){
-    setScore(Monsters.getInstance().getInfo().score);
-    setUserGold(Monsters.getInstance().getInfo().gold);
-    monsterLevel = Monsters.getInstance().getInfo().wave;
+  // 점수 바꾸기
+  if (Object.keys(monsterSpawner.getInfo()).length !== 0) {
+    setScore(monsterSpawner.getInfo().score);
+    setUserGold(monsterSpawner.getInfo().gold);
+    monsterLevel = monsterSpawner.getInfo().wave;
   }
 
   ctx.font = "25px Times New Roman";
@@ -259,7 +300,7 @@ function gameLoop() {
     for (let i = monsters.length - 1; i >= 0; i--) {
       const monster = monsters[i];
       if (monster.hp > 0) {
-        const isDestroyed = monster.move(base);
+        // const isDestroyed = monster.move(base);
         // if (isDestroyed) {
         //   /* 게임 오버 */
         //   alert("게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ");
@@ -271,29 +312,27 @@ function gameLoop() {
         monster.updateAnimation();
 
         // 이팩트 그리기
-        for(let value of vfx) {
+        for (let value of vfx) {
           value.draw(ctx);
         }
 
         // 이펙트 삭제 
-        if(vfx.length !== 0){
+        if (vfx.length !== 0) {
           const index = vfx.findIndex(vfx => vfx.isFinished === true);
-      
+
           if (index !== -1) {
             // 해당 인덱스를 찾아서 배열에서 삭제
             vfx.splice(index, 1);
           }
         }
 
-
-  
       } else {
         // 이펙트 추가
         const vfxCount = Object.keys(GetVfxAnimations()).length;
         const randomVfx = Math.floor(Math.random() * (vfxCount));
-        vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y))
+        vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y, monster.size))
         
-        Monsters.getInstance().sendMonsterDamageMessage(monster.uuid, 10000);
+        monsterSpawner.sendMonsterDamageMessage(monster.uuid, 10000);
         /* 몬스터가 죽었을 때 */
         monsters.splice(i, 1);
       }
@@ -308,18 +347,16 @@ async function initGame() {
     //return;
   }
 
-  Monsters.getInstance(getSocket(), getRoom());
-  Monsters.getInstance().initialization();
-
   gameAssets = await loadGameAssets();
+
   console.log(gameAssets);
-  Monsters.getInstance(getSocket(), "getRoom()");
-  Monsters.getInstance().initialization();
+  monsterSpawner.initialization();
+  intiChat(getSocket());
   // 몬스터 경로 생성
   //서버 반응이 늦을경우 대기
-  while(monsterPath === undefined){
+  while (monsterPath === undefined) {
     await sleep(100);
-    monsterPath = Monsters.getInstance().getPath();
+    monsterPath = monsterSpawner.getPath();
   }
 
   console.log(monsterPath);
@@ -329,6 +366,7 @@ async function initGame() {
   placeBase();
   // 버튼 배치
   placeInitButtons();
+  setBaseImage();
   //타워 배치 설정
   initTowerBase();
 
@@ -357,7 +395,6 @@ const dog = GetMonsterAnimation("dog");
 const eagle = GetMonsterAnimation("eagle");
 const gator = GetMonsterAnimation("gator");
 const ghost = GetMonsterAnimation("ghost");
-
 
 const vfx01 = GetVfxAnimation(0);
 const vfx02 = GetVfxAnimation(1);
