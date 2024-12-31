@@ -96,11 +96,9 @@ export const sendEvent = async (handlerId, payload) => {
       } else if (data[0] === 1003) {
         roomId = null
         exitRoom()
-      }
       // 타워 핸들러
-      if(data[0] === 4001){
+      } else if(data[0] === 4001){
         setNewTower(data[1]);
-
       }
       clearTimeout(loadError);
       return resolve(true);
