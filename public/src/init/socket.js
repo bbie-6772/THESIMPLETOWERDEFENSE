@@ -7,7 +7,6 @@ import {
   exitRoom,
 } from "../../lobby.js";
 import Monsters from "../model/monsterSpawner.js";
-import { setNewTower } from "../model/tower.js";
 import { settingAttack } from "../model/towerBase.model.js";
 import { removeTower, setNewTower } from "../model/tower.js";
 

@@ -18,8 +18,8 @@ const towersGapY = 200;
 // 블럭과의 거리
 const blockGap = 200;
 
-const towerBaseWidth = gettowerBaseWidth();
-const towerBaseheight = gettowerBaseheight();
+const towerBaseWidth = 180;
+const towerBaseheight = 180;
 
 const width = 78; // 타워 이미지 가로 길이 (이미지 파일 길이에 따라 변경 필요하며 세로 길이와 비율을 맞춰주셔야 합니다!)
 const height = 150; // 타워 이미지 세로 길이
