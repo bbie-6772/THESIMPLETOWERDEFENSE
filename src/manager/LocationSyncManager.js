@@ -271,4 +271,3 @@ function updateMonsterPosition(id, x, y) {
 
 // 게임 루프 시작
 requestAnimationFrame(gameLoop);
-*/
