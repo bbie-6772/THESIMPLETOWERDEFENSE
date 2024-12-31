@@ -19,7 +19,6 @@ const tier_scale_cooldown = 1;
 export const max_tier = 5;
 export const max_upgrade = 5;
 
-
 //타워 추가
 export const addTower = (userId, X, Y, towerId, tier) => {
   const gameAssetsTowers = getGameAssets().towers;
@@ -54,15 +53,15 @@ export const getUsersTowers = (userId) => {
   let returnValue = towers.find((Element) => {
     return Element.userId === userId;
   });
-  if(returnValue === undefined) return undefined;
+  if (returnValue === undefined) return undefined;
   return returnValue.data;
 };
 
 // 단일 타워 조회
 export const getUsersTower = (userId, X, Y) => {
   const userstowers = getUsersTowers(userId);
-  if(userstowers === undefined) return undefined;
-  return userstowers.data.find((Element) => {
+  if (userstowers === undefined) return undefined;
+  return userstowers.find((Element) => {
     return Element.X == X && Element.Y == Y;
   });
 };
@@ -80,7 +79,7 @@ export const removeUser = (userId) => {
 // 배열에서 타워 삭제
 export const removeUsersTower = (userId, X, Y) => {
   let userstowers = getUsersTowers(userId);
-  const indexoftower = userstowers.data.findIndex((Element) => {
+  const indexoftower = userstowers.findIndex((Element) => {
     return Element.X == X && Element.Y == Y;
   });
   if (indexoftower < 0) return false;
@@ -99,19 +98,24 @@ export const currentTowerStat = (userId, X, Y) => {
     return Element.id == tower.towerId;
   });
 
-  currentTower.damage += tower.tier * tier_scale_damage;
-  currentTower.target += tower.tier * tier_scale_target;
-  currentTower.range += tower.tier * tier_scale_range;
-  currentTower.cost += tower.tier * tier_scale_cost;
-  currentTower.cooldown -= tower.tier * tier_scale_cooldown;
+  let towerTier = tower.tier ?? 0;
 
-  return currentTower;
+  return {
+    id: currentTower.id,
+    type: currentTower.type,
+    damage: currentTower.damage + towerTier * tier_scale_damage,
+    target: currentTower.target + towerTier * tier_scale_target,
+    range: currentTower.range + towerTier * tier_scale_range,
+    cost: currentTower.cost + towerTier * tier_scale_cost,
+    cooldown: currentTower.cooldown - towerTier * tier_scale_cooldown,
+    image: currentTower.image,
+  };
 };
 
 export const towerCoolDown = (tower, cooldown, deltaTime) => {
   tower.cooldown -= deltaTime;
   if (tower.cooldown < 0) {
-    tower.id += cooldown;
+    tower.cooldown += cooldown;
     return true;
   }
   return false;
@@ -122,7 +126,7 @@ export const merge = (uuid, x1, y1, x2, y2) => {
   const one = getUsersTower(uuid, x1, y1);
   const other = getUsersTower(uuid, x2, y2);
   const newtier = other.tier + 1;
-  
+
   // one과 other를 삭제한다
   removeUsersTower(uuid, x1, y1);
   removeUsersTower(uuid, x2, y2);
@@ -134,7 +138,7 @@ export const merge = (uuid, x1, y1, x2, y2) => {
 
   // 생성된 타워에 대한 정보를 반환한다(클라이언트에 전달해야함)
   return { uuid: uuid, type: randomTower, tier: newtier, x: x2, y: y2 };
-}
+};
 
 export const upgrade = (uuid, towerId) => {
   // 유저의 타워 업그레이드 수치를 증가시킨다
@@ -144,7 +148,7 @@ export const upgrade = (uuid, towerId) => {
   }
   user.upgrade[towerId]++;
   return { uuid: uuid, type: towerId, level: user.upgrade[towerId] };
-}
+};
 
 const towerModel = {
   addTower,
