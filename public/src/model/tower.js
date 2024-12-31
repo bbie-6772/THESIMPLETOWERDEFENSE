@@ -37,7 +37,6 @@ export class Tower {
     this.tier = tier;
     this.beamDuration = 0; // 타워 광선 지속 시간
     this.target = null; // 타워 광선의 목표
-    towers.push(this);
   }
 
   // draw(ctx) {
@@ -134,3 +133,12 @@ export const setNewTower = (data) => {
   setTowerBase(x, y, newtower);
   setUserGold(gold);
 };
+
+export const removeTower = (x, y) => {
+  var targetIdx = towers.findIndex((e) => {
+    return e.x === x && e.y === y;
+  });
+  towers.splice(targetIdx, 1);
+  console.log(towers);
+  setTowerBase(x, y, null);
+}
