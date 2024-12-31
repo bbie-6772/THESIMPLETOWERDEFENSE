@@ -233,11 +233,10 @@ export const updateRoomInfo = (roomInfo) => {
 
 // 대기방 유저 업데이트 함수
 export const updateUser = (roomInfo) => {
+    console.log(roomInfo)
     if (roomInfo) {
         host.innerText = roomInfo.userId1
         entry.innerText = roomInfo.userId2 || "비어 있음"
-    } else {
-
     }
 }
 

@@ -21,7 +21,6 @@ export const enterRoom = (userId, payload, socket) => {
         status: "fail", 
         message: "방 생성에 실패하였습니다."
     }
-    
     let room = getRoom(userId)
     // 아이디 대신 닉네임으로 변환
     room = { ...room, userId1: getUser(room.userId1).nickname, userId2: getUser(room.userId2)?.nickname }
@@ -35,11 +34,12 @@ export const enterRoom = (userId, payload, socket) => {
 export const exitRoom = (userId, payload, socket, io) => {
     const room = leaveRoom(payload.roomId, userId)
     if (room) {
+        room.userId1 = getUser(room.userId1).nickname
         // 업뎃 정보 공유
-        io.to(payload.roomId).emit('room', { room })
+        io.to(payload.roomId).emit('room', room )
         // 참가자가 나갔을 시 참가자만 제외
         socket.emit('leaveRoom', { roomId: payload.roomId })
-    // 호스트가 나갈 시 인원 전부 삭제하도록 요구
+    // 호스트가 나갈 시 + 오류 시 인원 전부 삭제하도록 요구
     } else io.to(payload.roomId).emit('leaveRoom', { roomId: payload.roomId })
 
     return { status: "success" }
@@ -49,6 +49,8 @@ export const kickUser = (userId, payload, socket) => {
     const room = kick(payload.roomId)
     // 참가자에게 방을 나가도록 요구
     socket.to(payload.roomId).emit('leaveRoom', { roomId: payload.roomId })
+    // 닉네임 변환
+    room.userId1 = getUser(room.userId1).nickname
     // 업데이트된 값 적용
     socket.emit('room', { room })
 

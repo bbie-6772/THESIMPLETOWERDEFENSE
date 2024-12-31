@@ -52,7 +52,7 @@ socket.on("ready", (data) => {
 });
 
 socket.on("room", (data) => {
-  updateUser(data.room);
+  updateUser(data);
 });
 
 // 방이 파괴되었을 시 

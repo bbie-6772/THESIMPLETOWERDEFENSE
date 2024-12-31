@@ -139,11 +139,12 @@ export const handleDisconnect = (socket, io) => {
         } else {
             left = leaveRoom(room.gameId, user.userId)
             if (left) {
+                left.userId1 = getUser(left.userId1).nickname
                 // 업뎃 정보 공유
-                io.to(room.gameId).emit('room', { room: left })
+                io.to(room.gameId).emit('room', left )
                 // 참가자가 나갔을 시 참가자만 제외
                 socket.emit('leaveRoom', { roomId: room.gameId })
-                // 호스트가 나갈 시 인원 전부 삭제하도록 요구
+                // 호스트가 나갈 시 + 오류 시 인원 전부 삭제하도록 요구
             } else io.to(room.gameId).emit('leaveRoom', { roomId: room.gameId })
         }
     }
@@ -211,8 +212,10 @@ export const handlerEvent = (io, socket, data) => {
             io.emit('response', response);
             return;
         }
+
         // 대상 유저에게만 보냄
         socket.emit('response', [data.handlerId, response]);
+
     } catch (err) {
         console.log(err)
         socket.emit('connection', {

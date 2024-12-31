@@ -69,7 +69,8 @@ export const leaveRoom = (gameId, userId) => {
         gameRooms[roomIdx].userId2 = null
     } else return false  
 
-    return gameRooms[roomIdx]
+    // 얕은 복사 방지
+    return {...gameRooms[roomIdx]}
 }
 
 export const destroyRoom = (userId) => {
