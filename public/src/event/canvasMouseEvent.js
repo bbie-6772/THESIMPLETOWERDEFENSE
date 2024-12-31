@@ -111,7 +111,7 @@ function handleMouseup(event) {
 
     const payload = { x1 : currentTower.x, y1 : currentTower.y, x2 : targetTower.x, y2 : targetTower.y };
     console.log(`tower merge : ${[currentTower.x, currentTower.y]} & ${[targetTower.x, targetTower.y]}`)
-    // { x1, y1, x2, y2 }
+    // { x1, y1, x2, y2 } : 그리드 좌표
     sendEvent(3001, payload);
     currentTower = null;
   }

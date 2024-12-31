@@ -34,7 +34,7 @@ export const placeTower = (userId, payload, socket) => {
     }
     //데이터 적용
     const changedgold = user.gold - towers.data[getRandomTower].cost;
-    addTower(userId, X, Y, towers.data[getRandomTower].id);
+    addTower(userId, X, Y, towers.data[getRandomTower].id, 1);
     setUserGold(userId, changedgold);
     return {
       status: "success",

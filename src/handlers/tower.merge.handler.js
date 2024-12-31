@@ -16,6 +16,7 @@ export const TowerMerge = (uuid, payload) => {
     if (!one || !other) return { status: 'fail', message: '타워를 찾을 수 없습니다' };
     // 합성이 유효한지 검사 (타워 티어가 같은지, 타워가 최고티어가 아닌지)
     if (one === other) return { status: 'fail', message: '서로 다른 타워를 선택해야합니다' };
+    if (one.towerId !== other.towerId) return { status: 'fail', message: '같은 타입의 타워를 선택해야합니다' };
     if (one.tier !== other.tier) return { status: 'fail', message: '타워의 티어가 서로 다릅니다' };
     if (one.tier === towerModel.max_tier) return { status: 'fail', message: '타워가 최대 티어입니다' };
     // { uuid, type, tier, x, y }
