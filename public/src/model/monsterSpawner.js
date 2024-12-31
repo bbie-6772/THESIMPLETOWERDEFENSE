@@ -1,5 +1,7 @@
 import { TestMonster } from "./testMonster.js";
 import { GetMonsterAnimation } from "./monsterAnimations.model.js";
+import { GetVfxAnimation, GetVfxAnimations } from "./vfxAnimations.model.js";
+import { Vfx } from "./vfx.model.js";
 
 export default class Monsters {
   constructor(socket, gameId) {
@@ -47,7 +49,7 @@ export default class Monsters {
   }
 
   deleteMonster(uuid) {
-    const index = monsters.findIndex((obj) => obj.uuid === uuid);
+    const index = this.monsters.findIndex((obj) => obj.uuid === uuid);
     if (index !== -1) {
       this.monsters.splice(index, 1); // 해당 인덱스의 객체를 삭제
     }
@@ -86,7 +88,10 @@ export default class Monsters {
 
       // 몬스터 삭제
       if (data.message.eventName === "deleteMonster") {
-        this.deleteMonster(data.message.monster);
+        this.deleteMonster(data.message.monster.uuid);
+        const vfxCount = Object.keys(GetVfxAnimations()).length;
+        const randomVfx = Math.floor(Math.random() * (vfxCount));
+        this.vfxs.push(new Vfx(GetVfxAnimation(randomVfx), data.message.monster.x, data.message.monster.y, data.message.monster.size))
       }
 
       // 핑퐁

@@ -311,6 +311,7 @@ function gameLoop() {
         // 이곳에 애니 메이션 추가하자.
         monster.updateAnimation();
 
+        vfx = monsterSpawner.vfxs
         // 이팩트 그리기
         for (let value of vfx) {
           value.draw(ctx);
@@ -326,15 +327,13 @@ function gameLoop() {
           }
         }
 
-      } else {
-        // 이펙트 추가
-        const vfxCount = Object.keys(GetVfxAnimations()).length;
-        const randomVfx = Math.floor(Math.random() * (vfxCount));
-        vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y, monster.size))
-        
-        monsterSpawner.sendMonsterDamageMessage(monster.uuid, 10000);
-        /* 몬스터가 죽었을 때 */
-        monsters.splice(i, 1);
+      // } else {
+      //   // 이펙트 추가
+      //   const vfxCount = Object.keys(GetVfxAnimations()).length;
+      //   const randomVfx = Math.floor(Math.random() * (vfxCount));
+      //   vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y, monster.size))
+      //   /* 몬스터가 죽었을 때 */
+      //   monsters.splice(i, 1);
       }
     }
   }
