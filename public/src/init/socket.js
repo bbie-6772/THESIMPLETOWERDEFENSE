@@ -5,10 +5,12 @@ import {
   updateUser,
   gameStart,
   exitRoom,
+  updateUserInfo,
 } from "../../lobby.js";
 import Monsters from "../model/monsterSpawner.js";
 import { settingAttack } from "../model/towerBase.model.js";
 import { removeTower, setNewTower } from "../model/tower.js";
+import { updateLocationSync } from "../utils/client.LocationSync.js";
 
 let userId = null;
 let nickname = null;
@@ -41,6 +43,7 @@ socket.once("connection", (data) => {
     [userId, nickname, highScoreS, highScoreM] = data;
     // 방 목록 업데이트
     updateRooms(data[4]);
+    updateUserInfo(nickname,highScoreS,highScoreM)
   }
 });
 
@@ -52,8 +55,25 @@ socket.on("ready", (data) => {
   if (data.status === "start") gameStart();
 });
 
+// #region 위치동기화 받기
+socket.on("locationSync", (data) => {
+  // validation
+  if (!data || !Array.isArray(data.data)) {
+    console.error("[LocationSync/Error] Invalid data format.");
+    return;
+  }
+  // 몬스터 데이터
+  const monsters = data.data;
+  console.log("[LocationSync/Received] monsters: ", monsters);
+
+  // 게임 로직으로 위치 동기화
+  updateLocationSync(monsters);
+});
+// #endregion
+
+
 socket.on("room", (data) => {
-  updateUser(data.room);
+  updateUser(data);
 });
 
 socket.on("attack", (data) => {
@@ -64,7 +84,7 @@ socket.on("attack", (data) => {
 socket.on('leaveRoom',(data) => {
   roomId = null
   exitRoom()
-  socket.emit('leaveRoom',{ roomId: data.roomId })
+  socket.emit('leaveRoom', { roomId: data.roomId })
 })
 
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
@@ -95,13 +115,9 @@ export const sendEvent = async (handlerId, payload) => {
         updateRoomInfo(data[1].room);
         updateUser(data[1].room);
         roomId = data[1].room.gameId
-      // 방 로딩 핸들러
+        // 방 로딩 핸들러
       } else if (data[0] === 1002) {
         updateRooms(data[1].rooms);
-      // 방 나가기 핸들러
-      } else if (data[0] === 1003) {
-        roomId = null
-        exitRoom()
       }
       if(data[0] === 3001){
         try{
@@ -114,7 +130,7 @@ export const sendEvent = async (handlerId, payload) => {
           removeTower(x, y);
           removeTower(rx, ry);
           // 상위 타워 생성
-          setNewTower({towerid : towerId, x : x, y : y, gold : 0});
+          setNewTower({towerid : towerId, x : x, y : y, gold : 0, tier: tier});
         }catch(err){
           console.log(err);
         }

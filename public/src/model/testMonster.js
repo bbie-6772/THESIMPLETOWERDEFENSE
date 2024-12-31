@@ -14,6 +14,7 @@ export class TestMonster {
     this.width = 80; // 몬스터 이미지 가로 길이
     this.height = 80; // 몬스터 이미지 세로 길이
     this.isFlipped = false;
+    this.size = data.size;
 
     // 애니메이션
     this.animation = monsterAnimations; // 몬스터 애니메이션
@@ -85,34 +86,37 @@ export class TestMonster {
   }
 
   draw(ctx) {
-    const width = this.animation[this.currentFrame].width * 2;
-    const height = this.animation[this.currentFrame].height * 2;
+    const width = this.animation[this.currentFrame].width * this.size;
+    const height = this.animation[this.currentFrame].height * this.size;
 
     ctx.save(); // 캔버스 상태 저장
 
     // 좌우 반전 처리
     if (this.isFlipped) {
-      ctx.translate(this.x + width / 2, this.y + height / 2); // 중심으로 이동
+      ctx.translate(this.x, this.y); // 중심 좌표로 이동
       ctx.scale(-1, 1); // X축 반전
-      ctx.translate(-this.x - width / 2, -this.y - height / 2); // 원래 위치로 복귀
+      ctx.translate(-this.x, -this.y); // 원래 위치로 복귀
     }
 
+    // 이미지 중심 좌표 기준으로 그리기
     ctx.drawImage(
       this.animation[this.currentFrame],
-      this.x,
-      this.y,
+      this.x - width / 2, // 중심 기준으로 좌측 상단으로 이동
+      this.y - height / 2, // 중심 기준으로 상단으로 이동
       width,
       height,
     );
 
     ctx.restore(); // 캔버스 상태 복구
 
+    // 텍스트 그리기
     ctx.font = "12px Arial";
     ctx.fillStyle = "white";
+    ctx.textAlign = "center"; // 텍스트 중앙 정렬
     ctx.fillText(
       `(레벨 ${this.level}) ${this.name} : ${this.hp}/${this.maxHp}`,
-      this.x,
-      this.y - 5,
+      this.x, // 중심 X 좌표
+      this.y - height / 2 - 10, // 이미지 바로 위에 텍스트 배치
     );
   }
 }

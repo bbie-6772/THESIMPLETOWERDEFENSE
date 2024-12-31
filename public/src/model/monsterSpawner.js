@@ -1,7 +1,5 @@
 import { TestMonster } from "./testMonster.js";
 import { GetMonsterAnimation } from "./monsterAnimations.model.js";
-// import { 
-// , deleteMonster } from "../game.js";
 
 export default class Monsters {
   constructor(socket, gameId) {
@@ -61,9 +59,12 @@ export default class Monsters {
 
   // 데미지 테스트 - 테스트입니다
   sendMonsterDamageMessage(uuid, damage) {
-    this.socket.emit("monsterDamageMessage", {
-      uuid: uuid,
-      damage: damage,
+    this.socket.emit(this.gameId, {
+      message: {
+        eventName: "monsterDamageMessage",
+        uuid: uuid,
+        damage: damage,
+      },
     });
   }
 
@@ -71,6 +72,7 @@ export default class Monsters {
   receiveMonsterMessage() {
     console.log(this.gameId);
     this.socket.on(this.gameId, (data) => {
+      console.log(data.message.eventName)
       // 몬스터 스폰.
       if (data.message.eventName === "spawnMonster") {
         const monsterInfo = data.message.info;
@@ -91,6 +93,7 @@ export default class Monsters {
 
       // 핑퐁
       if (data.message.eventName === "respawnPing") {
+        console.log("옴")
         this.info = data.message.info;
         this.wave = this.info.wave;
         this.socket.emit(this.gameId, {

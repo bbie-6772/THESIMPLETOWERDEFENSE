@@ -88,6 +88,7 @@ export const towerDraw = (ctx) => {
           tmpTower.width * scaleX,
           tmpTower.height * scaleY
         );
+        ctx.fillText(`${tmpTower.tier}티어`, xPosition * scaleX, yPosition * scaleY);
       }
     }
   }

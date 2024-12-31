@@ -42,6 +42,7 @@ export const placeTower = (userId, payload, socket) => {
       x: X,
       y: Y,
       gold: changedgold,
+      tier: 1,
     };
   } catch (err) {
     return { status: "fail", message: err.message };
