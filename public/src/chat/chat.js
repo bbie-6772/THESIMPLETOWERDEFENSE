@@ -1,4 +1,6 @@
-const socket = io(); // Socket.IO 클라이언트 인스턴스 생성
+import { getSocket } from "../init/socket";
+
+const socket = getSocket(); // Socket.IO 클라이언트 인스턴스 생성
 
 let currentChannel = null; // 현재 채널을 저장할 변수 초기화
 const messageInput = document.getElementById('messageInput'); // 메시지 입력 필드 요소 가져오기
