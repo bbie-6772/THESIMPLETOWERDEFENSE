@@ -111,32 +111,30 @@ export const handleConnection = async (socket) => {
             }
         })
 
-        const soloRank = await prisma.ranks.findMany({
-            where: { userId2: null},
-            orderBy: [{
-                score: 'desc',
-            }], 
-            select: {
-                userId1: true,
-                score: true
-            },
-            take: 10 
-        })
+        // const soloRank = await prisma.ranks.findMany({
+        //     where: { userId2: null},
+        //     orderBy: [{
+        //         score: 'desc',
+        //     }], 
+        //     select: {
+        //         userId1: true,
+        //         score: true
+        //     },
+        //     take: 10 
+        // })
 
-        const multiRank = await prisma.ranks.findMany({
-            where: { userId2: { isNot: null} },
-            orderBy: [{
-                score: 'desc',
-            }],
-            select: {
-                userId1: true,
-                userId2: true,
-                score: true
-            },
-            take: 10 
-        })
-
-        console.log(soloRank, multiRank)
+        // const multiRank = await prisma.ranks.findMany({
+        //     where: { userId2: { isNot: null} },
+        //     orderBy: [{
+        //         score: 'desc',
+        //     }],
+        //     select: {
+        //         userId1: true,
+        //         userId2: true,
+        //         score: true
+        //     },
+        //     take: 10 
+        // })
 
         //유저와 연결되면 클라이언트에게 인터페이스 용 값 전달
         socket.emit('connection', [loginUser.id, loginUser.nickname, loginUser.highScoreS, loginUser.highScoreM, rooms])
