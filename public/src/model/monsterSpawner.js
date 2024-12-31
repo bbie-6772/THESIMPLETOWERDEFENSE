@@ -72,6 +72,7 @@ export default class Monsters {
   receiveMonsterMessage() {
     console.log(this.gameId);
     this.socket.on(this.gameId, (data) => {
+      console.log(data.message.eventName)
       // 몬스터 스폰.
       if (data.message.eventName === "spawnMonster") {
         const monsterInfo = data.message.info;
@@ -92,6 +93,7 @@ export default class Monsters {
 
       // 핑퐁
       if (data.message.eventName === "respawnPing") {
+        console.log("옴")
         this.info = data.message.info;
         this.wave = this.info.wave;
         this.socket.emit(this.gameId, {

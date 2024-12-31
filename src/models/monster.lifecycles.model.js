@@ -31,8 +31,6 @@ export default class MonsterLifecycles {
     this.gameId = null; // 통신용 이벤트네임.
     this.monsterStorage = MonsterStorage.getInstance(); // MonsterStorage 인스턴스 연결
 
-
-
     // 리스폰 - setInterval 제어용도.
     this.spawnInterval = null; // setInterval 담을 용도.
     this.isMonsterSpawnActive = false; // 스폰을 진행 중인가.
@@ -43,7 +41,6 @@ export default class MonsterLifecycles {
     // 에셋
     this.monstersAssets = getGameAssets().monsters.data; // 몬스터 에셋
 
-    
   }
 
   // 초기화(리스폰 정보).
@@ -87,12 +84,10 @@ export default class MonsterLifecycles {
     this.spawnInterval = setInterval(() => {
       const {eliteBossUuid} = this.monsterStorage.getInfo(this.gameId)
 
-      
-
       //// 3. 몬스터 생성이 활성화 됬는지 체크.
       if (!this.isMonsterSpawnActive) {
         //// 4. 서버 연결이 중지 된다면 종료한다.
-        const pingPong = this.monsterStorage.getInfo(this.eventName).pingPong;
+        const pingPong = this.monsterStorage.getInfo(this.gameId).pingPong;
         if (pingPong <= 0) {
           this.terminateRespawn();
           return;
@@ -197,8 +192,8 @@ export default class MonsterLifecycles {
 
     const interval = setInterval(() => {
 
-      let pingPong = this.monsterStorage.getInfo(this.eventName).pingPong;
-      this.io.to(this.eventName).emit(this.eventName, {
+      let pingPong = this.monsterStorage.getInfo(this.gameId).pingPong;
+      this.io.emit(this.gameId, {
         message: { 
           eventName: "respawnPing", 
           info: this.monsterStorage.getInfo(this.gameId),
@@ -209,7 +204,9 @@ export default class MonsterLifecycles {
         pingPong--; // 응답 대기 중이면 카운트 감소
         this.monsterStorage.updateInfo(this.gameId, {pingPong : pingPong})
       }
+      
       if (pingPong === 0 || pingPong === undefined) {
+        console.log("이게 왜 됨")
         clearInterval(interval); // 응답 없으면 타이머 종료
       }
     }, 1000); // 1초마다 체크

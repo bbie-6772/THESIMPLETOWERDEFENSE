@@ -173,6 +173,8 @@ export const handleDisconnect = (socket, io) => {
             } else io.to(room.gameId).emit('leaveRoom', { roomId: room.gameId })
         }
     }
+
+    console.log(getUsers())
 }
 
 // 준비상태 확인
