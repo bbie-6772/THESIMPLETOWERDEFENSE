@@ -1,8 +1,8 @@
 import { CLIENT_VERSION } from "../constant.js"
 import handlerMappings from "./handler.Mapping.js"
 import { prisma } from "../init/prisma.js";
-import { addUser,getUser } from "../models/users.model.js";
-import { getRooms, gameReady } from "../models/gameRoom.model.js";
+import { addUser, getUser, getUsers, deleteUser } from "../models/users.model.js";
+import { getRoom, getRooms, gameReady, destroyRoom, leaveRoom } from "../models/gameRoom.model.js";
 import jwt from "jsonwebtoken";
 
 const Auth = (data) => {
@@ -94,7 +94,7 @@ export const handleConnection = async (socket) => {
             return; ``
         }
         //유저 추가
-        addUser(loginUser.id, loginUser.nickname)
+        addUser(loginUser.id, loginUser.nickname, socket.id)
 
         console.log(loginUser.id, "접속")
 
@@ -124,8 +124,22 @@ export const handleConnection = async (socket) => {
     }
 }
 
-export const handleDisconnect = (socket, uuid) => {
-
+export const handleDisconnect = (socket, io) => {
+    // 유저 존재 확인
+    const user = deleteUser(socket.id)
+    let room = getRoom(user.userId);
+    let destroyed = null;
+    // 참여 방 확인 + 게임 시작 여부 확인으로 방 삭제 혹은 나가기
+    if (room) {
+        if (room.startTime > 0) {
+            destroyed = destroyRoom(user.userId)
+            io.to(room.gameId).emit('leaveRoom', { roomId: destroyed.gameId })
+        }
+        else {
+            room = leaveRoom(room.gameId, user.userId)
+            io.to(room.gameId).emit('room', { room })
+        }
+    }
 }
 
 // 준비상태 확인

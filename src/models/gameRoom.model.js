@@ -71,6 +71,12 @@ export const leaveRoom = (gameId, userId) => {
     return gameRooms[roomIdx]
 }
 
+export const destroyRoom = (userId) => {
+    const roomIdx = gameRooms.findIndex((e) => e.userId1 === userId || e.userId2 === userId )
+    if (roomIdx !== -1) return Object.assign(...gameRooms.splice(roomIdx, 1))
+    else return false
+}
+
 export const gameReady = (gameId, userId, single) => {
     const roomIdx = gameRooms.findIndex((e) => e.gameId === gameId)
     // 방이 서버에 있는 확인

@@ -21,10 +21,7 @@ export default class Monsters {
   // 싱글턴
   static getInstance = (socket = null, gameId = null) => {
     //console.log(`접속한 소켓 : ${socket.id} `)
-    if (!Monsters.instance) {
-      Monsters.instance = new Monsters(socket, gameId);
-    }
-    return Monsters.instance;
+    return new Monsters(socket, gameId)
   };
 
   // 초기화
@@ -90,8 +87,6 @@ export default class Monsters {
       // 몬스터 삭제
       if (data.message.eventName === "deleteMonster") {
         //this.deleteMonster(data.message.monster);
-
-        
       }
 
       // 핑퐁

@@ -4,6 +4,7 @@ import { sendEvent, ready, getSocket } from "./src/init/socket.js"
 //import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { intiChat } from './src/chat/chat.js';
 
+let game = null;
 let rooms = [];
 let selectedRoom = null;
 let roomId = null;
@@ -245,6 +246,7 @@ export const exitRoom = () => {
     selectedRoom = null
     roomId = null
     waitRoom.hide()
+    gameOver()
     // 방 대기열 요청
     sendEvent(1002);
 }
@@ -261,6 +263,14 @@ export const updateRooms = (roomsInfo) => {
 // 게임 시작 
 export const gameStart = () => {
     waitRoom.hide();
-    import("./src/game.js");
+    import("./src/game.js").then( module => {
+        game = module
+    });
     gameFrame.style.display = "block"
+}
+
+// 게임 오버,끝
+export const gameOver = () => {
+    game = null
+    gameFrame.style.display = "none"
 }

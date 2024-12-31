@@ -75,7 +75,7 @@ export default class MonsterLifecycles {
       if (!this.isMonsterSpawnActive) {
         //// 4. 서버 연결이 중지 된다면 종료한다.
         const pingPong = this.monsterStorage.getInfo(this.eventName).pingPong;
-        if (pingPong === 0) {
+        if (pingPong <= 0) {
           this.terminateRespawn();
           return;
         }
@@ -108,9 +108,6 @@ export default class MonsterLifecycles {
             speed: monsterList[randomIdex].speed * 5, // 스피드
           },
         };
-
-        
-
         //// 7. 메세지를 보내자. (전체로) - 수정 해야함!!
         this.io.emit(this.eventName, {
           message: {
@@ -163,9 +160,10 @@ export default class MonsterLifecycles {
     })
 
     const interval = setInterval(() => {
+
       let pingPong = this.monsterStorage.getInfo(this.eventName).pingPong;
-      
-      this.io.emit(this.eventName, {
+      console.log("보냈는데 맞나요")
+      this.io.to(this.eventName).emit(this.eventName, {
         message: { 
           eventName: "respawnPing", 
           info: this.monsterStorage.getInfo(this.eventName),
@@ -199,9 +197,7 @@ export default class MonsterLifecycles {
 
     let monster = this.monsterStorage.getMonster(this.eventName, monsterUuid);
     // 몬스터 유효성 검사.
-    if (Object.keys(monster).length === 0) {
-      return;
-    }
+    if (typeof monster === "object") return;
 
     // 몬스터정보 업데이트
     this.monsterStorage.updateMonster(this.eventName, monsterUuid, {
