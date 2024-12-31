@@ -11,6 +11,7 @@ let userId = null;
 let nickname = null;
 let highScoreS = null;
 let highScoreM = null;
+let roomId = null;
 
 const token = localStorage.getItem("access-Token");
 // 로그인이 안되어있을 시 로그인 창으로
@@ -89,11 +90,13 @@ export const sendEvent = async (handlerId, payload) => {
       if (data[0] === 1001) {
         updateRoomInfo(data[1].room);
         updateUser(data[1].room);
+        roomId = data[1].room.gameId
       // 방 로딩 핸들러
       } else if (data[0] === 1002) {
         updateRooms(data[1].rooms);
       // 방 나가기 핸들러
       } else if (data[0] === 1003) {
+        roomId = null
         exitRoom()
       }
 

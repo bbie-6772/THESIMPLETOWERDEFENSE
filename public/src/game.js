@@ -4,7 +4,7 @@ import { Tower, GetTowerFromCoordinate } from "./model/tower.js";
 import { Button, getButtons, setButton } from "./model/buttons.model.js";
 import { canvasMouseEventinit, drawmousePoint } from "./event/canvasMouseEvent.js";
 import { loadGameAssets } from "./init/assets.js";
-import { getSocket } from "./init/socket.js";
+import { getSocket, getRoom } from "./init/socket.js";
 import Monsters from "./model/monsterSpawner.js";
 import {loadMonsterImages, GetMonsterAnimation} from "./model/monsterAnimations.model.js"
 import { initTowerBase, towerDraw } from "./model/towerBase.model.js";
