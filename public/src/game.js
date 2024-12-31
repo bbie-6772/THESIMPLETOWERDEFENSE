@@ -34,7 +34,7 @@ monsterSpawner.socket.on("locationSync", (data) => {
   }
   // 몬스터 데이터
   const monsters = data.data;
-  console.log("[LocationSync/Received] monsters: ", monsters);
+  //console.log("[LocationSync/Received] monsters: ", monsters);
 
   // 게임 로직으로 위치 동기화
   updateLocationSync(monsters);
@@ -93,7 +93,7 @@ let monsterPath;
 
 function updateLocationSync(monsters) {
   monsters.forEach((monster) => {
-    console.log(`[LocationSync] 몬스터 UUID: ${monster.uuid} x: ${monster.x}, y: ${monster.y}`);
+    //console.log(`[LocationSync] 몬스터 UUID: ${monster.uuid} x: ${monster.x}, y: ${monster.y}`);
 
     // x, y 값이 null일 때 예외 처리
     if (monster.x === null || monster.y === null) {
@@ -109,9 +109,9 @@ function updateLocationSync(monsters) {
       targetMonster.targetX = monster.targetX;
       targetMonster.targetY = monster.targetY;
       targetMonster.curIndex = monster.curIndex;
-      console.log(`[LocationSync] 업데이트:  ${targetMonster.x}, ${targetMonster.y}, , ${targetMonster.targetX}, , ${targetMonster.targetY}, , ${targetMonster.curIndex}`);
+      //console.log(`[LocationSync] 업데이트:  ${targetMonster.x}, ${targetMonster.y}, , ${targetMonster.targetX}, , ${targetMonster.targetY}, , ${targetMonster.curIndex}`);
     } else {
-      console.log(`[LocationSync] 몬스터 UUID ${monster.uuid}을(를) 찾을 수 없습니다.`);
+      //console.log(`[LocationSync] 몬스터 UUID ${monster.uuid}을(를) 찾을 수 없습니다.`);
     }
   });
 }
