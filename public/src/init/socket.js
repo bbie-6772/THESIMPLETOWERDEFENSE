@@ -50,15 +50,15 @@ socket.on("ready", (data) => {
   alert(data.message);
   if (data.status === "start") gameStart();
 
-  console.log("this.room : " + room);
-  // 위치 동기화 시작
+  //#region 위치 동기화 시작
+  console.log("[SOCKETJS/TEST] roomId : " + roomId);
   socket.emit("startSync", {
     userId,
     token,
     clientVersion: CLIENT_VERSION,
-    // gameId: this.getRoom(),
-    gameId: room,
+    gameId: roomId,
   });
+  //#endregion
 });
 
 socket.on("room", (data) => {
@@ -66,9 +66,9 @@ socket.on("room", (data) => {
 });
 
 // 방이 파괴되었을 시 
-socket.on('leaveRoom',(data) => {
+socket.on('leaveRoom', (data) => {
   exitRoom()
-  socket.emit('leaveRoom',{ roomId: data.roomId })
+  socket.emit('leaveRoom', { roomId: data.roomId })
 })
 
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
@@ -99,15 +99,15 @@ export const sendEvent = async (handlerId, payload) => {
         updateRoomInfo(data[1].room);
         updateUser(data[1].room);
         roomId = data[1].room.gameId
-      // 방 로딩 핸들러
+        // 방 로딩 핸들러
       } else if (data[0] === 1002) {
         updateRooms(data[1].rooms);
-      // 방 나가기 핸들러
+        // 방 나가기 핸들러
       } else if (data[0] === 1003) {
         roomId = null
         exitRoom()
-      // 타워 핸들러
-      } else if(data[0] === 4001){
+        // 타워 핸들러
+      } else if (data[0] === 4001) {
         setNewTower(data[1]);
       }
       clearTimeout(loadError);

@@ -33,7 +33,6 @@ export default class LocationSyncManager {
 
     // 존재하는 몬스터들에 대해서 서버사이드 이동 갱신
     updateMonsterMovement(monstersCached) {
-        //
         Object.entries(monstersCached).forEach(([uuid, monster]) => {
             // 이동 로직 (간단한 랜덤 이동 예제)
             const diffx = monster.targetX - monster.x;
@@ -51,7 +50,7 @@ export default class LocationSyncManager {
 
             // 목적지에 도달한 경우 처리 (필요시)
             if (updatedX === monster.targetX && updatedY === monster.targetY) {
-                console.log(`[TEST] check: Monster ${uuid} destination arrived`);
+                console.log(`[LSM/TEST] check: Monster ${uuid} destination arrived`);
             }
         });
     }
@@ -60,31 +59,41 @@ export default class LocationSyncManager {
 
     // 동기화 작업 시작
     startSync(data) {
+
+
         // 테스트 로그
-        console.log("[TEST] sync interval test log");        
-        // console.log("[TEST] data.message.gameId", data.message.gameId);        
-        console.log("[TEST] data.message.gameId", data.gameId);        
-        
+        console.log("[LSM/TEST] data.gameId", data.gameId);
         // gameId 확인 및 검증
         this.gameId = data.gameId;
         if (!this.gameId) {
-            console.error("[Invalid] gameId 유효하지 않음");
+            console.error("[LSM/Invalid] gameId 유효하지 않음");
         }
-
         // 이미 실행 중인지 확인
         if (this.interval) {
-            console.warn("[Already Running] 기존 동기화 중지");
+            console.warn("[LSM/Already Running] 기존 동기화 중지");
             this.stopSync();
         }
 
-
         // 인터벌 시작
         this.interval = setInterval(() => {
+            //#region 전체 로그 테스트
+            console.log("[LSM/TEST] this.monsterStorage.test();:  ", this.monsterStorage.test());
+            //#endregion
+
+            // 테스트 로그: 몬스터스토리지 유효한지
+            if (!this.monsterStorage)
+                console.warn("[LSM/Invalid] monsterstorage invalid");
+
+
             // monsters 변경될 수 있으니 다시 가져오기
             const monstersCached = this.monsterStorage.getMonsters(this.gameId);
+            if (monstersCached == null)
+                console.log("[LSM/Empty] monstersCached null");
+            console.log("[LSM/Empty] Object.keys(monstersCached).length :" + Object.keys(monstersCached).length);
+
             // 비어있으면 동기화할 필요 없음
             if (!Object.keys(monstersCached).length) {
-                console.log("No monsters to sync.");
+                console.log("[LSM/Empty] No monsters to sync.");
                 return;
             }
 
@@ -270,4 +279,4 @@ function updateMonsterPosition(id, x, y) {
 }
 
 // 게임 루프 시작
-requestAnimationFrame(gameLoop);
+requestAnimationFrame(gameLoop);    */

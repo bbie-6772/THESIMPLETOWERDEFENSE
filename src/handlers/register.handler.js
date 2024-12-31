@@ -26,6 +26,7 @@ const registerHandler = (io) => {
     // #region LOCATION SYNC AND STOPSTNC
     // 동기화 시작
     socket.on('startSync', (data) => {
+      console.log("[RH/INFO] startSync received");
       LocationSyncManager.getInstance().startSync(data);
     });
 
