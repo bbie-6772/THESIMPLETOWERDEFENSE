@@ -1,5 +1,6 @@
 import { getrooms } from "../models/rooms.model.js";
 import towerModel from "../models/tower.model";
+import MonsterStorage from "../models/monsterStorage.model.js";
 
 //0,0 좌표의 타워
 const tower0Position = [200, 200];
@@ -11,8 +12,11 @@ const blockGap = 200;
 
 export const towerAttackCondtorl = (deltaTime) => {
   const rooms = getrooms();
+  const monsters = []; ///몬스터들을 받아오는 내용
   for (let roomsIndex = 0; roomsIndex < rooms.length; roomsIndex++) {
-    if (rooms.monsterCount > 0) {
+    const monsters = MonsterStorage.getMonsters(rooms[roomsIndex].gameId);
+
+    if (monsters.length > 0) {
       let allUsersTowers = [];
       allUsersTowers.push(
         ...towerModel.getUsersTowers(rooms[roomsIndex].userId1)
@@ -32,7 +36,7 @@ export const towerAttackCondtorl = (deltaTime) => {
           allUsersTowers[allUsersTowersIndex].X,
           allUsersTowers[allUsersTowersIndex].Y
         );
-        //타워 쿨다운 확인인
+        //타워 쿨다운 확인
         if (
           towerModel.towerCoolDown(
             allUsersTowers[allUsersTowersIndex],

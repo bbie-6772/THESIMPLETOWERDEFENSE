@@ -28,7 +28,7 @@ export const getUsers = (userId) => {
 
 export const setUserGold = (userId, gold)=>{
     try{
-        userId.find((element) => element.userId === userId).gold = gold;
+        users.find((element) => element.userId === userId).gold = gold;
         return true;
     }
     catch(err){

@@ -7,6 +7,7 @@ import {
   exitRoom,
 } from "../../lobby.js";
 import Monsters from "../model/monsterSpawner.js";
+import { setNewTower } from "../model/tower.js";
 
 let userId = null;
 let nickname = null;
@@ -43,10 +44,6 @@ socket.once("connection", (data) => {
 });
 
 socket.on("response", (data) => {
-  //타워 배치
-  if (data.handlerId == "towerPlacement") {
-    console.log("서버로부터 수신된 타워배치 데이터:", data.data.toString());
-  }
 });
 
 socket.on("ready", (data) => {
@@ -92,6 +89,7 @@ export const sendEvent = async (handlerId, payload) => {
       if (data[0] === 1001) {
         updateRoomInfo(data[1].room);
         updateUser(data[1].room);
+        roomId = data[1].room.gameId
       // 방 로딩 핸들러
       } else if (data[0] === 1002) {
         updateRooms(data[1].rooms);
@@ -99,7 +97,6 @@ export const sendEvent = async (handlerId, payload) => {
       } else if(data[0] === 4001){
         setNewTower(data[1]);
       }
-
       clearTimeout(loadError);
       return resolve(true);
     });
@@ -121,4 +118,8 @@ export const ready = (roomId, single) => {
 export const getSocket = () => {
   return socket;
 };
+
+export const getRoom = () => {
+  return roomId
+}
 
