@@ -105,6 +105,7 @@ function handleMouseup(event) {
 
     // { oneID, otherID }
     sendEvent(3001, { oneID : currentTower.oid, otherID : targetTower.oid});
+    currentTower = null;
   }
   isHolding = false;
   holdingicon = {};
@@ -129,6 +130,14 @@ export const drawmousePoint = (ctx) => {
   if (isHolding && "image" in holdingicon) {
     ctx.drawImage(
       holdingicon.image,
+      mousePosition[0] - 25,
+      mousePosition[1] - 25,
+      50,
+      50
+    );
+  }else if(isHolding && currentTower){
+    ctx.drawImage(
+      currentTower.image,
       mousePosition[0] - 25,
       mousePosition[1] - 25,
       50,
