@@ -7,7 +7,7 @@ export const addUser = (userId, nickname) => {
     const user =  {
         userId: userId,
         nickname: nickname,
-        gold: 0,
+        gold: 1000,
         monsterKill: 0,
         totalDamage:0,
         upgrades : {
@@ -22,7 +22,7 @@ export const getUser = (userId) => {
 
 export const setUserGold = (userId, gold)=>{
     try{
-        userId.find((element) => element.userId === userId).gold = gold;
+        users.find((element) => element.userId === userId).gold = gold;
         return true;
     }
     catch(err){

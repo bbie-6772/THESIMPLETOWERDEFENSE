@@ -6,13 +6,13 @@ import {
   gameStart,
 } from "../../lobby.js";
 import Monsters from "../model/monsterSpawner.js";
+import { setNewTower } from "../model/tower.js";
 
 let userId = null;
 let nickname = null;
 let highScoreS = null;
 let highScoreM = null;
 let room = null;
-
 const token = localStorage.getItem("access-Token");
 // 로그인이 안되어있을 시 로그인 창으로
 if (!token) {
@@ -42,10 +42,6 @@ socket.once("connection", (data) => {
 });
 
 socket.on("response", (data) => {
-  //타워 배치
-  if (data.handlerId == "towerPlacement") {
-    console.log("서버로부터 수신된 타워배치 데이터:", data.data.toString());
-  }
 });
 
 socket.on("ready", (data) => {
@@ -88,6 +84,11 @@ export const sendEvent = async (handlerId, payload) => {
       // 방 로딩 핸들러
       if (data[0] === 1002) {
         updateRooms(data[1].rooms);
+      }
+      // 타워 핸들러
+      if(data[0] === 4001){
+        setNewTower(data[1]);
+
       }
       clearTimeout(loadError);
       return resolve(true);

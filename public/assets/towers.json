@@ -10,7 +10,7 @@
       "range": 100,
       "cost": 100,
       "cooldown": 500,
-      "image": ""
+      "image": "../assets/images/towerSingle.png"
     },
     {
       "id": 2,
@@ -20,7 +20,7 @@
       "range": 50,
       "cost": 100,
       "cooldown": 500,
-      "image": ""
+      "image": "../assets/images/towerMulti.png"
     },
     {
       "id": 3,
@@ -30,7 +30,7 @@
       "range": 100,
       "cost": 100,
       "cooldown": 500,
-      "image": ""
+      "image": "../assets/images/towerSplash.png"
     }
   ]
 }

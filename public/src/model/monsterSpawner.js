@@ -1,5 +1,6 @@
 import { TestMonster } from "./testMonster.js";
 import { GetMonsterAnimation } from "./monsterAnimations.model.js";
+import sleep from "../utils/sleep.js";
 // import { 
 // , deleteMonster } from "../game.js";
 

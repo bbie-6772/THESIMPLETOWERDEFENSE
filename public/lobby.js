@@ -2,7 +2,6 @@ import { sendEvent, ready } from "./src/init/socket.js"
 //import Monsters from "./src/model/monsterSpawner.js";
 //import { getSocket, getRoom } from "./src/init/socket.js";
 //import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-
 let rooms = [];
 let selectedRoom = null;
 let roomId = null;
@@ -243,7 +242,7 @@ export const updateRooms = (roomsInfo) => {
 }
 
 export const gameStart = () => {
-    waitRoom.hide()
-    import("./src/game.js")
+    waitRoom.hide();
+    import("./src/game.js");
     gameFrame.style.display = "block"
 }
