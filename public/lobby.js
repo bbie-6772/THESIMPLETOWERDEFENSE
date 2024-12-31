@@ -31,6 +31,9 @@ let waitRoomPassword = null;
 let chatBox = null;
 let host = null;
 let entry = null;
+let nickname = null;
+let highScoreS = null;
+let highScoreM = null;
 
 let exitButton = null;
 let kickButton = null;
@@ -45,6 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
     roomCreationForm = document.getElementById('roomCreationForm');
     enableCheckbox = document.getElementById('enablePasswordInput');
     passwordInput = document.getElementById('passwordInput');
+
+    nickname = document.getElementById('nickname');
+    highScoreS = document.getElementById('highScoreS');
+    highScoreM = document.getElementById('highScoreM');
 
     roomList = document.getElementById('roomList');
     roomSelectionModal = new bootstrap.Modal(document.getElementById('roomSelectionModal'));
@@ -233,11 +240,23 @@ export const updateRoomInfo = (roomInfo) => {
 
 // 대기방 유저 업데이트 함수
 export const updateUser = (roomInfo) => {
-    console.log(roomInfo)
     if (roomInfo) {
         host.innerText = roomInfo.userId1
         entry.innerText = roomInfo.userId2 || "비어 있음"
     }
+}
+
+// 유저 정보 업데이트
+export const updateUserInfo = (name, score1, score2) => {
+    let soloScore = document.createElement('div');
+    let multiScore = document.createElement('div');
+
+    nickname.innerText = name;
+    soloScore.innerText = score1;
+    multiScore.innerText = score2;
+    
+    highScoreS.append(soloScore)
+    highScoreM.append(multiScore)
 }
 
 // 대기방 나가기
