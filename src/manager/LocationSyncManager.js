@@ -64,7 +64,7 @@ export default class LocationSyncManager {
             // 목적지에 도달한 경우 처리=> 새로운 targetX, targetY
             const epsilon = 0.01;
             if (Math.abs(updatedX - monster.targetX) < epsilon && Math.abs(updatedY - monster.targetY) < epsilon) {
-                console.log(`[LSM/TEST] Monster ${uuid} reached its destination`);
+                // console.log(`[LSM/TEST] Monster ${uuid} reached its destination`);
 
                 // 새로운 목적지 설정 (랜덤 좌표 예제)
                 const newCurIndex = (monster.curIndex + 1) % this.monsterPath.length;
