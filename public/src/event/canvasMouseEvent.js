@@ -1,4 +1,4 @@
-import { GetTowerFromCoordinate } from "../model/tower.js";
+import { GetTowerFromCoordinate ,GetTowerCoordinateFromGrid } from "../model/tower.js";
 import { getButtons } from "../model/buttons.model.js";
 import { getGameCanvas } from "../model/gameCanva.model.js";
 import { baseColisionCheck } from "../model/towerBase.model.js";
@@ -37,16 +37,16 @@ function handleClick(event) {
   var y = (event.clientY - dcanvasRect.top) * scaleY;
   var t = GetTowerFromCoordinate(x, y);
   if (t) {
+    const { xPosition, yPosition } = GetTowerCoordinateFromGrid(t.x, t.y);
     dctx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
     dctx.fillStyle = "green";
     dctx.lineWidth = 3; // 테두리 두께
-    dctx.strokeRect(t.x, t.y, t.width, t.height);
+    dctx.strokeRect(xPosition * scaleX, yPosition * scaleY, t.width, t.height);
   }
 }
 //마우스 버튼을 누른 경우
 function handleMousedown(event) {
   const buttons = getButtons();
-  console.log(buttons);
   for (let i = 0; i < buttons.length; i++) {
     if (buttons[i].mouseOver == true) {
       const holdingImage = new Image();
@@ -72,7 +72,7 @@ function handleMousedown(event) {
   var x = (event.clientX - canvasRect.left) * scaleX;
   var y = (event.clientY - canvasRect.top) * scaleY;
   currentTower = GetTowerFromCoordinate(x, y);
-  if(currentTower){
+  if (currentTower) {
     isHolding = true;
   }
 }
@@ -80,12 +80,12 @@ function handleMousedown(event) {
 function handleMouseup(event) {
   if ("button" in holdingicon) {
     if (holdingicon.button.text === "랜덤타워") {
-      console.log(localStorage.getItem("access-Token"));
       const towerPosition = baseColisionCheck(
         mousePosition[0],
         mousePosition[1]
       );
       if (towerPosition) {
+      console.log( towerPosition.x,  towerPosition.y);
         console.log(towerPosition);
         sendEvent(4001, { X: towerPosition.x, Y: towerPosition.y });
       }
@@ -95,16 +95,16 @@ function handleMouseup(event) {
   Canvas.classList.remove("hide-cursor");
 
   // 타워가 선택된 경우, 마우스를 뗀 곳에서 합성
-  if(isHolding && currentTower){
+  if (isHolding && currentTower) {
     const scaleX = Canvas.width / canvasRect.width; // 가로 스케일
     const scaleY = Canvas.height / canvasRect.height; // 세로 스케일
-    
+
     var x = (event.clientX - canvasRect.left) * scaleX;
     var y = (event.clientY - canvasRect.top) * scaleY;
     var targetTower = GetTowerFromCoordinate(x, y);
 
     // { oneID, otherID }
-    sendEvent(3001, { oneID : currentTower.oid, otherID : targetTower.oid});
+    sendEvent(3001, { oneID: currentTower.oid, otherID: targetTower.oid });
   }
   isHolding = false;
   holdingicon = {};

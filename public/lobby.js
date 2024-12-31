@@ -259,7 +259,7 @@ export const updateRooms = (roomsInfo) => {
 
 // 게임 시작 
 export const gameStart = () => {
-    waitRoom.hide()
-    import("./src/game.js")
+    waitRoom.hide();
+    import("./src/game.js");
     gameFrame.style.display = "block"
 }

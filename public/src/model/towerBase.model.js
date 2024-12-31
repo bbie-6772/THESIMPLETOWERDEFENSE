@@ -1,24 +1,22 @@
 import { getGameCanvas } from "./gameCanva.model.js";
+import { GetTowerCoordinateFromGrid } from "./tower.js";
 
 let towerBase = [];
 let towerBasePosition = [];
 
-const basePoint = { x: 100, y: 100 };
-const incremWidth = (1920 * (8 / 10)) / 2;
-const incremHeight = 1080 * (8 / 10);
-
-//0,0 좌표의 타워 (basePoint에 + 해서 계산)
-const tower0Position = [300, 300];
-// 타워끼리의 거리
-const towersGapX = 200;
-const towersGapY = 200;
-// 블럭과의 거리
-const blockGap = 200;
+const width = 78; // 타워 이미지 가로 길이 (이미지 파일 길이에 따라 변경 필요하며 세로 길이와 비율을 맞춰주셔야 합니다!)
 
 const baseImage = new Image();
 baseImage.src = "../assets/images/towerPlatform.png";
 const towerBaseWidth = 180;
 const towerBaseheight = 180;
+
+export const gettowerBaseheight = ()=>{
+  return towerBaseheight;
+};
+export const gettowerBaseWidth = ()=>{
+  return towerBaseWidth;
+};
 
 export const initTowerBase = () => {
   towerBase = [];
@@ -33,10 +31,10 @@ export const initTowerBase = () => {
 };
 
 export const setTowerBase = (X, Y, tower) => {
-  towerBase[X][Y] = tower;
+  towerBase[Y][X] = tower;
 };
 export const getTowerBase = (X, Y, tower) => {
-  return towerBase[X][Y];
+  return towerBase[Y][X];
 };
 
 export const towerDraw = (ctx) => {
@@ -47,29 +45,20 @@ export const towerDraw = (ctx) => {
   for (let i = 0; i < towerBase.length; i++) {
     towerBasePosition[i] = towerBasePosition[i]?? [];
     for (let o = 0; o < towerBase[i].length; o++) {
-      const xPosition =
-        (incremWidth / 2 +
-          ((o % 2) * towersGapX - towersGapX / 2) +
-          (o > 1 ? incremWidth : 0)) *
-        scaleX;
-      const yPosition =
-        (tower0Position[1] +
-          incremHeight / 2 +
-          (i * towersGapY - towersGapY / 2 - towersGapY - towerBaseheight)) *
-        scaleY;
+      const {xPosition, yPosition} = GetTowerCoordinateFromGrid(o,i);
 
       //타워 발판 생성
       ctx.drawImage(
         baseImage,
-        xPosition,
-        yPosition,
+        xPosition - towerBaseWidth /2 + width /2 * scaleX,
+        yPosition * scaleY,
         towerBaseWidth * scaleX,
         towerBaseheight * scaleY
       );
 
       towerBasePosition[i][o] = {
-        xPosition,
-        yPosition,
+        xPosition: xPosition * scaleX,
+        yPosition: yPosition * scaleY,
         towerBaseWidth: towerBaseWidth * scaleX,
         towerBaseheight: towerBaseheight * scaleY,
       };
@@ -79,8 +68,8 @@ export const towerDraw = (ctx) => {
         //타워 그리기
         ctx.drawImage(
           tmpTower.image,
-          xPosition,
-          yPosition,
+          xPosition * scaleX,
+          yPosition * scaleY,
           tmpTower.width * scaleX,
           tmpTower.height * scaleY
         );
