@@ -178,7 +178,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 15px;
             width: 250px;
-            max-height: 250px;
+            max-height: 50%;
             overflow: auto;
             transition: transform 0.3s ease;
         }
@@ -322,28 +322,29 @@
         </div>
     </div>
 
-    <div class="fixed-top p-3 d-flex justify-content-between" style="pointer-events: none">
-        <div class="user-profile-card" style="pointer-events: auto">
-            <div class="d-flex align-items-center">
-                <div class="me-3">
-                    <!-- User Icon -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor"
-                        class="bi bi-person-circle text-primary" viewBox="0 0 16 16">
-                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-                        <path fill-rule="evenodd"
-                            d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
-                    </svg>
-                </div>
-                <div>
-                    <h5 class="nickname mb-1" id="nickname">닉네임</h5>
-                    <p class="high-score mb-0" id="highScoreS">최고 점수(싱글)</p>
-                    <p class="high-score mb-0" id="highScoreM">최고 점수(협동)</p>
-                    <p class="userInterfaceStuff mb-0" id="gold" style="color: gold;">골드</p>
-                    <p class="userInterfaceStuff mb-0" id="curLevel" style="color: black;">현재 레벨</p>
-                    <p class="userInterfaceStuff mb-0" id="endTimer" style="color: red;">엔드타이머</p>
-                </div>
+    <div class="user-profile-card fixed-top p-3 d-flex justify-content-start">
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                <!-- User Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor"
+                    class="bi bi-person-circle text-primary" viewBox="0 0 16 16">
+                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                    <path fill-rule="evenodd"
+                        d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+                </svg>
+            </div>
+            <div>
+                <h5 class="nickname mb-1" id="nickname">닉네임</h5>
+                <p class="high-score mb-0" id="highScoreS">최고 점수(싱글)</p>
+                <p class="high-score mb-0" id="highScoreM">최고 점수(협동)</p>
+                <p class="userInterfaceStuff mb-0" id="gold" style="color: gold;">골드</p>
+                <p class="userInterfaceStuff mb-0" id="curLevel" style="color: black;">현재 레벨</p>
+                <p class="userInterfaceStuff mb-0" id="endTimer" style="color: red;">엔드타이머</p>
             </div>
         </div>
+    </div>
+
+    <div class="fixed-top p-3 d-flex justify-content-end" style="pointer-events: none">
         <div class="ranking-card" style="pointer-events: auto">
             <div class="d-flex align-items-center">
                 <div>
