@@ -248,15 +248,15 @@ export default class MonsterLifecycles {
 
 
   //====[몬스터 체력 업데이트]====// 
-  updateMonsterHealth(monsterUuid, data) {
+  updateMonsterHealth(monsterUuid, data, gameId = this.gameId) {
     
-    let monster = this.monsterStorage.getMonster(this.gameId, monsterUuid);
+    let monster = this.monsterStorage.getMonster(gameId, monsterUuid);
     
     // 몬스터 유효성 검사.
     if (!monster || Object.keys(monster).length === 0) return;
 
     // 몬스터정보 업데이트
-    this.monsterStorage.updateMonster(this.gameId, monsterUuid, {
+    this.monsterStorage.updateMonster(gameId, monsterUuid, {
       stat: {
         health: monster.stat.health - data,
         speed: monster.stat.speed,
@@ -264,7 +264,7 @@ export default class MonsterLifecycles {
     });
 
     // 업데이트를 갱신.
-    monster = this.monsterStorage.getMonster(this.gameId, monsterUuid);
+    monster = this.monsterStorage.getMonster(gameId, monsterUuid);
     
     // 삭제 검사. 
     this.removeMonster(monster);

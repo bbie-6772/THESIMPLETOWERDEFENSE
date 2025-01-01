@@ -10,7 +10,6 @@ import {
 import Monsters from "../model/monsterSpawner.js";
 import { settingAttack } from "../model/towerBase.model.js";
 import { removeTower, setNewTower } from "../model/tower.js";
-import { updateLocationSync } from "../utils/client.LocationSync.js";
 import { setUserGold } from "../model/userInterface.model.js";
 
 let userId = null;
