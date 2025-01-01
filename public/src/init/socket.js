@@ -6,6 +6,7 @@ import {
   gameStart,
   exitRoom,
   updateUserInfo,
+  updateRank
 } from "../../lobby.js";
 import Monsters from "../model/monsterSpawner.js";
 import { settingAttack } from "../model/towerBase.model.js";
@@ -43,6 +44,7 @@ socket.once("connection", (data) => {
     // 방 목록 업데이트
     updateRooms(data[4]);
     updateUserInfo(nickname,highScoreS,highScoreM)
+    updateRank(data[5], data[6])
   }
 });
 
