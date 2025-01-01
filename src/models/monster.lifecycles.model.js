@@ -2,9 +2,9 @@ import { getGameAssets } from "../init/assets.js";
 import { v4 as uuidv4 } from "uuid";
 import MonsterStorage from "./monsterStorage.model.js";
 import { generatePath } from "../init/pathGenerator.js";
-import { roomInfoUpdate, roomGameOverTimerSetting, getStartTimer, roomMonsterCountUpdate, getRoomFromGameId } from "./gameRoom.model.js"
+import { roomInfoUpdate, roomGameOverTimerSetting, getStartTimer, roomMonsterCountUpdate, getRoomFromGameId, getRoom } from "./gameRoom.model.js"
 import { getUser } from "./users.model.js";
-
+import { getRooms } from "./gameRoom.model.js";
 /*====[구조를 변경한 이유]====*/
 // 1. 룸 생성 -> 게임 시작 방식으로, 각 방마다 독립적인 인스턴스를 생성하는 것이 더 적합하다고 판단.
 //    - 일반적인 클래스 구조를 사용하면 각 방의 상태와 동작을 개별적으로 관리할 수 있음.
@@ -241,7 +241,20 @@ export default class MonsterLifecycles {
   monsterAliveCountUpdate() {
     const aliveCount = this.monsterStorage.getInfo(this.gameId).totalCount - this.monsterStorage.getInfo(this.gameId).kills
     this.monsterStorage.updateInfo(this.gameId, { aliveCount })
-    this.socket.emit("monsterCount", aliveCount )
+    const room = getRoomFromGameId(this.gameId);
+    if(room){
+      if (room.userId1 != null) {
+      this.io.sockets.sockets
+        .get(getUser(room.userId1).socketId)
+        .emit("monsterCount", aliveCount);}
+    
+      if (room.userId2 != null) {
+        this.io.sockets.sockets
+          .get(getUser(room.userId2).socketId)
+          .emit("monsterCount", aliveCount);
+      }
+    }
+    //this.io.to(this.gameId).emit("monsterCount", aliveCount )
     return aliveCount
   }
 

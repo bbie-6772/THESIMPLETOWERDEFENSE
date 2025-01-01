@@ -1,7 +1,8 @@
+import { Socket } from "socket.io";
 import { getGameAssets } from "../init/assets.js";
 import { getRandomInt } from "../utils/randNumberGenerate.js";
 import { getUser } from "./users.model.js";
-
+import { getio } from "../handlers/register.handler.js";
 const towers = [];
 
 //0,0 좌표의 타워
@@ -114,10 +115,10 @@ export const currentTowerStat = (userId, X, Y) => {
 };
 
 export const towerCoolDown = (tower, cooldown, deltaTime) => {
-let towerCooldown = +tower.cooldown ?? 0;
+  let towerCooldown = +tower.cooldown ?? 0;
 
-towerCooldown -= +deltaTime;
-  if (towerCooldown < 0 ) {
+  towerCooldown -= +deltaTime;
+  if (towerCooldown < 0) {
     towerCooldown += +cooldown;
     tower.cooldown = +towerCooldown;
     return true;
@@ -142,8 +143,16 @@ export const merge = (uuid, x1, y1, x2, y2) => {
   addTower(uuid, x2, y2, towers.data[randomTower].id, newtier);
 
   // 생성된 타워에 대한 정보를 반환한다(클라이언트에 전달해야함)
-  return { uuid: uuid, towerId: towers.data[randomTower].id, tier: newtier, x: x2, y: y2, rx: x1, ry: y1 };
-}
+  return {
+    uuid: uuid,
+    towerId: towers.data[randomTower].id,
+    tier: newtier,
+    x: x2,
+    y: y2,
+    rx: x1,
+    ry: y1,
+  };
+};
 
 export const upgrade = (uuid, towerId) => {
   // 유저의 타워 업그레이드 수치를 증가시킨다
@@ -151,7 +160,7 @@ export const upgrade = (uuid, towerId) => {
 
   user.upgrades[towerId]++;
   return { uuid: uuid, towerId: towerId, level: user.upgrades[towerId] };
-}
+};
 // 타워 판매 기능 추가
 export const sellTower = (userId, X, Y) => {
   const tower = getUsersTower(userId, X, Y);
@@ -174,9 +183,9 @@ export const sellTower = (userId, X, Y) => {
   const user = getUser(userId);
   user.gold += sellPrice; // 유저에게 골드 추가
 
+
   return { success: true, message: "타워가 판매되었습니다.", sellPrice };
 };
-
 
 const towerModel = {
   addTower,

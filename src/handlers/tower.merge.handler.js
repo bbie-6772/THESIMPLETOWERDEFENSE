@@ -2,6 +2,7 @@ import { getGameAssets } from "../init/assets.js";
 import { getRoom } from "../models/gameRoom.model.js";
 import towerModel from "../models/tower.model.js";
 import { getUser, setUserGold } from "../models/users.model.js";
+import { getio } from "./register.handler.js";
 
 // 타워 합성 핸들러, handlerID : 3001
 export const TowerMerge = (uuid, payload) => {
@@ -85,5 +86,20 @@ export const TowerSell = (uuid, payload) => {
     const newGold = user.gold + sellPrice;
     setUserGold(uuid, newGold); // UI 업데이트
 
+    const io = getio();
+
+    io.sockets.sockets
+      .get(getUser(room.userId1).socketId)
+      .emit("selltower", {
+        x, y
+      });
+  
+    if (room.userId2 != null) {
+      io.sockets.sockets
+        .get(getUser(room.userId2).socketId)
+        .emit("selltower", {
+            x, y
+        });
+    }
     return { status: 'success', message: '타워가 판매되었습니다.', newGold, x, y };
 }
