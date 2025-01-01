@@ -25,6 +25,8 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const monsterSpawner = Monsters.getInstance(getSocket(), getRoom())
 
+
+console.log("들어왔어요");
 // #region 위치동기화 받기
 monsterSpawner.socket.on("locationSync", (data) => {
   // validation
@@ -231,10 +233,9 @@ function gameLoop() {
   ctx.fillStyle = "black";
   ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 400); // 최고 기록 표시
 
-  const test = monsterSpawner.getInfo().endTimer;
+  const timer = monsterSpawner.getInfo().endTimer;
   ctx.fillStyle = "yellow";
-  ctx.fillText(`엔드타이머: ${test}`, 100 , 450); // 최고 기록 표시
-
+  ctx.fillText(`엔드타이머: ${timer}`, 100 , 450); // 최고 기록 표시
 
 
   getButtons().forEach((button) => {
@@ -280,6 +281,7 @@ async function initGame() {
   if (isInitGame) {
     //return;
   }
+  console.log("시작");
 
   gameAssets = await loadGameAssets();
 
@@ -382,4 +384,3 @@ Promise.all([
 
 await initGame();
 
-//requestAnimationFrame(gameLoop);

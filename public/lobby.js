@@ -1,4 +1,4 @@
-import { sendEvent, ready, getSocket } from "./src/init/socket.js"
+import { sendEvent, ready, getSocket, getRoom } from "./src/init/socket.js"
 //import Monsters from "./src/model/monsterSpawner.js";
 //import { getSocket, getRoom } from "./src/init/socket.js";
 //import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -304,14 +304,36 @@ export const updateRooms = (roomsInfo) => {
 // 게임 시작 
 export const gameStart = () => {
     waitRoom.hide();
-    import("./src/game.js").then( module => {
-        game = module
+
+    import(`./src/game.js?${new Date().getTime()}`).then(module => {
+        game = module;
+        gameFrame.style.display = "block";
+        console.log("게임 시작");
+
+        gameEnd(getSocket(), getRoom());
+    }).catch(err => {
+        console.error("게임 모듈 로딩 실패:", err);
     });
+    
     gameFrame.style.display = "block"
+
+
+    gameEnd(getSocket(), getRoom());
 }
 
 // 게임 오버,끝
 export const gameOver = () => {
-    game = null
+    console.log(game);
+    game = null;
     gameFrame.style.display = "none"
+}
+
+// 게임 종료. 
+const gameEnd= (socket, getRoom) => {
+    socket.on("gameEnd", (data) => {
+        console.log(data);
+        if(data.timer <= 0) {
+            gameOver();
+        }
+    });
 }

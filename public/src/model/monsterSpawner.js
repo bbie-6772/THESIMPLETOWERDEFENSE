@@ -16,6 +16,7 @@ export default class Monsters {
     this.wave = 1;
     // 메시지 연결
     this.receiveMonsterMessage();
+
   }
 
   // 싱글턴(아님)
@@ -60,6 +61,18 @@ export default class Monsters {
   getMonsters() {
     return this.monsters;
   }
+
+  // 몬스터 리스폰 리셋.
+  monstersReset() {
+    this.socket = null;
+    this.gameId = null;
+    this.monsters = [];
+    this.vfxs = [];
+    this.path = [];
+    this.info = {};
+    this.wave = 1;
+  }
+  
 
 
 
@@ -110,6 +123,8 @@ export default class Monsters {
         const speed = 6;
         this.vfxs.push(new Vfx(GetVfxAnimation(randomVfx), x, y, size, speed));
       }
+
+
 
       // 몬스터 삭제
       if (data.message.eventName === "deleteMonster") {

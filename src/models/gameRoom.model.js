@@ -47,7 +47,7 @@ export const roomInfoUpdate = (gameId, score, monsterCount, time)=> {
     }
 }
 
-// room 게임오버 타이머 세팅(외부).
+// room 게임오버 타이머 세팅(몬스터 리스폰).
 export const roomGameOverTimerSetting = (gameId) => {
     const index = gameRooms.findIndex((room) => room.gameId === gameId )
 
@@ -55,6 +55,25 @@ export const roomGameOverTimerSetting = (gameId) => {
         return gameRooms[index].gameOverTimer; 
     } else {
         return 60;
+    }
+}
+
+// room 게임오버 타이머 (로비).
+export const getStartTimer = (gameId,io)=> {
+    const index = gameRooms.findIndex((room) => room.gameId === gameId )
+    if(index !== -1){
+        if(gameRooms[index].startTime <= 0){
+            io.emit("gameEnd", {
+                timer: gameRooms[index].startTime
+            });
+
+            const destroyed = destroyRoom(gameRooms[index].userId1);
+            io.to(destroyed.gameId).emit('leaveRoom', { roomId: destroyed.gameId })
+        }
+    } else {
+        io.emit("gameEnd", {
+            timer: 60
+        });
     }
 }
 
