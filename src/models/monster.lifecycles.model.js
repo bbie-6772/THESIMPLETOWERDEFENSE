@@ -290,7 +290,8 @@ export default class MonsterLifecycles {
       },
     });
 
-    // 업데이트를 갱신.
+    // 변수 업데이트
+    monster = this.monsterStorage.getMonster(gameId, monsterUuid);
 
     // 몬스터 채력 클라에 보내기.
     this.io.emit(this.gameId, {
@@ -301,7 +302,6 @@ export default class MonsterLifecycles {
     }); // 클라이언트에게 ping 전송
 
     // 삭제 검사.
-    monster = this.monsterStorage.getMonster(gameId, monsterUuid);
     this.removeMonster(monster);
   }
 
