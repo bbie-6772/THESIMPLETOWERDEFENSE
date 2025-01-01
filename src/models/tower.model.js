@@ -151,6 +151,7 @@ export const upgrade = (uuid, towerId) => {
   return { uuid: uuid, type: towerId, level: user.upgrade[towerId] };
 };
 
+
 const towerModel = {
   addTower,
   getTowers,
