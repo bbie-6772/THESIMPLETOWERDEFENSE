@@ -171,7 +171,7 @@ export const sellTower = (userId, X, Y) => {
 
   // 유저에게 보상 추가
   const user = getUser(userId);
-  user.coins += sellPrice; // 유저에게 코인 추가 (유저 모델에 coins 속성이 있어야 함)
+  user.gold += sellPrice; // 유저에게 골드 추가
 
   return { success: true, message: "타워가 판매되었습니다.", sellPrice };
 };
