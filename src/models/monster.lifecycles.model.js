@@ -241,7 +241,7 @@ export default class MonsterLifecycles {
   monsterAliveCountUpdate() {
     const aliveCount = this.monsterStorage.getInfo(this.gameId).totalCount - this.monsterStorage.getInfo(this.gameId).kills
     this.monsterStorage.updateInfo(this.gameId, { aliveCount })
-    this.socket.emit("monsterCount", aliveCount )
+    this.io.to(this.gameId).emit("monsterCount", aliveCount )
     return aliveCount
   }
 
