@@ -2,7 +2,7 @@ import { getGameAssets } from "../init/assets.js";
 import { v4 as uuidv4 } from "uuid";
 import MonsterStorage from "./monsterStorage.model.js";
 import { generatePath } from "../init/pathGenerator.js";
-import {roomInfoUpdate, roomGameOverTimerSetting} from "./gameRoom.model.js"
+import { roomInfoUpdate, roomGameOverTimerSetting } from "./gameRoom.model.js"
 
 /*====[구조를 변경한 이유]====*/
 // 1. 룸 생성 -> 게임 시작 방식으로, 각 방마다 독립적인 인스턴스를 생성하는 것이 더 적합하다고 판단.
@@ -57,6 +57,8 @@ export default class MonsterLifecycles {
     this.x = monsterPath[0].x;
     this.y = monsterPath[0].y;
     this.curIndex = 0;
+    this.isStunned = false;
+    this.isSlow = false;
 
     const info = {
       totalCount: 0,
@@ -161,6 +163,8 @@ export default class MonsterLifecycles {
           targetX: monsterPath[resPathIndex + 1].x,
           targetY: monsterPath[resPathIndex + 1].y,
           curIndex: resPathIndex,
+          isStunned: false,
+          isSlow: false,
           size: eliteSize,
           gold: eliteGold,
           score: eliteScore,
@@ -206,9 +210,9 @@ export default class MonsterLifecycles {
           if (totalCount % WAVE_CYCLE === 0 && totalCount !== 0) {
             this.monsterStorage.updateInfo(this.gameId, { wave: wave + 1 });
           }
-          
+
           // 엔드 타이머 갱신
-          if(aliveCount > MONSTER_COUNTDOWN) {
+          if (aliveCount > MONSTER_COUNTDOWN) {
             this.monsterStorage.updateInfo(this.gameId, { endTimer: endTimer - 1 });
 
             roomInfoUpdate(
@@ -230,8 +234,8 @@ export default class MonsterLifecycles {
   monsterAliveCountUpdate() {
     this.socket.on(this.gameId, (data) => {
       if (data.message.eventName === "monsterAliveCountUpdate") {
-        this.monsterStorage.updateInfo(this.gameId, { aliveCount:  data.message.aliveCount });      
-      } 
+        this.monsterStorage.updateInfo(this.gameId, { aliveCount: data.message.aliveCount });
+      }
     });
   }
 
@@ -276,18 +280,23 @@ export default class MonsterLifecycles {
 
     const roomSize = Object.keys(this.monsterStorage.test()).length;
     // console.log(`[${this.gameId}]번 방 리스폰을 종료합니다. (rooms : [${roomSize}])`);
-  
+
   }
 
 
 
   //====[몬스터 체력 업데이트]====// 
   updateMonsterHealth(monsterUuid, data, gameId = this.gameId) {
-    
+
     let monster = this.monsterStorage.getMonster(gameId, monsterUuid);
-    
+
     // 몬스터 유효성 검사.
     if (!monster || Object.keys(monster).length === 0) return;
+
+    //#region 몬스터 피격 시 경직 혹은 둔화
+    // this.monsterStorage.applyMonsterStunned(gameId, monsterUuid);
+    this.monsterStorage.applyMonsterSlow(gameId, monsterUuid);
+    //#endregion
 
     // 몬스터정보 업데이트
     this.monsterStorage.updateMonster(gameId, monsterUuid, {
@@ -367,7 +376,7 @@ export default class MonsterLifecycles {
 
         // 콘솔로그
         //console.log(`[${this.gameId}]번방 앨리트 몬스터가 제거되었습니다.`);
-      } 
+      }
     }
   }
 
