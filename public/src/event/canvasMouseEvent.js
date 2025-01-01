@@ -63,6 +63,17 @@ function handleMousedown(event) {
         holdingicon = { button: buttons[i], image: holdingImage };
         break;
       }
+
+      if(buttons[i].text === '단일타워강화'){
+        console.log('타워 강화');
+        sendEvent(3002, 1);
+      }else if(buttons[i].text.text === '멀티타워강화'){
+        console.log('타워 강화');
+        sendEvent(3002, 2);
+      }else if(buttons[i].text.text === '범위타워강화'){
+        console.log('타워 강화');
+        sendEvent(3002, 3);
+      }
     }
   }
 
@@ -90,12 +101,6 @@ function handleMouseup(event) {
         sendEvent(4001, { X: towerPosition.x, Y: towerPosition.y, tier: 1 });
       }
     } else if (holdingicon.button.text === "타워판매") {
-    }else if(holdingicon.button.text === '단일타워강화'){
-      sendEvent(3002, 0);
-    }else if(holdingicon.button.text === '멀티타워강화'){
-      sendEvent(3002, 1);
-    }else if(holdingicon.button.text === '범위타워강화'){
-      sendEvent(3002, 2);
     }
   }
   Canvas.classList.remove("hide-cursor");

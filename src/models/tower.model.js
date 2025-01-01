@@ -115,7 +115,7 @@ export const currentTowerStat = (userId, X, Y) => {
 
 export const towerCoolDown = (tower, cooldown, deltaTime) => {
   tower.cooldown -= deltaTime;
-  if (tower.cooldown < 0) {
+  if (tower.cooldown < 0 || !tower.cooldown) {
     tower.cooldown += cooldown;
     return true;
   }
@@ -150,6 +150,7 @@ export const upgrade = (uuid, towerId) => {
   user.upgrade[towerId]++;
   return { uuid: uuid, type: towerId, level: user.upgrade[towerId] };
 };
+
 
 const towerModel = {
   addTower,
