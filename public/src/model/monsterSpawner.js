@@ -16,6 +16,7 @@ export default class Monsters {
     this.wave = 1;
     // 메시지 연결
     this.receiveMonsterMessage();
+
   }
 
   // 싱글턴(아님)
@@ -95,6 +96,8 @@ export default class Monsters {
         const speed = 6;
         this.vfxs.push(new Vfx(GetVfxAnimation(randomVfx), x, y, size, speed));
       }
+
+
 
       // 몬스터 삭제
       if (data.message.eventName === "deleteMonster") {

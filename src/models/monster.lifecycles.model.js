@@ -2,7 +2,7 @@ import { getGameAssets } from "../init/assets.js";
 import { v4 as uuidv4 } from "uuid";
 import MonsterStorage from "./monsterStorage.model.js";
 import { generatePath } from "../init/pathGenerator.js";
-import { roomInfoUpdate, roomGameOverTimerSetting } from "./gameRoom.model.js"
+import {roomInfoUpdate, roomGameOverTimerSetting, getStartTimer, roomMonsterCountUpdate} from "./gameRoom.model.js"
 
 /*====[구조를 변경한 이유]====*/
 // 1. 룸 생성 -> 게임 시작 방식으로, 각 방마다 독립적인 인스턴스를 생성하는 것이 더 적합하다고 판단.
@@ -15,14 +15,11 @@ import { roomInfoUpdate, roomGameOverTimerSetting } from "./gameRoom.model.js"
 /*===========================*/
 
 // 상수
-const WAVE_CYCLE = 10;
 const ELITE_MULTIPLIER = 2; // 앨리트 몬스터 배율
-const ELITE_MONSTER_SPAWN_CYCLE = 10; // 앨리터 몬스터 등장주기
 const ELITE_MONSTER_SIZE = 4; // 엘리트 몬스터 크기
 const NORMAL_MONSTER_SIZE = 2; // 일반 몬스터 크기
 const MONSTER_SPEED = 1; // 몬스터 디폴트 속도
 const MONSTER_SPAWN_CYCLE = 2000; // 리스폰 속도. (1000 === 1초)
-const MONSTER_COUNTDOWN = 10;
 
 export default class MonsterLifecycles {
   // 생성자
@@ -35,6 +32,7 @@ export default class MonsterLifecycles {
 
     // 리스폰 - setInterval 제어용도.
     this.spawnInterval = null; // setInterval 담을 용도.
+    this.pingPongInterval = null; // setInterval 담을 용도.
     this.isMonsterSpawnActive = false; // 스폰을 진행 중인가.
 
     // 리스폰 위치 플래그 변수
@@ -103,7 +101,7 @@ export default class MonsterLifecycles {
 
 
     this.spawnInterval = setInterval(() => {
-      const { eliteBossUuid } = this.monsterStorage.getInfo(this.gameId);
+
 
       //// 3. 몬스터 생성이 활성화 됬는지 체크.
       if (!this.isMonsterSpawnActive) {
@@ -129,8 +127,9 @@ export default class MonsterLifecycles {
         const { totalCount, wave } = this.monsterStorage.getInfo(this.gameId);
         const { gold, score, health, speed } = monsterList[randomIdex];
 
+        const eliteMonsterCycle = roomMonsterCountUpdate(this.gameId);
         const isEliteMonster =
-          totalCount !== 0 && totalCount % ELITE_MONSTER_SPAWN_CYCLE === 0;
+          totalCount !== 0 && totalCount % eliteMonsterCycle === 0;
 
         const eliteSize = isEliteMonster
           ? ELITE_MONSTER_SIZE
@@ -209,12 +208,14 @@ export default class MonsterLifecycles {
           const { wave, totalCount, aliveCount, endTimer } = this.monsterStorage.getInfo(this.gameId);
 
           // 웨이브(레벨) 증가.
-          if (totalCount % WAVE_CYCLE === 0 && totalCount !== 0) {
+          const monsterWaveCycle = roomMonsterCountUpdate(this.gameId);
+          if (totalCount % monsterWaveCycle === 0 && totalCount !== 0) {
             this.monsterStorage.updateInfo(this.gameId, { wave: wave + 1 });
           }
 
           // 엔드 타이머 갱신
-          if (aliveCount > MONSTER_COUNTDOWN) {
+          const monsterCountDown = roomMonsterCountUpdate(this.gameId);
+          if (aliveCount > monsterCountDown) {
             this.monsterStorage.updateInfo(this.gameId, { endTimer: endTimer - 1 });
 
             roomInfoUpdate(
@@ -223,6 +224,12 @@ export default class MonsterLifecycles {
               this.monsterStorage.getInfo(this.gameId).aliveCount,
               this.monsterStorage.getInfo(this.gameId).endTimer
             );
+
+            getStartTimer(this.gameId, this.io);
+
+            if(this.monsterStorage.getInfo(this.gameId).endTimer <= 0){
+              this.terminateRespawn();
+            }
           } else {
             const endTimer = roomGameOverTimerSetting(this.gameId);
             this.monsterStorage.updateInfo(this.gameId, { endTimer: endTimer });
@@ -251,7 +258,7 @@ export default class MonsterLifecycles {
       }
     });
 
-    const interval = setInterval(() => {
+    this.pingPongInterval = setInterval(() => {
       let pingPong = this.monsterStorage.getInfo(this.gameId).pingPong;
       this.io.to(this.gameId).emit(this.gameId, {
         message: {
@@ -266,17 +273,19 @@ export default class MonsterLifecycles {
       }
 
       if (pingPong === 0 || pingPong === undefined) {
-        clearInterval(interval); // 응답 없으면 타이머 종료
+        clearInterval(this.pingPongInterval); // 응답 없으면 타이머 종료
       }
     }, 1000); // 1초마다 체크
   }
 
   //====[리스폰 종료 처리]====//
-  terminateRespawn() {
+  terminateRespawn(gameId = this.gameId) {
     clearInterval(this.spawnInterval);
+    clearInterval(this.pingPongInterval);
     this.spawnInterval = null;
-    this.monsterStorage.removeInfo(this.gameId);
-    this.monsterStorage.removeMonsters(this.gameId);
+    this.pingPongInterval = null;
+    this.monsterStorage.removeInfo(gameId);
+    this.monsterStorage.removeMonsters(gameId);
 
     const roomSize = Object.keys(this.monsterStorage.test()).length;
     // console.log(`[${this.gameId}]번 방 리스폰을 종료합니다. (rooms : [${roomSize}])`);

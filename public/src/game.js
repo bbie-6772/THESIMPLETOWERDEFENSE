@@ -411,4 +411,3 @@ Promise.all([
 
 await initGame();
 
-//requestAnimationFrame(gameLoop);
