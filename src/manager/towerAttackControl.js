@@ -119,7 +119,7 @@ export const towerAttackCondtorl = (io, monstercycle) => {
                       monsters[mosterkey[monstersIndex]].y,
                       monsters[mosterkey[i]].x,
                       monsters[mosterkey[i]].y
-                    ) < 30
+                    ) < 100
                   ) {
                     //데미지 함수
                     monstercycle.updateMonsterHealth(

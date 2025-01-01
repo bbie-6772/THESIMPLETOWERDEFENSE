@@ -47,45 +47,18 @@ export default class Monsters {
 
   spawnMonster(monster) {
     this.monsters.push(monster);
-    this.monsterAliveCountUpdate();
   }
 
   deleteMonster(uuid) {
     const index = this.monsters.findIndex((obj) => obj.uuid === uuid);
     if (index !== -1) {
       this.monsters.splice(index, 1); // 해당 인덱스의 객체를 삭제
-      this.monsterAliveCountUpdate();
+
     }
   }
 
   getMonsters() {
     return this.monsters;
-  }
-
-  // 몬스터 리스폰 리셋.
-  monstersReset() {
-    this.socket = null;
-    this.gameId = null;
-    this.monsters = [];
-    this.vfxs = [];
-    this.path = [];
-    this.info = {};
-    this.wave = 1;
-  }
-  
-
-
-
-  // 생존 몬스터 카운터.
-  monsterAliveCountUpdate() {
-    if (this.monsters.length !== 0) {
-      this.socket.emit(this.gameId, {
-        message: {
-          eventName: "monsterAliveCountUpdate",
-          aliveCount: this.monsters.length,
-        },
-      });
-    }
   }
 
   // 서버 -> 클라 메세지.

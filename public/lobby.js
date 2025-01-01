@@ -1,9 +1,7 @@
 import { sendEvent, ready, getSocket, getRoom } from "./src/init/socket.js"
-//import Monsters from "./src/model/monsterSpawner.js";
-//import { getSocket, getRoom } from "./src/init/socket.js";
-//import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { intiChat } from './src/chat/chat.js';
 import showAlert from "./src/utils/sweetAlert.js";
+
 
 let game = null;
 let rooms = [];
@@ -20,6 +18,7 @@ let selectedRoomDetails = null;
 let confirmRoomSelection = null;
 let refreshButton = null;
 let gameFrame = null;
+let countBar = null;
 
 let roomName = null;
 let roomType = null;
@@ -65,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     confirmRoomSelection = document.getElementById('confirmRoomSelection');
     refreshButton = document.getElementById('refreshButton');
     gameFrame = document.getElementById('gameFrame')
+    countBar = document.getElementById('countBar')
 
     roomName = document.getElementById('roomName')
     roomType = document.getElementById('roomType')
@@ -336,4 +336,8 @@ const gameEnd= (socket, getRoom) => {
             gameOver();
         }
     });
+}
+
+export const getCountBar = () => {
+    return countBar
 }

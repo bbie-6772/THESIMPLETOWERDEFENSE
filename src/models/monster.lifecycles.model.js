@@ -58,6 +58,8 @@ export default class MonsterLifecycles {
     this.x = monsterPath[0].x;
     this.y = monsterPath[0].y;
     this.curIndex = 0;
+    this.isStunned = false;
+    this.isSlow = false;
 
     const info = {
       totalCount: 0,
@@ -162,6 +164,8 @@ export default class MonsterLifecycles {
           targetX: monsterPath[resPathIndex + 1].x,
           targetY: monsterPath[resPathIndex + 1].y,
           curIndex: resPathIndex,
+          isStunned: false,
+          isSlow: false,
           size: eliteSize,
           gold: eliteGold,
           score: eliteScore,
@@ -170,8 +174,8 @@ export default class MonsterLifecycles {
             speed: eliteSpeed, // 스피드
           },
         };
-        //// 7. 메세지를 보내자. (전체로) - 수정 해야함!!
-        this.io.emit(this.gameId, {
+        //// 7. 메세지를 보내자.
+        this.io.to(this.gameId).emit(this.gameId, {
           message: {
             eventName: "spawnMonster",
             info: monsterInfo,
@@ -197,6 +201,8 @@ export default class MonsterLifecycles {
           });
         }
 
+        this.monsterAliveCountUpdate()
+
         //// 11. 일정 시간 후 메시지 전송 상태를 다시 초기화 (생성 제한 용.)
         setTimeout(() => {
           this.isMonsterSpawnActive = false;
@@ -207,9 +213,9 @@ export default class MonsterLifecycles {
           if (totalCount % WAVE_CYCLE === 0 && totalCount !== 0) {
             this.monsterStorage.updateInfo(this.gameId, { wave: wave + 1 });
           }
-          
+
           // 엔드 타이머 갱신
-          if(aliveCount > MONSTER_COUNTDOWN) {
+          if (aliveCount > MONSTER_COUNTDOWN) {
             this.monsterStorage.updateInfo(this.gameId, { endTimer: endTimer - 1 });
 
             roomInfoUpdate(
@@ -235,13 +241,11 @@ export default class MonsterLifecycles {
 
   // 생존몬스터 업데이트
   monsterAliveCountUpdate() {
-    this.socket.on(this.gameId, (data) => {
-      if (data.message.eventName === "monsterAliveCountUpdate") {
-        this.monsterStorage.updateInfo(this.gameId, { aliveCount:  data.message.aliveCount });      
-      } 
-    });
+    const aliveCount = this.monsterStorage.getInfo(this.gameId).totalCount - this.monsterStorage.getInfo(this.gameId).kills
+    this.monsterStorage.updateInfo(this.gameId, { aliveCount })
+    this.socket.emit("monsterCount", aliveCount )
+    return aliveCount
   }
-
 
   //====[서버 <-> 클라 연결 체크]====//
   sendRespawnPing() {
@@ -256,7 +260,7 @@ export default class MonsterLifecycles {
 
     this.pingPongInterval = setInterval(() => {
       let pingPong = this.monsterStorage.getInfo(this.gameId).pingPong;
-      this.io.emit(this.gameId, {
+      this.io.to(this.gameId).emit(this.gameId, {
         message: {
           eventName: "respawnPing",
           info: this.monsterStorage.getInfo(this.gameId),
@@ -283,19 +287,23 @@ export default class MonsterLifecycles {
     this.monsterStorage.removeInfo(gameId);
     this.monsterStorage.removeMonsters(gameId);
 
-    console.log(`[${this.gameId}]번 방 리스폰을 종료합니다. `);
-  
+    const roomSize = Object.keys(this.monsterStorage.test()).length;
+    // console.log(`[${this.gameId}]번 방 리스폰을 종료합니다. (rooms : [${roomSize}])`);
+
   }
-
-
 
   //====[몬스터 체력 업데이트]====// 
   updateMonsterHealth(monsterUuid, data, gameId = this.gameId) {
-    
+
     let monster = this.monsterStorage.getMonster(gameId, monsterUuid);
-    
+
     // 몬스터 유효성 검사.
     if (!monster || Object.keys(monster).length === 0) return;
+
+    //#region 몬스터 피격 시 경직 혹은 둔화
+    // this.monsterStorage.applyMonsterStunned(gameId, monsterUuid);
+    this.monsterStorage.applyMonsterSlow(gameId, monsterUuid);
+    //#endregion
 
     // 몬스터정보 업데이트
     this.monsterStorage.updateMonster(gameId, monsterUuid, {
@@ -309,7 +317,7 @@ export default class MonsterLifecycles {
     monster = this.monsterStorage.getMonster(gameId, monsterUuid);
 
     // 몬스터 채력 클라에 보내기.
-    this.io.emit(this.gameId, {
+    this.io.to(this.gameId).emit(this.gameId, {
       message: {
         eventName: "monsterDamaged",
         monster: monster,
@@ -327,7 +335,7 @@ export default class MonsterLifecycles {
       const monstergoid = monster.gold;
 
       // 싱글이면 상관없지만 멀티 모드일때 다른유저에게 삭제요청.
-      this.io.emit(this.gameId, {
+      this.io.to(this.gameId).emit(this.gameId, {
         message: {
           eventName: "deleteMonster",
           monster: monster,
@@ -338,19 +346,16 @@ export default class MonsterLifecycles {
       this.monsterStorage.removeMonster(this.gameId, monster.uuid);
 
       // 정보 수정.
-      const { kills, score, gold, wave, eliteBossUuid } =
-        this.monsterStorage.getInfo(this.gameId);
-      const aliveCount = Object.keys(
-        this.monsterStorage.getMonsters(this.gameId),
-      ).length;
+      const { kills, score, gold, wave, eliteBossUuid } = this.monsterStorage.getInfo(this.gameId);
 
       // 정보 업데이트.
       this.monsterStorage.updateInfo(this.gameId, {
-        aliveCount: aliveCount,
         kills: kills + 1,
         score: score + monsterScore * wave,
         gold: gold + monstergoid * wave,
       });
+
+      monsterAliveCountUpdate()
 
       // 정보를 게임룸에 전송.
       roomInfoUpdate(
@@ -361,7 +366,7 @@ export default class MonsterLifecycles {
       );
 
       // 정보 클라에 전송.
-      this.io.emit(this.gameId, {
+      this.io.to(this.gameId).emit(this.gameId, {
         message: {
           eventName: "monsterInfoMessage",
           info: this.monsterStorage.getInfo(this.gameId),
@@ -375,7 +380,7 @@ export default class MonsterLifecycles {
 
         // 콘솔로그
         //console.log(`[${this.gameId}]번방 앨리트 몬스터가 제거되었습니다.`);
-      } 
+      }
     }
   }
 
