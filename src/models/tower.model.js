@@ -138,7 +138,7 @@ export const merge = (uuid, x1, y1, x2, y2) => {
   addTower(uuid, x2, y2, towers.data[randomTower].id, newtier);
 
   // 생성된 타워에 대한 정보를 반환한다(클라이언트에 전달해야함)
-  return { uuid: uuid, towerId: towers.data[randomTower].id, tier: newtier, x: x2, y: y2, rx : x1, ry : y1 };
+  return { uuid: uuid, towerId: towers.data[randomTower].id, tier: newtier, x: x2, y: y2, rx: x1, ry: y1 };
 }
 
 export const upgrade = (uuid, towerId) => {
@@ -148,6 +148,31 @@ export const upgrade = (uuid, towerId) => {
   user.upgrades[towerId]++;
   return { uuid: uuid, towerId: towerId, level: user.upgrades[towerId] };
 }
+// 타워 판매 기능 추가
+export const sellTower = (userId, X, Y) => {
+  const tower = getUsersTower(userId, X, Y);
+  if (!tower) {
+    return { success: false, message: "해당 위치에 타워가 없습니다." };
+  }
+
+  const gameAssetsTowers = getGameAssets().towers;
+  const currentTower = gameAssetsTowers.data.find((Element) => {
+    return Element.id == tower.towerId;
+  });
+
+  // 판매 시 보상 계산 (70%)
+  const sellPrice = Math.floor(currentTower.cost * 0.7);
+
+  // 타워 제거
+  removeUsersTower(userId, X, Y);
+
+  // 유저에게 보상 추가
+  const user = getUser(userId);
+  user.gold += sellPrice; // 유저에게 골드 추가
+
+  return { success: true, message: "타워가 판매되었습니다.", sellPrice };
+};
+
 
 const towerModel = {
   addTower,
@@ -160,6 +185,7 @@ const towerModel = {
   towerCoolDown,
   merge,
   upgrade,
+  sellTower, // 판매 기능 추가
   max_tier,
   max_upgrade,
 };

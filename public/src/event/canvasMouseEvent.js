@@ -1,4 +1,4 @@
-import { GetTowerFromCoordinate ,GetTowerCoordinateFromGrid } from "../model/tower.js";
+import { GetTowerFromCoordinate, GetTowerCoordinateFromGrid } from "../model/tower.js";
 import { getButtons } from "../model/buttons.model.js";
 import { getGameCanvas } from "../model/gameCanva.model.js";
 import { baseColisionCheck } from "../model/towerBase.model.js";
@@ -64,13 +64,13 @@ function handleMousedown(event) {
         break;
       }
 
-      if(buttons[i].text === '단일타워강화'){
+      if (buttons[i].text === '단일타워강화') {
         console.log('타워 강화');
         sendEvent(3002, 1);
-      }else if(buttons[i].text.text === '멀티타워강화'){
+      } else if (buttons[i].text.text === '멀티타워강화') {
         console.log('타워 강화');
         sendEvent(3002, 2);
-      }else if(buttons[i].text.text === '범위타워강화'){
+      } else if (buttons[i].text.text === '범위타워강화') {
         console.log('타워 강화');
         sendEvent(3002, 3);
       }
@@ -96,11 +96,16 @@ function handleMouseup(event) {
         mousePosition[1]
       );
       if (towerPosition) {
-      console.log( towerPosition.x,  towerPosition.y);
+        console.log(towerPosition.x, towerPosition.y);
         console.log(towerPosition);
         sendEvent(4001, { X: towerPosition.x, Y: towerPosition.y, tier: 1 });
       }
     } else if (holdingicon.button.text === "타워판매") {
+      if (currentTower) {
+        const payload = { x: currentTower.x, y: currentTower.y };
+        sendEvent(3003, payload); // 타워 판매 요청
+        currentTower = null; // 판매 후 현재 타워 초기화
+      }
     }
   }
   Canvas.classList.remove("hide-cursor");
@@ -114,7 +119,7 @@ function handleMouseup(event) {
     var y = (event.clientY - canvasRect.top) * scaleY;
     var targetTower = GetTowerFromCoordinate(x, y);
 
-    const payload = { x1 : currentTower.x, y1 : currentTower.y, x2 : targetTower.x, y2 : targetTower.y };
+    const payload = { x1: currentTower.x, y1: currentTower.y, x2: targetTower.x, y2: targetTower.y };
     console.log(`tower merge : ${[currentTower.x, currentTower.y]} & ${[targetTower.x, targetTower.y]}`)
     // { x1, y1, x2, y2 } : 그리드 좌표
     sendEvent(3001, payload);
@@ -124,7 +129,7 @@ function handleMouseup(event) {
   holdingicon = {};
 }
 //캔버스에 진입한 경우
-function handleMouseover(event) {}
+function handleMouseover(event) { }
 //캔버스상에서 마우스를 움직인 경우우
 function handleMousemove(event) {
   const gameCanvas = getGameCanvas();
@@ -148,7 +153,7 @@ export const drawmousePoint = (ctx) => {
       50,
       50
     );
-  }else if(isHolding && currentTower){
+  } else if (isHolding && currentTower) {
     ctx.drawImage(
       currentTower.image,
       mousePosition[0] - 25,

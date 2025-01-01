@@ -10,7 +10,7 @@ import {
 } from "../../lobby.js";
 import Monsters from "../model/monsterSpawner.js";
 import { settingAttack } from "../model/towerBase.model.js";
-import { removeTower, setNewTower } from "../model/tower.js";
+import { removeTower, setNewTower, sellTower } from "../model/tower.js";
 import { setUserGold } from "../model/userInterface.model.js";
 
 let userId = null;
@@ -94,7 +94,7 @@ socket.on("attack", (data) => {
 });
 
 // 방이 파괴되었을 시 
-socket.on('leaveRoom',(data) => {
+socket.on('leaveRoom', (data) => {
   roomId = null
   exitRoom()
   socket.emit('leaveRoom', { roomId: data.roomId })
@@ -132,8 +132,7 @@ export const sendEvent = async (handlerId, payload) => {
       } else if (data[0] === 1002) {
         updateRooms(data[1].rooms);
       }
-      
-      
+    
       clearTimeout(loadError);
       return resolve(true);
     });
