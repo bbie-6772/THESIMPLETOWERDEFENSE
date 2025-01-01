@@ -187,7 +187,7 @@ export default class MonsterLifecycles {
           const monstersSize = Object.keys(this.monsterStorage.getMonsters(this.gameId)).length;
           const roomSize = Object.keys(this.monsterStorage.test()).length;
           
-          console.log(`[${this.gameId}]번방 몬스터가 생성되었습니다. (rooms : [${roomSize}] / monsters : [${monstersSize + 1}])`);
+          // console.log(`[${this.gameId}]번방 몬스터가 생성되었습니다. (rooms : [${roomSize}] / monsters : [${monstersSize + 1}])`);
         }, MONSTER_SPAWN_CYCLE); 
       }
     }, MONSTER_SPAWN_CYCLE); 
@@ -218,7 +218,7 @@ export default class MonsterLifecycles {
       }
       
       if (pingPong === 0 || pingPong === undefined) {
-        console.log("이게 왜 됨")
+        // console.log("이게 왜 됨")
         clearInterval(interval); // 응답 없으면 타이머 종료
       }
     }, 1000); // 1초마다 체크
@@ -232,7 +232,7 @@ export default class MonsterLifecycles {
     this.monsterStorage.removeMonsters(this.gameId);
 
     const roomSize = Object.keys(this.monsterStorage.test()).length;
-    console.log(`[${this.gameId}]번 방 리스폰을 종료합니다. (rooms : [${roomSize}])`);
+    // console.log(`[${this.gameId}]번 방 리스폰을 종료합니다. (rooms : [${roomSize}])`);
   
   }
 
@@ -314,10 +314,10 @@ export default class MonsterLifecycles {
         });
 
         // 콘솔로그
-        console.log(`[${this.gameId}]번방 앨리트 몬스터가 제거되었습니다.`);
+        // console.log(`[${this.gameId}]번방 앨리트 몬스터가 제거되었습니다.`);
       } else {
         // 콘솔로그
-        console.log(`[${this.gameId}]번방 몬스터가 제거되었습니다.`);
+        // console.log(`[${this.gameId}]번방 몬스터가 제거되었습니다.`);
       }
       
       

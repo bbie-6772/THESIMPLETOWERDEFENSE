@@ -112,7 +112,7 @@ export const GetTowerCoordinateFromGrid = (x, y) => {
 };
 //return { status: 'success',towerid: towers.data[getRandomTower].id, x: X, y: Y, gold };
 export const setNewTower = (data) => {
-  const { towerid, x, y, gold, tier } = data;
+  const { userId, towerid, x, y, gold, tier } = data;
   //const {towers} = getGameAssets();
   console.log(towerid);
   const tmpTower = getGameAssets().towers.data.find((element) => {
@@ -124,7 +124,7 @@ export const setNewTower = (data) => {
   tmpTowerImage.src = tmpTower.image;
 
   const newtower = new Tower(
-    localStorage.getItem("access-Token"),
+    userId,
     x,
     y,
     tmpTowerImage,

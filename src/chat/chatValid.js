@@ -18,7 +18,7 @@ export async function validateMessage(message) {
         });
 
         const result = chatCompletion.choices[0]?.message || "";
-        console.log("내용 : ", result);
+        // console.log("내용 : ", result);
 
         if (!result) {
             return '반려: 결과가 없습니다.'; // 유효하지 않은 경우

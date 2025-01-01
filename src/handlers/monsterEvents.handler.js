@@ -12,7 +12,7 @@ export const receiveMonsterMessage = (io, socket) => {
   // 초기화.
   socket.on("monsterEventInit", (data) => {
 
-    console.log(data.message.gameId);
+    // console.log(data.message.gameId);
 
     const roomCount = Object.keys(monsterStorage.getInfo(data.message.gameId)).length;
     

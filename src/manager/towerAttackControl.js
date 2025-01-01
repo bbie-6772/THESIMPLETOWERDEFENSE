@@ -79,21 +79,21 @@ export const towerAttackCondtorl = (io, monstercycle) => {
             allUsersTowers[allUsersTowersIndex].X,
             allUsersTowers[allUsersTowersIndex].Y
           );
-          console.log(monsters
-          );
+          // console.log(monsters
+          // );
           const mosterkey = Object.keys(monsters);
           for (
             let monstersIndex = 0;
             monstersIndex < mosterkey.length;
             monstersIndex++
           ) {
-            console.log(
-              xPosition,
-              yPosition,
-              monsters[mosterkey[monstersIndex]].x,
-              monsters[mosterkey[monstersIndex]].y,
-              tmpTower.range
-            );
+            // console.log(
+            //   xPosition,
+            //   yPosition,
+            //   monsters[mosterkey[monstersIndex]].x,
+            //   monsters[mosterkey[monstersIndex]].y,
+            //   tmpTower.range
+            // );
             if (monsters[mosterkey[monstersIndex]] != undefined&&
               distanceCheck(
                 xPosition,

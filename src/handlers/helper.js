@@ -96,7 +96,7 @@ export const handleConnection = async (socket) => {
         //유저 추가
         addUser(loginUser.id, loginUser.nickname, socket.id)
 
-        console.log(loginUser.id, "접속")
+        // console.log(loginUser.id, "접속")
 
         // 주요 정보 변환
         const rooms = getRooms().map((e) => {
@@ -156,7 +156,7 @@ export const handleDisconnect = (socket, io) => {
     let destroyed = null;
     let left = null
     // 참여 방 확인 + 게임 시작 여부 확인으로 방 삭제 혹은 나가기
-    console.log(room)
+    // console.log(room)
     if (room) {
         if (room.startTime > 0) {
             destroyed = destroyRoom(user.userId)
@@ -174,7 +174,7 @@ export const handleDisconnect = (socket, io) => {
         }
     }
 
-    console.log(getUsers())
+    // console.log(getUsers())
 }
 
 // 준비상태 확인
@@ -232,6 +232,7 @@ export const handlerEvent = (io, socket, data) => {
             return;
         }
 
+        // console.log(`helper.js:235 - ${data.userId}`);
         const response = handler(data.userId, data.payload, socket, io);
 
         // 서버 전 유저에게 알림

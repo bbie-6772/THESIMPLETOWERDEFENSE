@@ -51,9 +51,29 @@ socket.on("response", (data) => {
   // console.log(`socket.js:51 - handlerId : ${data[0]} response : ${data[1]}`);
   // 타워 핸들러
   if(data[0] === 4001){
-    console.log(`socket.js:132 - tower place received`);
+    // console.log(`socket.js:132 - tower place received : ${data[1]}`);
     setNewTower(data[1]);
   } 
+
+  if(data[0] === 3001){
+    // 타워 합성 핸들러
+    // data[1] : { uuid, type, tier, x, y, removeX, removeY }
+    const payload = data[1];
+    console.log(payload);
+    const { uuid, towerId, tier, x, y, rx, ry } = data[1];
+    // 기존 타워 삭제
+    removeTower(x, y);
+    removeTower(rx, ry);
+    // 상위 타워 생성
+    setNewTower({towerid : towerId, x : x, y : y, gold : 0, tier: tier});
+  }else if(data[0] === 3002){
+    // 타워 강화 핸들러
+    // data[1] : { level, remainGold, towerId, uuid }
+    const { level, remainGold, towerId, uuid } = data[1];
+    console.log(`socket.js:73 - ${data[1]}`);
+    
+    setUserGold(remainGold);
+  }
 });
 
 socket.on("ready", (data) => {
@@ -110,29 +130,7 @@ export const sendEvent = async (handlerId, payload) => {
       } else if (data[0] === 1002) {
         updateRooms(data[1].rooms);
       }
-      if(data[0] === 3001){
-        try{
-          // 타워 합성 핸들러
-          // data[1] : { uuid, type, tier, x, y, removeX, removeY }
-          const payload = data[1];
-          console.log(payload);
-          const { uuid, towerId, tier, x, y, rx, ry } = data[1];
-          // 기존 타워 삭제
-          removeTower(x, y);
-          removeTower(rx, ry);
-          // 상위 타워 생성
-          setNewTower({towerid : towerId, x : x, y : y, gold : 0, tier: tier});
-        }catch(err){
-          console.log(err);
-        }
-      }else if(data[0] === 3002){
-        // 타워 강화 핸들러
-        // data[1] : { level, remainGold, towerId, uuid }
-        const { level, remainGold, towerId, uuid } = data[1];
-        console.log(data[1]);
-        
-        setUserGold(remainGold);
-      }
+      
       
       clearTimeout(loadError);
       return resolve(true);

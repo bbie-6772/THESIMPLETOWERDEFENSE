@@ -6,7 +6,7 @@ import { getUser } from "../models/users.model.js";
 // 타워 합성 핸들러, handlerID : 3001
 export const TowerMerge = (uuid, payload) => {
     const { x1, y1, x2, y2 } = payload;
-
+    // console.log(`tower.merge.handler.js:9 - ${uuid}`);
     // 검증
     // uuid가 유효한지 검사 (uuid가 존재하는지)
     const room = getRoom(uuid);
@@ -16,12 +16,13 @@ export const TowerMerge = (uuid, payload) => {
     const other = towerModel.getUsersTower(uuid, x2, y2);
     if (!one || !other) return { status: 'fail', message: '타워를 찾을 수 없습니다' };
     // 합성이 유효한지 검사 (타워 티어가 같은지, 타워가 최고티어가 아닌지)
+    if (one.uuid !== other.uuid) return {status: 'fail', message: '자신의 타워를 선택해야합니다'}
     if (one === other) return { status: 'fail', message: '서로 다른 타워를 선택해야합니다' };
     if (one.towerId !== other.towerId) return { status: 'fail', message: '같은 타입의 타워를 선택해야합니다' };
     if (one.tier !== other.tier) return { status: 'fail', message: '타워의 티어가 서로 다릅니다' };
     if (one.tier === towerModel.max_tier) return { status: 'fail', message: '타워가 최대 티어입니다' };
     // { uuid, type, tier, x, y }
-    return towerModel.merge(uuid, x1, y1, x2, y2);
+    return { ...towerModel.merge(uuid, x1, y1, x2, y2), roomcast: true };
 }
 
 // 타워 강화 핸들러, handlerID : 3002
@@ -49,7 +50,7 @@ export const TowerUpgrade = (uuid, payload) => {
     const remainGold = user.gold - upgrades[currentLevel];
     setUserGold(uuid, remainGold);
     
-    const response = { ...towerModel.upgrade(uuid, towerId), remainGold};
-    console.log(response);
+    const response = { ...towerModel.upgrade(uuid, towerId), remainGold, roomcast:true };
+    // console.log(response);
     return response;
 }
