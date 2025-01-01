@@ -10,7 +10,6 @@ import {
 import Monsters from "../model/monsterSpawner.js";
 import { settingAttack } from "../model/towerBase.model.js";
 import { removeTower, setNewTower } from "../model/tower.js";
-import { updateLocationSync } from "../utils/client.LocationSync.js";
 import { setUserGold } from "../model/userInterface.model.js";
 
 let userId = null;
@@ -44,7 +43,7 @@ socket.once("connection", (data) => {
     [userId, nickname, highScoreS, highScoreM] = data;
     // 방 목록 업데이트
     updateRooms(data[4]);
-    updateUserInfo(nickname,highScoreS,highScoreM)
+    updateUserInfo(nickname, highScoreS, highScoreM)
   }
 });
 
@@ -67,7 +66,7 @@ socket.on("attack", (data) => {
 });
 
 // 방이 파괴되었을 시 
-socket.on('leaveRoom',(data) => {
+socket.on('leaveRoom', (data) => {
   roomId = null
   exitRoom()
   socket.emit('leaveRoom', { roomId: data.roomId })
@@ -105,8 +104,8 @@ export const sendEvent = async (handlerId, payload) => {
       } else if (data[0] === 1002) {
         updateRooms(data[1].rooms);
       }
-      if(data[0] === 3001){
-        try{
+      if (data[0] === 3001) {
+        try {
           // 타워 합성 핸들러
           // data[1] : { uuid, type, tier, x, y, removeX, removeY }
           const payload = data[1];
@@ -116,22 +115,22 @@ export const sendEvent = async (handlerId, payload) => {
           removeTower(x, y);
           removeTower(rx, ry);
           // 상위 타워 생성
-          setNewTower({towerid : towerId, x : x, y : y, gold : 0, tier: tier});
-        }catch(err){
+          setNewTower({ towerid: towerId, x: x, y: y, gold: 0, tier: tier });
+        } catch (err) {
           console.log(err);
         }
-      }else if(data[0] === 3002){
+      } else if (data[0] === 3002) {
         // 타워 강화 핸들러
         // data[1] : { level, remainGold, towerId, uuid }
         const { level, remainGold, towerId, uuid } = data[1];
         console.log(data[1]);
-        
+
         setUserGold(remainGold);
       }
       // 타워 핸들러
-      if(data[0] === 4001){
+      if (data[0] === 4001) {
         setNewTower(data[1]);
-      } 
+      }
       clearTimeout(loadError);
       return resolve(true);
     });
