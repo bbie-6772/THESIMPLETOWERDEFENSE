@@ -23,7 +23,7 @@ const Auth = (data) => {
                 status: "fail",
                 message: "Not a valid account"
             });
-            return false ;
+            return false;
         }
 
         // 토큰 + 사용자 검증
@@ -112,28 +112,28 @@ export const handleConnection = async (socket) => {
         })
 
         const soloRank = await prisma.ranks.findMany({
-            where: { userId2: null},
-            orderBy: [{
-                score: 'desc',
-            }], 
-            select: {
-                user1: { select: { nickname: true } },
-                score: true
-            },
-            take: 10 
-        })
-
-        const multiRank = await prisma.ranks.findMany({
-            where: { userId2: { not: null} },
+            where: { userId2: null },
             orderBy: [{
                 score: 'desc',
             }],
             select: {
-                user1: {select : { nickname: true }},
-                user2: {select: { nickname: true } },
+                user1: { select: { nickname: true } },
                 score: true
             },
-            take: 10 
+            take: 10
+        })
+
+        const multiRank = await prisma.ranks.findMany({
+            where: { userId2: { not: null } },
+            orderBy: [{
+                score: 'desc',
+            }],
+            select: {
+                user1: { select: { nickname: true } },
+                user2: { select: { nickname: true } },
+                score: true
+            },
+            take: 10
         })
 
         //유저와 연결되면 클라이언트에게 인터페이스 용 값 전달
@@ -166,7 +166,7 @@ export const handleDisconnect = (socket, io) => {
             if (left) {
                 left.userId1 = getUser(left.userId1).nickname
                 // 업뎃 정보 공유
-                io.to(room.gameId).emit('room', left )
+                io.to(room.gameId).emit('room', left)
                 // 참가자가 나갔을 시 참가자만 제외
                 socket.emit('leaveRoom', { roomId: room.gameId })
                 // 호스트가 나갈 시 + 오류 시 인원 전부 삭제하도록 요구
@@ -183,7 +183,7 @@ export const ready = (io, socket, data) => {
     if (!Auth(data)) return
 
     const status = gameReady(data.roomId, data.userId, data.single)
-    
+
     switch (status) {
         case false:
             socket.emit('ready', {
@@ -221,12 +221,12 @@ export const ready = (io, socket, data) => {
 export const handlerEvent = (io, socket, data) => {
     try {
         // 기본 검증
-        if(!Auth(data)) return
+        if (!Auth(data)) return
 
         const handler = handlerMappings[data.handlerId]
         if (!handler) {
             socket.emit('response', {
-                status : "fail",
+                status: "fail",
                 message: "Handler not found"
             })
             return;
@@ -241,7 +241,7 @@ export const handlerEvent = (io, socket, data) => {
             return;
         }
 
-        else if(response.roomcast) {
+        else if (response.roomcast) {
             const gameId = getRoom(data.userId).gameId;
             io.to(gameId).emit('response', [data.handlerId, response]);
             // console.log(`helper.js:246 - ${data.userId}, ${gameId}, ${getRooms()}`);
