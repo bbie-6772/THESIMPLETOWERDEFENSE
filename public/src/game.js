@@ -300,6 +300,8 @@ async function initGame() {
   initMap();
   // 기지 배치
   placeBase();
+
+  
   // 버튼 배치
   placeInitButtons();
   setBaseImage();

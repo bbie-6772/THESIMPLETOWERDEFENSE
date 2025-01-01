@@ -106,7 +106,11 @@ export const towerAttackCondtorl = (io, monstercycle) => {
                   monsters[mosterkey[monstersIndex]].y
                 );
               });
-
+              const tmpupgradeuser = getUser((user1towers ?? []).length
+              ? rooms[roomsIndex].userId1
+              : rooms[roomsIndex].userId2);
+              const upgrade = (tmpupgradeuser.upgrades[tmpTower.type]??1) + 1;
+              
               //공격회수 차감
               tmpTower.target--;
               //범위공격 타워
@@ -124,7 +128,7 @@ export const towerAttackCondtorl = (io, monstercycle) => {
                     //데미지 함수
                     monstercycle.updateMonsterHealth(
                       monsters[mosterkey[i]].uuid,
-                      tmpTower.damage
+                      tmpTower.damage +  (20* upgrade)
                     );
                   }
                 }
@@ -133,7 +137,7 @@ export const towerAttackCondtorl = (io, monstercycle) => {
                 //데미지 함수
                 monstercycle.updateMonsterHealth(
                   monsters[mosterkey[monstersIndex]].uuid,
-                  tmpTower.damage
+                  tmpTower.damage +  (20* upgrade)
                 );
               }
             }
