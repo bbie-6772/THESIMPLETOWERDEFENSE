@@ -2,6 +2,7 @@ import { getGameAssets } from "../init/assets.js";
 import { v4 as uuidv4 } from "uuid";
 import MonsterStorage from "./monsterStorage.model.js";
 import { generatePath } from "../init/pathGenerator.js";
+import {roomInfoUpdate, roomGameOverTimerSetting} from "./gameRoom.model.js"
 
 /*====[구조를 변경한 이유]====*/
 // 1. 룸 생성 -> 게임 시작 방식으로, 각 방마다 독립적인 인스턴스를 생성하는 것이 더 적합하다고 판단.
@@ -22,7 +23,6 @@ const NORMAL_MONSTER_SIZE = 2; // 일반 몬스터 크기
 const MONSTER_SPEED = 1; // 몬스터 디폴트 속도
 const MONSTER_SPAWN_CYCLE = 2000; // 리스폰 속도. (1000 === 1초)
 const MONSTER_COUNTDOWN = 10;
-const MONSTER_COUNTDOWN_TIMER = 60;
 
 export default class MonsterLifecycles {
   // 생성자
@@ -68,7 +68,7 @@ export default class MonsterLifecycles {
       path: monsterPath,
       pingPong: this.pingPongCount,
       eliteBossUuid: "",
-      endTimer: MONSTER_COUNTDOWN_TIMER,
+      endTimer: roomGameOverTimerSetting(this.gameId),
     };
 
     // 정보 데이터 생성.
@@ -134,13 +134,13 @@ export default class MonsterLifecycles {
           ? ELITE_MONSTER_SIZE
           : NORMAL_MONSTER_SIZE;
         const eliteGold = isEliteMonster
-          ? gold * ELITE_MULTIPLIER
+          ? gold * ELITE_MULTIPLIER * wave
           : gold * wave;
         const eliteScore = isEliteMonster
-          ? score * ELITE_MULTIPLIER
+          ? score * ELITE_MULTIPLIER * wave
           : score * wave;
         const eliteHealth = isEliteMonster
-          ? health * ELITE_MULTIPLIER
+          ? health * ELITE_MULTIPLIER * wave
           : health * wave;
         const eliteSpeed = isEliteMonster
           ? speed * MONSTER_SPEED
@@ -206,12 +206,20 @@ export default class MonsterLifecycles {
           if (totalCount % WAVE_CYCLE === 0 && totalCount !== 0) {
             this.monsterStorage.updateInfo(this.gameId, { wave: wave + 1 });
           }
-
+          
           // 엔드 타이머 갱신
           if(aliveCount > MONSTER_COUNTDOWN) {
             this.monsterStorage.updateInfo(this.gameId, { endTimer: endTimer - 1 });
+
+            roomInfoUpdate(
+              this.gameId,
+              this.monsterStorage.getInfo(this.gameId).score,
+              this.monsterStorage.getInfo(this.gameId).aliveCount,
+              this.monsterStorage.getInfo(this.gameId).endTimer
+            );
           } else {
-            this.monsterStorage.updateInfo(this.gameId, { endTimer: MONSTER_COUNTDOWN_TIMER });
+            const endTimer = roomGameOverTimerSetting(this.gameId);
+            this.monsterStorage.updateInfo(this.gameId, { endTimer: endTimer });
           }
         }, MONSTER_SPAWN_CYCLE);
       }
@@ -335,6 +343,14 @@ export default class MonsterLifecycles {
         score: score + monsterScore * wave,
         gold: gold + monstergoid * wave,
       });
+
+      // 정보를 게임룸에 전송.
+      roomInfoUpdate(
+        this.gameId,
+        this.monsterStorage.getInfo(this.gameId).score,
+        this.monsterStorage.getInfo(this.gameId).aliveCount,
+        this.monsterStorage.getInfo(this.gameId).endTimer
+      );
 
       // 정보 클라에 전송.
       this.io.emit(this.gameId, {
