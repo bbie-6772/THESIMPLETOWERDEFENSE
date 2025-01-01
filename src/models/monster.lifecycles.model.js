@@ -267,9 +267,8 @@ export default class MonsterLifecycles {
     this.monsterStorage.removeMonsters(this.gameId);
 
     const roomSize = Object.keys(this.monsterStorage.test()).length;
-    console.log(
-      `[${this.gameId}]번 방 리스폰을 종료합니다. (rooms : [${roomSize}])`,
-    );
+    // console.log(`[${this.gameId}]번 방 리스폰을 종료합니다. (rooms : [${roomSize}])`);
+  
   }
 
 
@@ -351,7 +350,7 @@ export default class MonsterLifecycles {
         });
 
         // 콘솔로그
-        console.log(`[${this.gameId}]번방 앨리트 몬스터가 제거되었습니다.`);
+        //console.log(`[${this.gameId}]번방 앨리트 몬스터가 제거되었습니다.`);
       } 
     }
   }

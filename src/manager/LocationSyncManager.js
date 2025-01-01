@@ -118,11 +118,11 @@ export default class LocationSyncManager {
             // monsters 변경될 수 있으니 다시 가져오기
             const monstersCached = this.monsterStorage.getMonsters(this.gameId);
             if (monstersCached == null)
-                console.log("[LSM/Empty] monstersCached null");
+                // console.log("[LSM/Empty] monstersCached null");
 
             // 비어있으면 동기화할 필요 없음
             if (!Object.keys(monstersCached).length) {
-                console.log("[LSM/Empty] No monsters to sync.");
+                // console.log("[LSM/Empty] No monsters to sync.");
                 return;
             }
 
@@ -159,7 +159,7 @@ export default class LocationSyncManager {
     // 동기화 중단
     stopSync() {
         if (this.interval) {
-            console.log('[LSM] 동기화 중단.');
+            // console.log('[LSM] 동기화 중단.');
             clearInterval(this.interval);
             this.interval = null;
         }
