@@ -49,7 +49,7 @@ export class MonsterCount {
         // 체력에 따라 색상 변경  
         if (percentage > 80) {
             this.countBar.style.backgroundColor = 'red';
-        } else if (percentage > 60) {
+        } else if (percentage >= 50) {
             this.countBar.style.backgroundColor = 'orange';
         } else {
             this.countBar.style.backgroundColor = 'green';
