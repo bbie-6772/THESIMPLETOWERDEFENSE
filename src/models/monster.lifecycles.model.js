@@ -173,8 +173,8 @@ export default class MonsterLifecycles {
             speed: eliteSpeed, // 스피드
           },
         };
-        //// 7. 메세지를 보내자. (전체로) - 수정 해야함!!
-        this.io.emit(this.gameId, {
+        //// 7. 메세지를 보내자.
+        this.io.to(this.gameId).emit(this.gameId, {
           message: {
             eventName: "spawnMonster",
             info: monsterInfo,
@@ -253,7 +253,7 @@ export default class MonsterLifecycles {
 
     const interval = setInterval(() => {
       let pingPong = this.monsterStorage.getInfo(this.gameId).pingPong;
-      this.io.emit(this.gameId, {
+      this.io.to(this.gameId).emit(this.gameId, {
         message: {
           eventName: "respawnPing",
           info: this.monsterStorage.getInfo(this.gameId),
@@ -308,7 +308,7 @@ export default class MonsterLifecycles {
     monster = this.monsterStorage.getMonster(gameId, monsterUuid);
 
     // 몬스터 채력 클라에 보내기.
-    this.io.emit(this.gameId, {
+    this.io.to(this.gameId).emit(this.gameId, {
       message: {
         eventName: "monsterDamaged",
         monster: monster,
@@ -326,7 +326,7 @@ export default class MonsterLifecycles {
       const monstergoid = monster.gold;
 
       // 싱글이면 상관없지만 멀티 모드일때 다른유저에게 삭제요청.
-      this.io.emit(this.gameId, {
+      this.io.to(this.gameId).emit(this.gameId, {
         message: {
           eventName: "deleteMonster",
           monster: monster,
@@ -357,7 +357,7 @@ export default class MonsterLifecycles {
       );
 
       // 정보 클라에 전송.
-      this.io.emit(this.gameId, {
+      this.io.to(this.gameId).emit(this.gameId, {
         message: {
           eventName: "monsterInfoMessage",
           info: this.monsterStorage.getInfo(this.gameId),

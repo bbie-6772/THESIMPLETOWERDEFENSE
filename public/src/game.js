@@ -296,8 +296,6 @@ async function initGame() {
     //return;
   }
 
-
-
   let gold = document.getElementById('gold');
   let curLevel = document.getElementById('curLevel');
   let endTimer = document.getElementById('endTimer');
