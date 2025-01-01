@@ -105,8 +105,6 @@ socket.on('leaveRoom', (data) => {
 }) 
 
 socket.on("gold", (data) => {
-  console.log("socket.js:109");
-  console.log(data.user1, data.user2);
   if(data.user1 === userId){
     setUserGold(data.gold1);
   }else if(data.user2 === userId){
