@@ -27,7 +27,7 @@ const registerHandler = (io) => {
 
     const towerAttackCondtorlIntervalId = setInterval(() => {
       towerAttackCondtorl(io, monstercycle);
-    }, 1000);
+    }, 300);
 
     // 유저가 '연결해제' 시 실행
     socket.on("disconnect", () => {
