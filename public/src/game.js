@@ -116,33 +116,6 @@ function updateLocationSync(monsters) {
   });
 }
 
-function generateRandomMonsterPath() {
-  const path = [];
-  let currentX = 0;
-  let currentY = Math.floor(Math.random() * 21) + 500; // 500 ~ 520 범위의 y 시작 (캔버스 y축 중간쯤에서 시작할 수 있도록 유도)
-
-  path.push({ x: currentX, y: currentY });
-
-  const stepX = canvas.width / 8; // 8개의 패스를 만들기 위해 X축을 8등분
-
-  for (let i = 1; i <= 8; i++) {
-    currentX = i * stepX; // 각 패스의 X 좌표를 균등하게 증가시킴
-    currentY += Math.floor(Math.random() * 200) - 100; // -100 ~ 100 범위의 y 변경
-
-    // y 좌표에 대한 clamp 처리
-    if (currentY < 0) {
-      currentY = 0;
-    }
-    if (currentY > canvas.height) {
-      currentY = canvas.height;
-    }
-
-    path.push({ x: currentX, y: currentY });
-  }
-
-  return path;
-}
-
 function initMap() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 그리기
   drawPath();
@@ -154,7 +127,6 @@ function drawPath() {
   const imageHeight = 60; // 몬스터 경로 이미지 높이
   const gap = 5; // 몬스터 경로 이미지 겹침 방지를 위한 간격
 
-  //console.log(monsterPath);
   const test = monsterPath.length;
 
   for (let i = 0; i < test - 1; i++) {
@@ -224,30 +196,6 @@ function placeInitButtons() {
   });
 }
 
-// function placeInitialTowers() {
-//   /*
-//     타워를 초기에 배치하는 함수입니다.
-//     무언가 빠진 코드가 있는 것 같지 않나요?
-//   */
-//   for (let i = 0; i < numOfInitialTowers; i++) {
-//     const { x, y } = getRandomPositionNearPath(200);
-//     const tower = new Tower(x, y, towerCost);
-//     towers.push(tower);
-//     tower.draw(ctx, towerImage);
-//   }
-// }
-
-// function placeNewTower() {
-//   /*
-//     타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-//     빠진 코드들을 채워넣어주세요!
-//   */
-//   const { x, y } = getRandomPositionNearPath(200);
-//   const tower = new Tower(x, y);
-//   towers.push(tower);
-//   //tower.draw(ctx, towerImage);
-// }
-
 function placeBase() {
   const lastPoint = monsterPath[monsterPath.length - 1];
   base = new Base(lastPoint.x, lastPoint.y, 1);
@@ -275,13 +223,19 @@ function gameLoop() {
 
   ctx.font = "25px Times New Roman";
   ctx.fillStyle = "skyblue";
-  ctx.fillText(`최고 기록: ${getHighScore()}`, 100, 50); // 최고 기록 표시
+  ctx.fillText(`최고 기록: ${getHighScore()}`, 100, 250); // 최고 기록 표시
   ctx.fillStyle = "white";
-  ctx.fillText(`점수: ${getScore()}`, 100, 100); // 현재 스코어 표시
+  ctx.fillText(`점수: ${getScore()}`, 100, 300); // 현재 스코어 표시
   ctx.fillStyle = "yellow";
-  ctx.fillText(`골드: ${getUserGold()}`, 100, 150); // 골드 표시
+  ctx.fillText(`골드: ${getUserGold()}`, 100, 350); // 골드 표시
   ctx.fillStyle = "black";
-  ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
+  ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 400); // 최고 기록 표시
+
+  const test = monsterSpawner.getInfo().endTimer;
+  ctx.fillStyle = "yellow";
+  ctx.fillText(`엔드타이머: ${test}`, 100 , 450); // 최고 기록 표시
+
+
 
   getButtons().forEach((button) => {
     button.draw(ctx);
@@ -300,42 +254,23 @@ function gameLoop() {
     for (let i = monsters.length - 1; i >= 0; i--) {
       const monster = monsters[i];
       if (monster.hp > 0) {
-        // const isDestroyed = monster.move(base);
-        // if (isDestroyed) {
-        //   /* 게임 오버 */
-        //   alert("게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ");
-        //   location.reload();
-        // }
-
         monster.draw(ctx);
         // 이곳에 애니 메이션 추가하자.
         monster.updateAnimation();
-
-        vfx = monsterSpawner.vfxs
-        // 이팩트 그리기
-        for (let value of vfx) {
-          value.draw(ctx);
-        }
-
-        // 이펙트 삭제 
-        if (vfx.length !== 0) {
-          const index = vfx.findIndex(vfx => vfx.isFinished === true);
-
-          if (index !== -1) {
-            // 해당 인덱스를 찾아서 배열에서 삭제
-            vfx.splice(index, 1);
-          }
-        }
-
-      // } else {
-      //   // 이펙트 추가
-      //   const vfxCount = Object.keys(GetVfxAnimations()).length;
-      //   const randomVfx = Math.floor(Math.random() * (vfxCount));
-      //   vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y, monster.size))
-      //   /* 몬스터가 죽었을 때 */
-      //   monsters.splice(i, 1);
       }
     }
+
+    vfx = monsterSpawner.vfxs;
+    for (let i = vfx.length - 1; i >= 0; i--) {
+      const temp = vfx[i];
+      temp.draw(ctx);
+
+      if(vfx.isFinished === true){
+        vfx.splice(i, 1);
+      }
+
+    }
+
   }
 
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
