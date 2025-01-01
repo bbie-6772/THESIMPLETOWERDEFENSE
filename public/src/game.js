@@ -17,7 +17,6 @@ import { setGameCanvas } from "./model/gameCanva.model.js";
 import { getUserGold, getScore, getHighScore, setScore, setUserGold } from "./model/userInterface.model.js";
 import { intiChat } from "./chat/chat.js";
 
-
 import { Vfx } from "./model/vfx.model.js";
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
@@ -25,6 +24,21 @@ import { Vfx } from "./model/vfx.model.js";
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const monsterSpawner = Monsters.getInstance(getSocket(), getRoom())
+
+// #region 위치동기화 받기
+monsterSpawner.socket.on("locationSync", (data) => {
+  // validation
+  if (!data || !Array.isArray(data.data)) {
+    console.error("[LocationSync/Error] Invalid data format.");
+    return;
+  }
+  // 몬스터 데이터
+  const monsters = data.data;
+  //console.log("[LocationSync/Received] monsters: ", monsters);
+
+  // 게임 로직으로 위치 동기화
+  updateLocationSync(monsters);
+});
 
 var canvasRect = canvas.getBoundingClientRect();
 var scaleX = canvas.width / canvasRect.width; // 가로 스케일
@@ -76,6 +90,31 @@ const pathImage = new Image();
 pathImage.src = "../assets/images/path.png";
 
 let monsterPath;
+
+function updateLocationSync(monsters) {
+  monsters.forEach((monster) => {
+    //console.log(`[LocationSync] 몬스터 UUID: ${monster.uuid} x: ${monster.x}, y: ${monster.y}`);
+
+    // x, y 값이 null일 때 예외 처리
+    if (monster.x === null || monster.y === null) {
+      console.warn(`[LocationSync/Warning] Monster with UUID ${monster.uuid} has invalid position: x: ${monster.x}, y: ${monster.y}`);
+      return;
+    }
+
+    // 위치 업데이트 로직
+    const targetMonster = monsterSpawner.getMonsters().find(m => m.uuid === monster.uuid);
+    if (targetMonster) {
+      targetMonster.x = monster.x;
+      targetMonster.y = monster.y;
+      targetMonster.targetX = monster.targetX;
+      targetMonster.targetY = monster.targetY;
+      targetMonster.curIndex = monster.curIndex;
+      //console.log(`[LocationSync] 업데이트:  ${targetMonster.x}, ${targetMonster.y}, , ${targetMonster.targetX}, , ${targetMonster.targetY}, , ${targetMonster.curIndex}`);
+    } else {
+      //console.log(`[LocationSync] 몬스터 UUID ${monster.uuid}을(를) 찾을 수 없습니다.`);
+    }
+  });
+}
 
 function generateRandomMonsterPath() {
   const path = [];
@@ -272,6 +311,7 @@ function gameLoop() {
         // 이곳에 애니 메이션 추가하자.
         monster.updateAnimation();
 
+        vfx = monsterSpawner.vfxs
         // 이팩트 그리기
         for (let value of vfx) {
           value.draw(ctx);
@@ -287,15 +327,13 @@ function gameLoop() {
           }
         }
 
-      } else {
-        // 이펙트 추가
-        const vfxCount = Object.keys(GetVfxAnimations()).length;
-        const randomVfx = Math.floor(Math.random() * (vfxCount));
-        vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y, monster.size))
-        
-        monsterSpawner.sendMonsterDamageMessage(monster.uuid, 10000);
-        /* 몬스터가 죽었을 때 */
-        monsters.splice(i, 1);
+      // } else {
+      //   // 이펙트 추가
+      //   const vfxCount = Object.keys(GetVfxAnimations()).length;
+      //   const randomVfx = Math.floor(Math.random() * (vfxCount));
+      //   vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y, monster.size))
+      //   /* 몬스터가 죽었을 때 */
+      //   monsters.splice(i, 1);
       }
     }
   }

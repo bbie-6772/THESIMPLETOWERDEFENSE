@@ -1,5 +1,7 @@
 import { TestMonster } from "./testMonster.js";
 import { GetMonsterAnimation } from "./monsterAnimations.model.js";
+import { GetVfxAnimation, GetVfxAnimations } from "./vfxAnimations.model.js";
+import { Vfx } from "./vfx.model.js";
 
 export default class Monsters {
   constructor(socket, gameId) {
@@ -16,7 +18,7 @@ export default class Monsters {
     this.receiveMonsterMessage();
   }
 
-  // 싱글턴
+  // 싱글턴(아님)
   static getInstance = (socket = null, gameId = null) => {
     //console.log(`접속한 소켓 : ${socket.id} `)
     return new Monsters(socket, gameId)
@@ -47,7 +49,7 @@ export default class Monsters {
   }
 
   deleteMonster(uuid) {
-    const index = monsters.findIndex((obj) => obj.uuid === uuid);
+    const index = this.monsters.findIndex((obj) => obj.uuid === uuid);
     if (index !== -1) {
       this.monsters.splice(index, 1); // 해당 인덱스의 객체를 삭제
     }
@@ -70,9 +72,7 @@ export default class Monsters {
 
   // 서버 -> 클라 메세지.
   receiveMonsterMessage() {
-    console.log(this.gameId);
     this.socket.on(this.gameId, (data) => {
-      console.log(data.message.eventName)
       // 몬스터 스폰.
       if (data.message.eventName === "spawnMonster") {
         const monsterInfo = data.message.info;
@@ -88,12 +88,14 @@ export default class Monsters {
 
       // 몬스터 삭제
       if (data.message.eventName === "deleteMonster") {
-        //this.deleteMonster(data.message.monster);
+        this.deleteMonster(data.message.monster.uuid);
+        const vfxCount = Object.keys(GetVfxAnimations()).length;
+        const randomVfx = Math.floor(Math.random() * (vfxCount));
+        this.vfxs.push(new Vfx(GetVfxAnimation(randomVfx), data.message.monster.x, data.message.monster.y, data.message.monster.size))
       }
 
       // 핑퐁
       if (data.message.eventName === "respawnPing") {
-        console.log("옴")
         this.info = data.message.info;
         this.wave = this.info.wave;
         this.socket.emit(this.gameId, {

@@ -56,22 +56,7 @@ socket.on("ready", (data) => {
   if (data.status === "start") gameStart();
 });
 
-// #region 위치동기화 받기
-socket.on("locationSync", (data) => {
-  // validation
-  if (!data || !Array.isArray(data.data)) {
-    console.error("[LocationSync/Error] Invalid data format.");
-    return;
-  }
-  // 몬스터 데이터
-  const monsters = data.data;
-  console.log("[LocationSync/Received] monsters: ", monsters);
-
-  // 게임 로직으로 위치 동기화
-  updateLocationSync(monsters);
-});
 // #endregion
-
 
 socket.on("room", (data) => {
   updateUser(data);
