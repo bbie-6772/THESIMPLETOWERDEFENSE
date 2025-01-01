@@ -114,6 +114,12 @@ function updateLocationSync(monsters) {
       targetMonster.targetX = monster.targetX;
       targetMonster.targetY = monster.targetY;
       targetMonster.curIndex = monster.curIndex;
+
+      //#region 몬스터 보는 방향 결정
+      const dirX = monster.targetX - monster.x;
+      targetMonster.setFlipped(dirX < 0);
+      //#endregion
+
       //console.log(`[LocationSync] 업데이트:  ${targetMonster.x}, ${targetMonster.y}, , ${targetMonster.targetX}, , ${targetMonster.targetY}, , ${targetMonster.curIndex}`);
     } else {
       //console.log(`[LocationSync] 몬스터 UUID ${monster.uuid}을(를) 찾을 수 없습니다.`);
@@ -274,7 +280,7 @@ function gameLoop() {
       const temp = vfx[i];
       temp.draw(ctx);
 
-      if(vfx.isFinished === true){
+      if (vfx.isFinished === true) {
         vfx.splice(i, 1);
       }
 

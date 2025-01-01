@@ -286,6 +286,12 @@
         #game-messages::-webkit-scrollbar {
             width: 8px;
         }
+
+        .count-container {  
+            max-width: 500px;  
+            margin: 50px auto;  
+            text-align: center;  
+        }  
     </style>
 </head>
 
@@ -303,10 +309,21 @@
                 </div>
             </div>
         </div>
+        <div class="contanier fixed-bottom" style="pointer-events: none">
+            <div class="count-container">
+                <h2 style="color:white">현재 몬스터 수</h2>
+                <div class="progress" style="height: 30px;">
+                    <div id="countBar" class="progress-bar" role="progressbar" style="width: 100%; background-color: green; color:black"
+                        aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                        100 / 100
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="fixed-top p-3 d-flex justify-content-between" style="pointer-events: none">
-        <div class="user-profile-card">
+        <div class="user-profile-card" style="pointer-events: auto">
             <div class="d-flex align-items-center">
                 <div class="me-3">
                     <!-- User Icon -->
@@ -327,7 +344,7 @@
                 </div>
             </div>
         </div>
-        <div class="ranking-card">
+        <div class="ranking-card" style="pointer-events: auto">
             <div class="d-flex align-items-center">
                 <div>
                     <h5 class="nickname mb-1" id="soloRank">TOP 10(싱글)</h5>
