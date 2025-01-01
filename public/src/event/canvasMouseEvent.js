@@ -65,13 +65,13 @@ function handleMousedown(event) {
       }
 
       if (buttons[i].text === '단일타워강화') {
-        console.log('타워 강화');
+        console.log('단일 타워 강화');
         sendEvent(3002, 1);
-      } else if (buttons[i].text.text === '멀티타워강화') {
-        console.log('타워 강화');
+      } else if (buttons[i].text === '멀티타워강화') {
+        console.log('멀티 타워 강화');
         sendEvent(3002, 2);
-      } else if (buttons[i].text.text === '범위타워강화') {
-        console.log('타워 강화');
+      } else if (buttons[i].text === '범위타워강화') {
+        console.log('범위 타워 강화');
         sendEvent(3002, 3);
       }
     }
