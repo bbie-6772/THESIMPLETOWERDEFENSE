@@ -1,9 +1,7 @@
-import { sendEvent, ready, getSocket } from "./src/init/socket.js"
-//import Monsters from "./src/model/monsterSpawner.js";
-//import { getSocket, getRoom } from "./src/init/socket.js";
-//import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { sendEvent, ready, getSocket, getRoom } from "./src/init/socket.js"
 import { intiChat } from './src/chat/chat.js';
 import showAlert from "./src/utils/sweetAlert.js";
+
 
 let game = null;
 let rooms = [];
@@ -20,6 +18,7 @@ let selectedRoomDetails = null;
 let confirmRoomSelection = null;
 let refreshButton = null;
 let gameFrame = null;
+let countBar = null;
 
 let roomName = null;
 let roomType = null;
@@ -65,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     confirmRoomSelection = document.getElementById('confirmRoomSelection');
     refreshButton = document.getElementById('refreshButton');
     gameFrame = document.getElementById('gameFrame')
+    countBar = document.getElementById('countBar')
 
     roomName = document.getElementById('roomName')
     roomType = document.getElementById('roomType')
@@ -303,15 +303,57 @@ export const updateRooms = (roomsInfo) => {
 
 // 게임 시작 
 export const gameStart = () => {
+    
+      document.getElementById('gold').style.display = "block";
+      document.getElementById('curLevel').style.display = "block";
+      document.getElementById('endTimer').style.display = "block";
+      document.getElementById('divgold').style.display = "block";
+      document.getElementById('divcurLevel').style.display = "block";
+      document.getElementById('divendTimer').style.display = "block";
+
     waitRoom.hide();
-    import("./src/game.js").then( module => {
-        game = module
+
+    import(`./src/game.js?${new Date().getTime()}`).then(module => {
+        game = module;
+        gameFrame.style.display = "block";
+        console.log("게임 시작");
+
+        gameEnd(getSocket(), getRoom());
+    }).catch(err => {
+        console.error("게임 모듈 로딩 실패:", err);
     });
+    
     gameFrame.style.display = "block"
+
+
+    gameEnd(getSocket(), getRoom());
 }
 
 // 게임 오버,끝
 export const gameOver = () => {
-    game = null
+    
+      document.getElementById('gold').style.display = "none";
+      document.getElementById('curLevel').style.display = "none";
+      document.getElementById('endTimer').style.display = "none";
+      document.getElementById('divgold').style.display = "none";
+      document.getElementById('divcurLevel').style.display = "none";
+      document.getElementById('divendTimer').style.display = "none";
+
+    console.log(game);
+    game = null;
     gameFrame.style.display = "none"
+}
+
+// 게임 종료. 
+const gameEnd= (socket, getRoom) => {
+    socket.on("gameEnd", (data) => {
+        console.log(data);
+        if(data.timer <= 0) {
+            gameOver();
+        }
+    });
+}
+
+export const getCountBar = () => {
+    return countBar
 }

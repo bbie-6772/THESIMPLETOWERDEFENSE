@@ -178,7 +178,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 15px;
             width: 250px;
-            max-height: 250px;
+            max-height: 50%;
             overflow: auto;
             transition: transform 0.3s ease;
         }
@@ -197,6 +197,15 @@
         }
 
         .high-score {
+            color: #007bff;
+            font-size: 1.2rem;
+        }
+        .userInterfaceStuff {
+            color: #007bff;
+            font-size: 1.2rem;
+            display: none;
+        }
+        .userInterfaceStuffData {
             color: #007bff;
             font-size: 1.2rem;
         }
@@ -281,6 +290,12 @@
         #game-messages::-webkit-scrollbar {
             width: 8px;
         }
+
+        .count-container {  
+            max-width: 500px;  
+            margin: 50px auto;  
+            text-align: center;  
+        }  
     </style>
 </head>
 
@@ -298,28 +313,43 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="fixed-top p-3 d-flex justify-content-between" style="pointer-events: none">
-        <div class="user-profile-card">
-            <div class="d-flex align-items-center">
-                <div class="me-3">
-                    <!-- User Icon -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor"
-                        class="bi bi-person-circle text-primary" viewBox="0 0 16 16">
-                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-                        <path fill-rule="evenodd"
-                            d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
-                    </svg>
-                </div>
-                <div>
-                    <h5 class="nickname mb-1" id="nickname">닉네임</h5>
-                    <p class="high-score mb-0" id="highScoreS">최고 점수(싱글)</p>
-                    <p class="high-score mb-0" id="highScoreM">최고 점수(협동)</p>
+        <div class="contanier fixed-bottom" style="pointer-events: none">
+            <div class="count-container">
+                <h2 style="color:white">현재 몬스터 수</h2>
+                <div class="progress" style="height: 30px;">
+                    <div id="countBar" class="progress-bar" role="progressbar" style="width: 100%; background-color: green; color:black"
+                        aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                        100 / 100
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="ranking-card">
+    </div>
+
+    <div class="user-profile-card fixed-top p-3 d-flex justify-content-start">
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                <!-- User Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor"
+                    class="bi bi-person-circle text-primary" viewBox="0 0 16 16">
+                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                    <path fill-rule="evenodd"
+                        d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+                </svg>
+            </div>
+            <div>
+                <h5 class="nickname mb-1" id="nickname">닉네임</h5>
+                <p class="high-score mb-0" id="highScoreS">최고 점수(싱글)</p>
+                <p class="high-score mb-0" id="highScoreM">최고 점수(협동)</p>
+                <p class="userInterfaceStuff mb-0" id="gold" style="color: gold;">골드<div class="userInterfaceStuff" id="divgold" style="color: gold;">0</div></p>
+                <p class="userInterfaceStuff mb-0" id="curLevel" style="color: black;">현재 레벨<div class="userInterfaceStuff" id="divcurLevel" style="color: black;">0</div></p>
+                <p class="userInterfaceStuff mb-0" id="endTimer" style="color: red;">엔드타이머<div class="userInterfaceStuff" id="divendTimer" style="color: red;">0</div></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed-top p-3 d-flex justify-content-end" style="pointer-events: none">
+        <div class="ranking-card" style="pointer-events: auto">
             <div class="d-flex align-items-center">
                 <div>
                     <h5 class="nickname mb-1" id="soloRank">TOP 10(싱글)</h5>

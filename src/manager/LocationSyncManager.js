@@ -52,11 +52,21 @@ export default class LocationSyncManager {
     // 존재하는 몬스터들에 대해서 서버사이드 이동 갱신
     updateMonsterMovement(monstersCached) {
         Object.entries(monstersCached).forEach(([uuid, monster]) => {
+            //#region 경직
+            if (monster.isStunned) return;
+            //#endregion
+
+            //#region 둔화 슬로우
+            const monsterSpeed = monster.stat.speed * (monster.isSlow ? 0.5 : 1);
+            if (monster.isSlow)
+                 console.log(">>> [monsterSpeed] : is slow" );
+            //#endregion
+
             // 이동 로직 (간단한 랜덤 이동 예제)
             const diffx = monster.targetX - monster.x;
             const diffy = monster.targetY - monster.y;
-            const dx = Math.sign(diffx) * Math.min(monster.stat.speed, Math.abs(diffx));
-            const dy = Math.sign(diffy) * Math.min(monster.stat.speed, Math.abs(diffy));
+            const dx = Math.sign(diffx) * Math.min(monsterSpeed, Math.abs(diffx));
+            const dy = Math.sign(diffy) * Math.min(monsterSpeed, Math.abs(diffy));
             // 현재 위치 기반 새로운 위치
             const updatedX = monster.x + dx;
             const updatedY = monster.y + dy;
@@ -120,11 +130,11 @@ export default class LocationSyncManager {
             if (monstersCached == null)
                 // console.log("[LSM/Empty] monstersCached null");
 
-            // 비어있으면 동기화할 필요 없음
-            if (!Object.keys(monstersCached).length) {
-                // console.log("[LSM/Empty] No monsters to sync.");
-                return;
-            }
+                // 비어있으면 동기화할 필요 없음
+                if (!Object.keys(monstersCached).length) {
+                    // console.log("[LSM/Empty] No monsters to sync.");
+                    return;
+                }
 
             // 몬스터 이동 로직을 통해 위치 업데이트
             this.updateMonsterMovement(monstersCached);

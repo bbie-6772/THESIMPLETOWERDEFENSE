@@ -25,6 +25,10 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const monsterSpawner = Monsters.getInstance(getSocket(), getRoom())
 
+const divgold = document.getElementById('divgold');
+const divcurlevel = document.getElementById('divcurLevel');
+const divendTimer = document.getElementById('divendTimer');
+
 // #region 위치동기화 받기
 monsterSpawner.socket.on("locationSync", (data) => {
   // validation
@@ -109,6 +113,12 @@ function updateLocationSync(monsters) {
       targetMonster.targetX = monster.targetX;
       targetMonster.targetY = monster.targetY;
       targetMonster.curIndex = monster.curIndex;
+
+      //#region 몬스터 보는 방향 결정
+      const dirX = monster.targetX - monster.x;
+      targetMonster.setFlipped(dirX < 0);
+      //#endregion
+
       //console.log(`[LocationSync] 업데이트:  ${targetMonster.x}, ${targetMonster.y}, , ${targetMonster.targetX}, , ${targetMonster.targetY}, , ${targetMonster.curIndex}`);
     } else {
       //console.log(`[LocationSync] 몬스터 UUID ${monster.uuid}을(를) 찾을 수 없습니다.`);
@@ -214,39 +224,28 @@ function gameLoop() {
     console.warn("monsterPath가 유효하지 않습니다.");
   }
 
-  // 점수 바꾸기
-  if (Object.keys(monsterSpawner.getInfo()).length !== 0) {
-    setScore(monsterSpawner.getInfo().score);
-    setUserGold(monsterSpawner.getInfo().gold);
-    monsterLevel = monsterSpawner.getInfo().wave;
-  }
-
   ctx.font = "25px Times New Roman";
-  ctx.fillStyle = "skyblue";
-  ctx.fillText(`최고 기록: ${getHighScore()}`, 100, 250); // 최고 기록 표시
-  ctx.fillStyle = "white";
-  ctx.fillText(`점수: ${getScore()}`, 100, 300); // 현재 스코어 표시
-  ctx.fillStyle = "yellow";
-  ctx.fillText(`골드: ${getUserGold()}`, 100, 350); // 골드 표시
-  ctx.fillStyle = "black";
-  ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 400); // 최고 기록 표시
-
-  const test = monsterSpawner.getInfo().endTimer;
-  ctx.fillStyle = "yellow";
-  ctx.fillText(`엔드타이머: ${test}`, 100 , 450); // 최고 기록 표시
 
 
+  divgold.innerText = getUserGold();
+  divcurlevel.innerText = monsterLevel;
+  divendTimer.innerText = monsterSpawner.getInfo().endTimer;
 
-  getButtons().forEach((button) => {
-    button.draw(ctx);
-  });
+
+  // ctx.fillStyle = "yellow";
+  // ctx.fillText(`골드: ${getUserGold()}`, 100, 350); // 골드 표시
+  // ctx.fillStyle = "black";
+  // ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 400); // 최고 기록 표시
+
+  // const test = monsterSpawner.getInfo().endTimer;
+  // ctx.fillStyle = "yellow";
+  // ctx.fillText(`엔드타이머: ${test}`, 100 , 450); // 최고 기록 표시
+
   towerDraw(ctx);
   // 타워 그리기 및 몬스터 공격 처리
 
   // 몬스터가 공격을 했을 수 있으므로 기지 다시 그리기
   // base.draw(ctx, baseImage);
-  //마우스를 따라가는 아이콘을 그리는 기능
-  drawmousePoint(ctx);
 
   // 리스폰되기전에 돌던문제.
   // 배열, 길이가 0 이상일때만 반복문 도는것을 허용.
@@ -265,13 +264,16 @@ function gameLoop() {
       const temp = vfx[i];
       temp.draw(ctx);
 
-      if(vfx.isFinished === true){
+      if (vfx.isFinished === true) {
         vfx.splice(i, 1);
       }
-
     }
-
   }
+  getButtons().forEach((button) => {
+    button.draw(ctx);
+  });
+  //마우스를 따라가는 아이콘을 그리는 기능
+  drawmousePoint(ctx);
 
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
@@ -382,4 +384,3 @@ Promise.all([
 
 await initGame();
 
-//requestAnimationFrame(gameLoop);

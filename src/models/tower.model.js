@@ -114,11 +114,15 @@ export const currentTowerStat = (userId, X, Y) => {
 };
 
 export const towerCoolDown = (tower, cooldown, deltaTime) => {
-  tower.cooldown -= deltaTime;
-  if (tower.cooldown < 0 || !tower.cooldown) {
-    tower.cooldown += cooldown;
+let towerCooldown = +tower.cooldown ?? 0;
+
+towerCooldown -= +deltaTime;
+  if (towerCooldown < 0 ) {
+    towerCooldown += +cooldown;
+    tower.cooldown = +towerCooldown;
     return true;
   }
+  tower.cooldown = +towerCooldown;
   return false;
 };
 

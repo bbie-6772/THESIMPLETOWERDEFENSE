@@ -37,7 +37,7 @@ export const placeTower = (userId, payload, socket) => {
     addTower(userId, X, Y, towers.data[getRandomTower].id, 1);
     setUserGold(userId, changedgold);
     return {
-      userId: userId,
+      uuid: userId,
       towerid: towers.data[getRandomTower].id,
       x: X,
       y: Y,

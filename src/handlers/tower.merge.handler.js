@@ -50,7 +50,7 @@ export const TowerUpgrade = (uuid, payload) => {
     const remainGold = user.gold - upgrades[currentLevel];
     setUserGold(uuid, remainGold);
     
-    const response = { ...towerModel.upgrade(uuid, towerId), remainGold, roomcast:true };
+    const response = { ...towerModel.upgrade(uuid, towerId), remainGold };
     // console.log(response);
     return response;
 }

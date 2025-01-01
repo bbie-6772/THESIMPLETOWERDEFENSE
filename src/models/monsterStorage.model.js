@@ -9,6 +9,8 @@ export default class MonsterStorage {
         targetX: 웨어포인트 좌표 x
         targetY: 웨어포인트 좌표 y
         curIndex: 경로 현재 인덱스 추가!!
+        isStunned: 피격 시 경직 플래그 추가!!
+        isSlow: 피격 시 둔화 플래그 추가!!
         score : 스코어
         gold : 골드.
         stat: {
@@ -26,13 +28,13 @@ export default class MonsterStorage {
         gold : 획득한 골드.
     */
 
-    /*===매게변수====*/
-    /*
-      id          : 룸 아이디.
-      monsterUuid : 몬스터 uuid
-      data        : 데이터
-    */
-    /*===============*/
+  /*===매게변수====*/
+  /*
+    id          : 룸 아이디.
+    monsterUuid : 몬스터 uuid
+    data        : 데이터
+  */
+  /*===============*/
 
 
   // 생성자.
@@ -40,7 +42,7 @@ export default class MonsterStorage {
 
     this.info = {};
     this.monsters = {};
-    
+
   }
 
   // 싱글턴.
@@ -105,8 +107,8 @@ export default class MonsterStorage {
 
   // 데이터 조회(단일 몬스터) - 특정 게임의 특정 몬스터 데이터를 가져옵니다.
   getMonster(id, monsterUuid) {
-    if(!this.monsters[id]) {
-      return; 
+    if (!this.monsters[id]) {
+      return;
     }
 
     return this.monsters[id][monsterUuid] || {};
@@ -150,6 +152,43 @@ export default class MonsterStorage {
 
     delete this.monsters[id];
   }
+
+  //#region 임시 테스트용
+  applyMonsterStunned(id, monsterUuid, duration = 200) {
+    const targetMonster = this.monsters[id][monsterUuid];
+    if (!targetMonster) {
+      // console.log("삭제할 몬스터가 존재하지 않습니다.");
+      return;
+    }
+    // console.log("[MSTRG/TEST] 테스트로그: " + JSON.stringify(this.monsters[id][monsterUuid], null, 2));
+    // console.log("[MSTRG/TEST] 테스트 : 경직시작 ");
+
+    targetMonster.isStunned = true;
+    setTimeout(() => {
+      if (this.monsters[id] && this.monsters[id][monsterUuid]) {
+        this.monsters[id][monsterUuid].isStunned = false;
+      }
+      // console.log("[MSTRG/TEST] 테스트 : 경직 끝 ");
+    }, duration);
+  }
+
+  applyMonsterSlow(id, monsterUuid, duration = 1000) {
+    const targetMonster = this.monsters[id][monsterUuid];
+    if (!targetMonster) {
+      // console.log("삭제할 몬스터가 존재하지 않습니다.");
+      return;
+    }
+    // console.log("[MSTRG/TEST] 테스트로그: " + JSON.stringify(this.monsters[id][monsterUuid], null, 2));
+    // console.log("[MSTRG/TEST] 테스트 : 슬로우 시작 ");
+
+    targetMonster.isSlow = true;
+    setTimeout(() => {
+      if (this.monsters[id] && this.monsters[id][monsterUuid]) {
+        this.monsters[id][monsterUuid].isSlow = false;
+      }
+      // console.log("[MSTRG/TEST] 테스트 : 슬로우 끝 ");
+    }, duration);
+  }  //#endregion
 
   // 전체 데이터 조회
   test() {

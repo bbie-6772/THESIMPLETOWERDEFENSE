@@ -1,4 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
+import LocationSyncManager from "../manager/LocationSyncManager.js";
+import { removeUser } from "./tower.model.js";
+import { setUserGold } from "./users.model.js";
 
 let gameRooms = [];
 
@@ -14,6 +17,13 @@ export const addRoom = (userId, gameName, password, difficult) => {
             4: 5
         }
 
+        const count = {
+            1: 25,
+            2: 20,
+            3: 15,
+            4: 10
+        }
+
         const room = {
             gameId: gameId,
             gameName: gameName,
@@ -24,11 +34,14 @@ export const addRoom = (userId, gameName, password, difficult) => {
             ready: false,
             score: 0,
             startTime: 0,
-            monsterCount: 0,
+            monsterCount: count[difficult],
             gameOverTimer: timer[difficult],
         }
 
         gameRooms.push(room)
+
+        LocationSyncManager.initialize
+
         return true 
     } catch (err) {
         console.log(err)
@@ -47,7 +60,15 @@ export const roomInfoUpdate = (gameId, score, monsterCount, time)=> {
     }
 }
 
-// room 게임오버 타이머 세팅(외부).
+export const roomMonsterCountUpdate= (gameId)=> {
+    const index = gameRooms.findIndex((room) => room.gameId === gameId )
+
+    if(index !== -1){
+        return gameRooms[index].monsterCount; 
+    }
+}
+
+// room 게임오버 타이머 세팅(몬스터 리스폰).
 export const roomGameOverTimerSetting = (gameId) => {
     const index = gameRooms.findIndex((room) => room.gameId === gameId )
 
@@ -58,8 +79,31 @@ export const roomGameOverTimerSetting = (gameId) => {
     }
 }
 
+// room 게임오버 타이머 (로비).
+export const getStartTimer = (gameId,io)=> {
+    const index = gameRooms.findIndex((room) => room.gameId === gameId )
+    if(index !== -1){
+        if(gameRooms[index].startTime <= 0){
+            io.emit("gameEnd", {
+                timer: gameRooms[index].startTime
+            });
+
+            const destroyed = destroyRoom(gameRooms[index].userId1);
+            io.to(destroyed.gameId).emit('leaveRoom', { roomId: destroyed.gameId })
+        }
+    } else {
+        io.emit("gameEnd", {
+            timer: 60
+        });
+    }
+}
+
 export const getRoom = (userId) => {
     return gameRooms.find((e) => e.userId1 === userId || e.userId2 === userId)
+}
+
+export const getRoomFromGameId = (gameId) => {
+    return gameRooms.find((e) => e.gameId === gameId);
 }
 
 export const getRooms = () => {
@@ -101,6 +145,8 @@ export const destroyRoom = (userId) => {
 }
 
 export const gameReady = (gameId, userId, single) => {
+    removeUser(userId);
+    setUserGold(userId, 500)
     const roomIdx = gameRooms.findIndex((e) => e.gameId === gameId)
     // 방이 서버에 있는 확인
     if (roomIdx === -1) return false
