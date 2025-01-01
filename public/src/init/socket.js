@@ -95,6 +95,13 @@ socket.on("room", (data) => {
   updateUser(data);
 });
 
+socket.on("selltower", (data) => {
+  const {  x, y} = data;
+  console.log(data);
+  // 기존 타워 삭제
+  removeTower(x, y);
+});
+
 socket.on("attack", (data) => {
   settingAttack(data);
 });
