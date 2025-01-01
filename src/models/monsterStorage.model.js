@@ -87,7 +87,7 @@ export default class MonsterStorage {
       // console.log("정보가 존재하지 않습니다.");
       return;
     }
-    
+
     // 정보  업데이트
     this.info[id] = {
       ...this.info[id],
@@ -165,7 +165,9 @@ export default class MonsterStorage {
 
     targetMonster.isStunned = true;
     setTimeout(() => {
-      targetMonster.isStunned = false;
+      if (this.monsters[id] && this.monsters[id][monsterUuid]) {
+        this.monsters[id][monsterUuid].isStunned = false;
+      }
       // console.log("[MSTRG/TEST] 테스트 : 경직 끝 ");
     }, duration);
   }
@@ -181,7 +183,9 @@ export default class MonsterStorage {
 
     targetMonster.isSlow = true;
     setTimeout(() => {
-      targetMonster.isSlow = false;
+      if (this.monsters[id] && this.monsters[id][monsterUuid]) {
+        this.monsters[id][monsterUuid].isSlow = false;
+      }
       // console.log("[MSTRG/TEST] 테스트 : 슬로우 끝 ");
     }, duration);
   }  //#endregion
