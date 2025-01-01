@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import LocationSyncManager from "../manager/LocationSyncManager.js";
 import { removeUser } from "./tower.model.js";
+import { setUserGold } from "./users.model.js";
+
 let gameRooms = [];
 
 export const addRoom = (userId, gameName, password, difficult) => {
@@ -144,6 +146,7 @@ export const destroyRoom = (userId) => {
 
 export const gameReady = (gameId, userId, single) => {
     removeUser(userId);
+    setUserGold(userId, 500)
     const roomIdx = gameRooms.findIndex((e) => e.gameId === gameId)
     // 방이 서버에 있는 확인
     if (roomIdx === -1) return false
