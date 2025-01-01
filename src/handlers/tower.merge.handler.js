@@ -1,7 +1,7 @@
 import { getGameAssets } from "../init/assets.js";
 import { getRoom } from "../models/gameRoom.model.js";
 import towerModel from "../models/tower.model.js";
-import { getUser } from "../models/users.model.js";
+import { getUser, setUserGold } from "../models/users.model.js";
 
 // 타워 합성 핸들러, handlerID : 3001
 export const TowerMerge = (uuid, payload) => {
@@ -85,5 +85,5 @@ export const TowerSell = (uuid, payload) => {
     const newGold = user.gold + sellPrice;
     setUserGold(uuid, newGold); // UI 업데이트
 
-    return { status: 'success', message: '타워가 판매되었습니다.', sellPrice };
+    return { status: 'success', message: '타워가 판매되었습니다.', newGold, x, y };
 }

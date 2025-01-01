@@ -143,31 +143,19 @@ export const removeTower = (x, y) => {
 }
 
 // 타워 판매 기능 추가
-export const sellTower = (x, y) => {
-  const targetTower = GetTowerFromCoordinate(x, y);
+export const sellTower = (x, y, newGold) => {
+  const { xPosition, yPosition } = GetTowerCoordinateFromGrid(x, y);
+  const targetTower = GetTowerFromCoordinate(xPosition, yPosition);
+  
   if (!targetTower) {
     console.log("해당 위치에 타워가 없습니다.");
     return { success: false, message: "해당 위치에 타워가 없습니다." };
   }
 
-  const gameAssetsTowers = getGameAssets().towers;
-  const currentTower = gameAssetsTowers.data.find((element) => {
-    return element.id === targetTower.uuid; // 타워의 uuid로 찾기
-  });
-
-  // 판매 시 보상 계산 (70%)
-  const sellPrice = Math.floor(currentTower.cost * 0.7);
-
   // 타워 제거
   removeTower(targetTower.x, targetTower.y);
 
-  // 유저에게 보상 추가
-  const userGold = getUserGold();
-  const newGold = userGold + sellPrice;
   setUserGold(newGold); // 골드 업데이트
-
-  console.log("타워가 판매되었습니다.", sellPrice);
-  return { success: true, message: "타워가 판매되었습니다.", sellPrice };
 };
 
 // // 타워 클릭 이벤트 추가 (예: 클릭 이벤트에서 판매 기능 호출)

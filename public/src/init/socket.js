@@ -52,6 +52,8 @@ socket.once("connection", (data) => {
 socket.on("response", (data) => {
   // console.log(`socket.js:51 - handlerId : ${data[0]} response : ${data[1]}`);
   // 타워 핸들러
+  if (data[1]?.status === "fail") return;
+
   if(data[0] === 4001){
     // console.log(`socket.js:132 - tower place received : ${data[1]}`);
     setNewTower(data[1]);
@@ -68,13 +70,16 @@ socket.on("response", (data) => {
     removeTower(rx, ry);
     // 상위 타워 생성
     setNewTower({towerid : towerId, x : x, y : y, gold : 0, tier: tier});
-  }else if(data[0] === 3002){
+  } else if(data[0] === 3002){
     // 타워 강화 핸들러
     // data[1] : { level, remainGold, towerId, uuid }
     const { level, remainGold, towerId, uuid } = data[1];
     console.log(`socket.js:73 - ${data[1]}`);
-    
     setUserGold(remainGold);
+  } else if (data[0] === 3003) {
+    const { newGold, x, y } = data[1];
+    //타워 판매 핸들러
+    sellTower(x, y, newGold);
   }
 });
 
@@ -98,7 +103,7 @@ socket.on('leaveRoom', (data) => {
   roomId = null
   exitRoom()
   socket.emit('leaveRoom', { roomId: data.roomId })
-})
+}) 
 
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
 export const sendEvent = async (handlerId, payload) => {
@@ -111,15 +116,9 @@ export const sendEvent = async (handlerId, payload) => {
       payload,
     });
 
-    const loadError = setTimeout(() => {
-      alert("서버와 연결이 원할하지 않습니다");
-      return reject(false);
-    }, 2000);
-
     socket.once("response", (data) => {
       if (data[1]?.status === "fail") {
         alert(data[1].message);
-        clearTimeout(loadError);
         return resolve(false);
       }
       // 방 입장 핸들러
@@ -132,7 +131,6 @@ export const sendEvent = async (handlerId, payload) => {
         updateRooms(data[1].rooms);
       }
     
-      clearTimeout(loadError);
       return resolve(true);
     });
   });
