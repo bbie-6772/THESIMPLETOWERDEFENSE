@@ -231,10 +231,7 @@ export default class MonsterLifecycles {
             if(this.monsterStorage.getInfo(this.gameId).endTimer <= 0){
               this.terminateRespawn();
             }
-          } else {
-            const endTimer = roomGameOverTimerSetting(this.gameId);
-            this.monsterStorage.updateInfo(this.gameId, { endTimer: endTimer });
-          }
+          } 
         }, MONSTER_SPAWN_CYCLE);
       }
     }, MONSTER_SPAWN_CYCLE);

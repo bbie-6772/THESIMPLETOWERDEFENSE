@@ -10,7 +10,7 @@ export const addUser = (userId, nickname, socketId) => {
     userId: userId,
     nickname: nickname,
     socketId: socketId,
-    gold: 1000,
+    gold: 500,
     monsterKill: 0,
     totalDamage: 0,
     upgrades: {},
