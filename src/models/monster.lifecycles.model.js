@@ -210,9 +210,9 @@ export default class MonsterLifecycles {
           // 엔드 타이머 갱신
           if(aliveCount > MONSTER_COUNTDOWN) {
             this.monsterStorage.updateInfo(this.gameId, { endTimer: endTimer - 1 });
+          } else {
+            this.monsterStorage.updateInfo(this.gameId, { endTimer: MONSTER_COUNTDOWN_TIMER });
           }
-          console.log(aliveCount);
-          console.log(this.monsterStorage.getInfo(this.gameId).endTimer);
         }, MONSTER_SPAWN_CYCLE);
       }
     }, MONSTER_SPAWN_CYCLE);
