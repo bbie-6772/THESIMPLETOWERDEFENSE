@@ -37,12 +37,13 @@ export const placeTower = (userId, payload, socket) => {
     addTower(userId, X, Y, towers.data[getRandomTower].id, 1);
     setUserGold(userId, changedgold);
     return {
-      status: "success",
+      userId: userId,
       towerid: towers.data[getRandomTower].id,
       x: X,
       y: Y,
       gold: changedgold,
       tier: 1,
+      roomcast: true,
     };
   } catch (err) {
     return { status: "fail", message: err.message };

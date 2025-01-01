@@ -115,7 +115,7 @@ export const currentTowerStat = (userId, X, Y) => {
 
 export const towerCoolDown = (tower, cooldown, deltaTime) => {
   tower.cooldown -= deltaTime;
-  if (tower.cooldown < 0) {
+  if (tower.cooldown < 0 || !tower.cooldown) {
     tower.cooldown += cooldown;
     return true;
   }
@@ -144,13 +144,10 @@ export const merge = (uuid, x1, y1, x2, y2) => {
 export const upgrade = (uuid, towerId) => {
   // 유저의 타워 업그레이드 수치를 증가시킨다
   const user = getUser(uuid);
-  if (!user.upgrade[towerId]) {
-    user.upgrade[towerId] = 0;
-  }
-  user.upgrade[towerId]++;
-  return { uuid: uuid, type: towerId, level: user.upgrade[towerId] };
-};
 
+  user.upgrades[towerId]++;
+  return { uuid: uuid, towerId: towerId, level: user.upgrades[towerId] };
+}
 // 타워 판매 기능 추가
 export const sellTower = (userId, X, Y) => {
   const tower = getUsersTower(userId, X, Y);

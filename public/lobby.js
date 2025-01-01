@@ -40,6 +40,9 @@ let exitButton = null;
 let kickButton = null;
 let playButton = null;
 
+let soloRank = null;
+let multiRank = null;
+
 let name = document.createElement('div');
 let type = document.createElement('div');
 let password = document.createElement('div');
@@ -53,6 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
     nickname = document.getElementById('nickname');
     highScoreS = document.getElementById('highScoreS');
     highScoreM = document.getElementById('highScoreM');
+    soloRank = document.getElementById('soloRank');
+    multiRank = document.getElementById('multiRank');
 
     roomList = document.getElementById('roomList');
     roomSelectionModal = new bootstrap.Modal(document.getElementById('roomSelectionModal'));
@@ -258,6 +263,23 @@ export const updateUserInfo = (name, score1, score2) => {
     
     highScoreS.append(soloScore)
     highScoreM.append(multiScore)
+}
+
+// 유저 정보 업데이트
+export const updateRank = (solo, multi) => {
+    solo.forEach((e) => {
+        let soloScore = document.createElement('div');
+        soloScore.innerText = `${e.user1.nickname}(${e.score})`;
+        soloScore.className = "high-score mb-0"
+        soloRank.append(soloScore)
+    })
+
+    multi.forEach((e) => {
+        let multiScore = document.createElement('div');
+        multiScore.innerText = `${e.user1.nickname}/${e.user2.nickname}(${e.score})`;
+        multiScore.className = "high-score mb-0"
+        multiRank.append(multiScore)
+    })
 }
 
 // 대기방 나가기

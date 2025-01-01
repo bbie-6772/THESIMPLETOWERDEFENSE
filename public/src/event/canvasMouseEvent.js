@@ -96,15 +96,13 @@ function handleMouseup(event) {
         mousePosition[1]
       );
       if (towerPosition) {
-        console.log(towerPosition.x, towerPosition.y);
-        console.log(towerPosition);
         sendEvent(4001, { X: towerPosition.x, Y: towerPosition.y, tier: 1 });
       }
     } else if (holdingicon.button.text === "타워판매") {
-      if (currentTower) {
-        const payload = { x: currentTower.x, y: currentTower.y };
+      const targetTower = GetTowerFromCoordinate(mousePosition[0], mousePosition[1]);
+      if (targetTower) {
+        const payload = { x: targetTower.x, y: targetTower.y };
         sendEvent(3003, payload); // 타워 판매 요청
-        currentTower = null; // 판매 후 현재 타워 초기화
       }
     }
   }
@@ -119,11 +117,12 @@ function handleMouseup(event) {
     var y = (event.clientY - canvasRect.top) * scaleY;
     var targetTower = GetTowerFromCoordinate(x, y);
 
-    const payload = { x1: currentTower.x, y1: currentTower.y, x2: targetTower.x, y2: targetTower.y };
-    console.log(`tower merge : ${[currentTower.x, currentTower.y]} & ${[targetTower.x, targetTower.y]}`)
-    // { x1, y1, x2, y2 } : 그리드 좌표
-    sendEvent(3001, payload);
-    currentTower = null;
+    if (targetTower && targetTower !== currentTower) {
+      const payload = { x1: currentTower.x, y1: currentTower.y, x2: targetTower.x, y2: targetTower.y };
+      // { x1, y1, x2, y2 } : 그리드 좌표
+      sendEvent(3001, payload);
+      currentTower = null;
+    }
   }
   isHolding = false;
   holdingicon = {};

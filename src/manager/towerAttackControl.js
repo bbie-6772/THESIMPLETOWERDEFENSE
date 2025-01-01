@@ -18,6 +18,7 @@ let deltaTime = 0;
 let isInit = false;
 let monsterStorage = MonsterStorage.getInstance(); // MonsterStorage 인스턴스 연결
 export const towerAttackCondtorl = (io, monstercycle) => {
+  try{
   if (!isInit) {
     previousTime = Date.now();
     isInit = true;
@@ -43,14 +44,14 @@ export const towerAttackCondtorl = (io, monstercycle) => {
         io.sockets.sockets.get(getUser(rooms[roomsIndex].userId1).socketId)
       );
       if (rooms[roomsIndex].userId2 != null) {
-        let user2towers = towerModel.getUsersTowers(rooms[roomsIndex].userId1);
+        let user2towers = towerModel.getUsersTowers(rooms[roomsIndex].userId2);
 
         if (user2towers != undefined && user2towers.length > 0) {
           allUsersTowers.push(...user2towers);
         }
 
         allUsersSockets.push(
-          io.sockets.sockets.get(getUser(rooms[roomsIndex].userId1).socketId)
+          io.sockets.sockets.get(getUser(rooms[roomsIndex].userId2).socketId)
         );
       }
       for (
@@ -60,7 +61,7 @@ export const towerAttackCondtorl = (io, monstercycle) => {
       ) {
         //타워 현재 스탯을 가져온다.
         const tmpTower = towerModel.currentTowerStat(
-          allUsersTowersIndex < user1towers.length
+          allUsersTowersIndex < (user1towers ?? []).length
             ? rooms[roomsIndex].userId1
             : rooms[roomsIndex].userId2,
           allUsersTowers[allUsersTowersIndex].X,
@@ -79,21 +80,12 @@ export const towerAttackCondtorl = (io, monstercycle) => {
             allUsersTowers[allUsersTowersIndex].X,
             allUsersTowers[allUsersTowersIndex].Y
           );
-          console.log(monsters
-          );
           const mosterkey = Object.keys(monsters);
           for (
             let monstersIndex = 0;
             monstersIndex < mosterkey.length;
             monstersIndex++
           ) {
-            console.log(
-              xPosition,
-              yPosition,
-              monsters[mosterkey[monstersIndex]].x,
-              monsters[mosterkey[monstersIndex]].y,
-              tmpTower.range
-            );
             if (monsters[mosterkey[monstersIndex]] != undefined&&
               distanceCheck(
                 xPosition,
@@ -151,6 +143,11 @@ export const towerAttackCondtorl = (io, monstercycle) => {
       }
     }
   }
+
+  }
+  catch(err){
+    console.log(err.message)
+  }
 };
 
 function distanceCheck(objectAX, objectAY, objectBX, objectBY) {
@@ -166,7 +163,7 @@ function sendToClient(
   towerY,
   targetX,
   targetY,
-  duration = 2000
+  duration = 1000
 ) {
   socket.emit("attack", {
     type: towertype,

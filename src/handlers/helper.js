@@ -96,7 +96,7 @@ export const handleConnection = async (socket) => {
         //유저 추가
         addUser(loginUser.id, loginUser.nickname, socket.id)
 
-        console.log(loginUser.id, "접속")
+        // console.log(loginUser.id, "접속")
 
         // 주요 정보 변환
         const rooms = getRooms().map((e) => {
@@ -111,33 +111,33 @@ export const handleConnection = async (socket) => {
             }
         })
 
-        // const soloRank = await prisma.ranks.findMany({
-        //     where: { userId2: null},
-        //     orderBy: [{
-        //         score: 'desc',
-        //     }], 
-        //     select: {
-        //         userId1: true,
-        //         score: true
-        //     },
-        //     take: 10 
-        // })
+        const soloRank = await prisma.ranks.findMany({
+            where: { userId2: null},
+            orderBy: [{
+                score: 'desc',
+            }], 
+            select: {
+                user1: { select: { nickname: true } },
+                score: true
+            },
+            take: 10 
+        })
 
-        // const multiRank = await prisma.ranks.findMany({
-        //     where: { userId2: { isNot: null} },
-        //     orderBy: [{
-        //         score: 'desc',
-        //     }],
-        //     select: {
-        //         userId1: true,
-        //         userId2: true,
-        //         score: true
-        //     },
-        //     take: 10 
-        // })
+        const multiRank = await prisma.ranks.findMany({
+            where: { userId2: { not: null} },
+            orderBy: [{
+                score: 'desc',
+            }],
+            select: {
+                user1: {select : { nickname: true }},
+                user2: {select: { nickname: true } },
+                score: true
+            },
+            take: 10 
+        })
 
         //유저와 연결되면 클라이언트에게 인터페이스 용 값 전달
-        socket.emit('connection', [loginUser.id, loginUser.nickname, loginUser.highScoreS, loginUser.highScoreM, rooms])
+        socket.emit('connection', [loginUser.id, loginUser.nickname, loginUser.highScoreS, loginUser.highScoreM, rooms, soloRank, multiRank])
 
     } catch (err) {
         console.log(err)
@@ -156,7 +156,7 @@ export const handleDisconnect = (socket, io) => {
     let destroyed = null;
     let left = null
     // 참여 방 확인 + 게임 시작 여부 확인으로 방 삭제 혹은 나가기
-    console.log(room)
+    // console.log(room)
     if (room) {
         if (room.startTime > 0) {
             destroyed = destroyRoom(user.userId)
@@ -174,7 +174,7 @@ export const handleDisconnect = (socket, io) => {
         }
     }
 
-    console.log(getUsers())
+    // console.log(getUsers())
 }
 
 // 준비상태 확인
@@ -232,6 +232,7 @@ export const handlerEvent = (io, socket, data) => {
             return;
         }
 
+        // console.log(`helper.js:235 - ${data.userId}`);
         const response = handler(data.userId, data.payload, socket, io);
 
         // 서버 전 유저에게 알림
@@ -240,8 +241,14 @@ export const handlerEvent = (io, socket, data) => {
             return;
         }
 
+        else if(response.roomcast) {
+            const gameId = getRoom(data.userId).gameId;
+            io.to(gameId).emit('response', [data.handlerId, response]);
+            // console.log(`helper.js:246 - ${data.userId}, ${gameId}, ${getRooms()}`);
+        }
+
         // 대상 유저에게만 보냄
-        socket.emit('response', [data.handlerId, response]);
+        else socket.emit('response', [data.handlerId, response]);
 
     } catch (err) {
         console.log(err)

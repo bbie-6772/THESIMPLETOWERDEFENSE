@@ -84,10 +84,8 @@ export const GetTowerFromCoordinate = (x, y) => {
   const scaleX = gameCanvas.Xscale; // 가로 스케일
   const scaleY = gameCanvas.Yscale; // 세로 스케일
 
-  console.log(x, y);
   return towers.find((e) => {
     const { xPosition, yPosition } = GetTowerCoordinateFromGrid(e.x, e.y);
-    console.log(e.x, e.y, xPosition, yPosition);
     return (
       xPosition * scaleX < x &&
       xPosition * scaleX > x - e.width &&
@@ -112,7 +110,7 @@ export const GetTowerCoordinateFromGrid = (x, y) => {
 };
 //return { status: 'success',towerid: towers.data[getRandomTower].id, x: X, y: Y, gold };
 export const setNewTower = (data) => {
-  const { towerid, x, y, gold, tier } = data;
+  const { userId, towerid, x, y, gold, tier } = data;
   //const {towers} = getGameAssets();
   console.log(towerid);
   const tmpTower = getGameAssets().towers.data.find((element) => {
@@ -124,7 +122,7 @@ export const setNewTower = (data) => {
   tmpTowerImage.src = tmpTower.image;
 
   const newtower = new Tower(
-    localStorage.getItem("access-Token"),
+    userId,
     x,
     y,
     tmpTowerImage,
@@ -145,31 +143,19 @@ export const removeTower = (x, y) => {
 }
 
 // 타워 판매 기능 추가
-export const sellTower = (x, y) => {
-  const targetTower = GetTowerFromCoordinate(x, y);
+export const sellTower = (x, y, newGold) => {
+  const { xPosition, yPosition } = GetTowerCoordinateFromGrid(x, y);
+  const targetTower = GetTowerFromCoordinate(xPosition, yPosition);
+  
   if (!targetTower) {
     console.log("해당 위치에 타워가 없습니다.");
     return { success: false, message: "해당 위치에 타워가 없습니다." };
   }
 
-  const gameAssetsTowers = getGameAssets().towers;
-  const currentTower = gameAssetsTowers.data.find((element) => {
-    return element.id === targetTower.uuid; // 타워의 uuid로 찾기
-  });
-
-  // 판매 시 보상 계산 (70%)
-  const sellPrice = Math.floor(currentTower.cost * 0.7);
-
   // 타워 제거
   removeTower(targetTower.x, targetTower.y);
 
-  // 유저에게 보상 추가
-  const userGold = getUserGold();
-  const newGold = userGold + sellPrice;
   setUserGold(newGold); // 골드 업데이트
-
-  console.log("타워가 판매되었습니다.", sellPrice);
-  return { success: true, message: "타워가 판매되었습니다.", sellPrice };
 };
 
 // // 타워 클릭 이벤트 추가 (예: 클릭 이벤트에서 판매 기능 호출)

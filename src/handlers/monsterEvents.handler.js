@@ -12,7 +12,7 @@ export const receiveMonsterMessage = (io, socket) => {
   // 초기화.
   socket.on("monsterEventInit", (data) => {
 
-    console.log(data.message.gameId);
+    // console.log(data.message.gameId);
 
     const roomCount = Object.keys(monsterStorage.getInfo(data.message.gameId)).length;
     
@@ -24,7 +24,8 @@ export const receiveMonsterMessage = (io, socket) => {
       socket.emit("monsterEventInit", monsterStorage.getInfo(data.message.gameId));
     }
 
-    monsters.monsterDamageMessage();
+
+    monsters.monsterAliveCountUpdate();
     monsters.sendRespawnPing();
 
     //#region locationSyncManager 싱크 시작
