@@ -6,18 +6,20 @@ import {
   gameStart,
   exitRoom,
   updateUserInfo,
-  updateRank
+  updateRank,
+  getCountBar
 } from "../../lobby.js";
 import Monsters from "../model/monsterSpawner.js";
 import { settingAttack } from "../model/towerBase.model.js";
 import { removeTower, setNewTower, sellTower } from "../model/tower.js";
-import { setUserGold } from "../model/userInterface.model.js";
+import { setUserGold, MonsterCount } from "../model/userInterface.model.js";
 
 let userId = null;
 let nickname = null;
 let highScoreS = null;
 let highScoreM = null;
 let roomId = null;
+let monsterCount = null;
 
 const token = localStorage.getItem("access-Token");
 // 로그인이 안되어있을 시 로그인 창으로
@@ -125,6 +127,8 @@ export const sendEvent = async (handlerId, payload) => {
       if (data[0] === 1001) {
         updateRoomInfo(data[1].room);
         updateUser(data[1].room);
+        monsterCount = new MonsterCount(data[1].room.monsterCount, getCountBar())
+        monsterCount.updateCountBar()
         roomId = data[1].room.gameId
         // 방 로딩 핸들러
       } else if (data[0] === 1002) {

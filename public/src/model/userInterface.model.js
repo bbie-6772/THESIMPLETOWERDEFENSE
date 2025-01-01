@@ -28,29 +28,29 @@ export const getHighScore = ()=>{
 
 export class MonsterCount {
     constructor(maxCount, countBar) {
-        this.maxHealth = maxCount;
-        this.currentHealth = 0;
+        this.maxCount = maxCount;
+        this.currentCount = 0;
         this.countBar = countBar;
     }
 
     // 몬스터 수 감소
     down(amount) {
-        this.currentHealth = Math.max(0, this.currentHealth - amount);
-        this.updateHealthBar();
+        this.currentCount = Math.max(0, this.currentCount - amount);
+        this.updateCountBar();
     }
 
     // 몬스터 수 증가
     up(amount) {
-        this.currentHealth = Math.min(this.maxHealth, this.currentHealth + amount);
-        this.updateHealthBar();
+        this.currentCount = Math.min(this.maxCount, this.currentCount + amount);
+        this.updateCountBar();
     }
 
-    // 체력바 업데이트 메서드  
-    updateHealthBar() {
-        const percentage = (this.currentHealth / this.maxHealth) * 100;
+    //몬스터바 업데이트 메서드  
+    updateCountBar() {
+        const percentage = (this.currentCount / this.maxCount) * 100;
         this.countBar.style.width = `${percentage}%`;
-        this.countBar.setAttribute('aria-valuenow', this.currentHealth);
-        this.countBar.textContent = `${this.currentHealth} / ${this.maxHealth}`;
+        this.countBar.setAttribute('aria-valuenow', this.currentCount);
+        this.countBar.textContent = `${this.currentCount} / ${this.maxCount}`;
 
         // 체력에 따라 색상 변경  
         if (percentage > 80) {

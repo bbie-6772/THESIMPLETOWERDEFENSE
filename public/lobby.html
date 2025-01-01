@@ -282,7 +282,7 @@
             width: 8px;
         }
 
-        .health-container {  
+        .count-container {  
             max-width: 500px;  
             margin: 50px auto;  
             text-align: center;  
@@ -304,12 +304,14 @@
                 </div>
             </div>
         </div>
-        <div class="fixed-bottom d-flex justify-content-center health-container">
-            <h2>캐릭터 체력</h2>
-            <div class="progress" style="height: 30px;">
-                <div id="healthBar" class="progress-bar" role="progressbar" style="width: 100%; background-color: green;"
-                    aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                    100 / 100
+        <div class="contanier fixed-bottom">
+            <div class="count-container">
+                <h2 style="color:white">현재 몬스터 수</h2>
+                <div class="progress" style="height: 30px;">
+                    <div id="countBar" class="progress-bar" role="progressbar" style="width: 100%; background-color: green; color:black"
+                        aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                        100 / 100
+                    </div>
                 </div>
             </div>
         </div>
