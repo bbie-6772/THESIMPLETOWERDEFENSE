@@ -8,7 +8,6 @@ import {
   updateUserInfo,
   updateRank
 } from "../../lobby.js";
-import Monsters from "../model/monsterSpawner.js";
 import { settingAttack } from "../model/towerBase.model.js";
 import { removeTower, setNewTower, sellTower } from "../model/tower.js";
 import { setUserGold } from "../model/userInterface.model.js";
@@ -105,8 +104,18 @@ socket.on('leaveRoom', (data) => {
   socket.emit('leaveRoom', { roomId: data.roomId })
 }) 
 
-// 클라이언트에서 총합적으로 server에 보내주는걸 관리
-export const sendEvent = async (handlerId, payload) => {
+socket.on("gold", (data) => {
+  console.log("socket.js:109");
+  console.log(data.user1, data.user2);
+  if(data.user1 === userId){
+    setUserGold(data.gold1);
+  }else if(data.user2 === userId){
+    setUserGold(data.gold2);
+  }
+})
+  
+  // 클라이언트에서 총합적으로 server에 보내주는걸 관리
+  export const sendEvent = async (handlerId, payload) => {
   const log = await new Promise((resolve, reject) => {
     socket.emit("event", {
       userId,
@@ -156,3 +165,6 @@ export const getRoom = () => {
   return roomId
 }
 
+export const getUserId = () => {
+  return userId;
+}

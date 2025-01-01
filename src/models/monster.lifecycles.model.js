@@ -2,7 +2,8 @@ import { getGameAssets } from "../init/assets.js";
 import { v4 as uuidv4 } from "uuid";
 import MonsterStorage from "./monsterStorage.model.js";
 import { generatePath } from "../init/pathGenerator.js";
-import {roomInfoUpdate, roomGameOverTimerSetting} from "./gameRoom.model.js"
+import {roomInfoUpdate, roomGameOverTimerSetting, getRoomFromGameId} from "./gameRoom.model.js"
+import { getUser } from "./users.model.js";
 
 /*====[구조를 변경한 이유]====*/
 // 1. 룸 생성 -> 게임 시작 방식으로, 각 방마다 독립적인 인스턴스를 생성하는 것이 더 적합하다고 판단.
@@ -318,6 +319,12 @@ export default class MonsterLifecycles {
       const monsterScore = monster.score;
       const monstergoid = monster.gold;
 
+      try{
+        const room = getRoomFromGameId(this.gameId);
+        const user1 = getUser(room.userId1);
+        const user2 = getUser(room.userId2);
+        if(user1) user1.gold += monstergoid;
+        if(user2) user2.gold += monstergoid;
       // 싱글이면 상관없지만 멀티 모드일때 다른유저에게 삭제요청.
       this.io.emit(this.gameId, {
         message: {
@@ -325,7 +332,15 @@ export default class MonsterLifecycles {
           monster: monster,
         },
       }); // 클라이언트에게 ping 전송
-
+        this.io.to(this.gameId).emit("gold", {
+          user1 : room.userId1,
+          gold1 : user1? user1.gold : 0,
+          user2 : room.userId2,
+          gold2 : user2? user2.gold : 0,
+        }) // 클라이언트에 골드 메시지 전송
+      }catch(err){
+        console.log(err);
+      }
       // 몬스터 삭제.
       this.monsterStorage.removeMonster(this.gameId, monster.uuid);
 
