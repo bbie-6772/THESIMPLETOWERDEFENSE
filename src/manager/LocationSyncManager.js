@@ -58,8 +58,6 @@ export default class LocationSyncManager {
 
             //#region 둔화 슬로우
             const monsterSpeed = monster.stat.speed * (monster.isSlow ? 0.5 : 1);
-            if (monster.isSlow)
-                 console.log(">>> [monsterSpeed] : is slow" );
             //#endregion
 
             // 이동 로직 (간단한 랜덤 이동 예제)
