@@ -10,6 +10,8 @@ import {
 import Monsters from "../model/monsterSpawner.js";
 import { settingAttack } from "../model/towerBase.model.js";
 import { removeTower, setNewTower } from "../model/tower.js";
+import { updateLocationSync } from "../utils/client.LocationSync.js";
+import { setUserGold } from "../model/userInterface.model.js";
 
 let userId = null;
 let nickname = null;
@@ -120,8 +122,11 @@ export const sendEvent = async (handlerId, payload) => {
         }
       }else if(data[0] === 3002){
         // 타워 강화 핸들러
-        // data[1] : {}
+        // data[1] : { level, remainGold, towerId, uuid }
+        const { level, remainGold, towerId, uuid } = data[1];
         console.log(data[1]);
+        
+        setUserGold(remainGold);
       }
       // 타워 핸들러
       if(data[0] === 4001){
