@@ -58,6 +58,14 @@ export const roomInfoUpdate = (gameId, score, monsterCount, time)=> {
     }
 }
 
+export const roomMonsterCountUpdate= (gameId)=> {
+    const index = gameRooms.findIndex((room) => room.gameId === gameId )
+
+    if(index !== -1){
+        return gameRooms[index].monsterCount; 
+    }
+}
+
 // room 게임오버 타이머 세팅(몬스터 리스폰).
 export const roomGameOverTimerSetting = (gameId) => {
     const index = gameRooms.findIndex((room) => room.gameId === gameId )
