@@ -9,7 +9,7 @@ import {
 } from "../../lobby.js";
 import Monsters from "../model/monsterSpawner.js";
 import { settingAttack } from "../model/towerBase.model.js";
-import { removeTower, setNewTower } from "../model/tower.js";
+import { removeTower, setNewTower, sellTower } from "../model/tower.js";
 import { setUserGold } from "../model/userInterface.model.js";
 
 let userId = null;
@@ -126,6 +126,11 @@ export const sendEvent = async (handlerId, payload) => {
         console.log(data[1]);
 
         setUserGold(remainGold);
+      } else if (data[0] === 3003) {
+        //타워 판매 핸들러
+        sellTower(x, y);
+        const { level, remainGold, towerId, uuid } = data[1];
+        console.log("판매 예정");
       }
       // 타워 핸들러
       if (data[0] === 4001) {

@@ -1,7 +1,7 @@
 import Monsters from "./monsterSpawner.js";
 import { getGameAssets } from "../init/assets.js";
 import { setTowerBase } from "./towerBase.model.js";
-import { setUserGold } from "./userInterface.model.js";
+import { setUserGold, getUserGold } from "./userInterface.model.js";
 import { gettowerBaseWidth, gettowerBaseheight } from "./towerBase.model.js";
 import { getGameCanvas } from "./gameCanva.model.js";
 var towers = [];
@@ -79,7 +79,7 @@ export class Tower {
 }
 
 export const GetTowerFromCoordinate = (x, y) => {
-  
+
   const gameCanvas = getGameCanvas();
   const scaleX = gameCanvas.Xscale; // 가로 스케일
   const scaleY = gameCanvas.Yscale; // 세로 스케일
@@ -103,7 +103,7 @@ export const GetTowerCoordinateFromGrid = (x, y) => {
       tower0Position[0] +
       incremWidth / 2 +
       ((x % 2) * towersGapX - towersGapX / 2) +
-      (x > 1 ? incremWidth : 0) + towerBaseWidth /2 - width /2,
+      (x > 1 ? incremWidth : 0) + towerBaseWidth / 2 - width / 2,
     yPosition:
       tower0Position[1] +
       incremHeight / 2 +
@@ -143,3 +143,41 @@ export const removeTower = (x, y) => {
   console.log(towers);
   setTowerBase(x, y, null);
 }
+
+// 타워 판매 기능 추가
+export const sellTower = (x, y) => {
+  const targetTower = GetTowerFromCoordinate(x, y);
+  if (!targetTower) {
+    console.log("해당 위치에 타워가 없습니다.");
+    return { success: false, message: "해당 위치에 타워가 없습니다." };
+  }
+
+  const gameAssetsTowers = getGameAssets().towers;
+  const currentTower = gameAssetsTowers.data.find((element) => {
+    return element.id === targetTower.uuid; // 타워의 uuid로 찾기
+  });
+
+  // 판매 시 보상 계산 (70%)
+  const sellPrice = Math.floor(currentTower.cost * 0.7);
+
+  // 타워 제거
+  removeTower(targetTower.x, targetTower.y);
+
+  // 유저에게 보상 추가
+  const userGold = getUserGold();
+  const newGold = userGold + sellPrice;
+  setUserGold(newGold); // 골드 업데이트
+
+  console.log("타워가 판매되었습니다.", sellPrice);
+  return { success: true, message: "타워가 판매되었습니다.", sellPrice };
+};
+
+// // 타워 클릭 이벤트 추가 (예: 클릭 이벤트에서 판매 기능 호출)
+// canvas.addEventListener('click', (event) => {
+//   const rect = canvas.getBoundingClientRect();
+//   const x = event.clientX - rect.left;
+//   const y = event.clientY - rect.top;
+
+//   // 타워 판매 호출
+//   sellTower(x, y);
+// });

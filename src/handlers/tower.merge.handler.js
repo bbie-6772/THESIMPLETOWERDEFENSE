@@ -45,11 +45,44 @@ export const TowerUpgrade = (uuid, payload) => {
     if (currentLevel === towerModel.max_upgrade) return { status: 'fail', message: '타워 업그레이드가 최대 레벨입니다' };
     // 골드가 충분한지 검증
     if (user.gold < upgrades[currentLevel]) return { status: "fail", message: "lack of money." };
-      
+
     const remainGold = user.gold - upgrades[currentLevel];
     setUserGold(uuid, remainGold);
-    
-    const response = { ...towerModel.upgrade(uuid, towerId), remainGold};
+
+    const response = { ...towerModel.upgrade(uuid, towerId), remainGold };
     console.log(response);
     return response;
+}
+
+// 타워 판매 핸들러, handlerID : 3003
+export const TowerSell = (uuid, payload) => {
+    const { x, y } = payload;
+
+    // 검증
+    // uuid가 유효한지 검사 (uuid가 존재하는지)
+    const room = getRoom(uuid);
+    if (!room) return { status: 'fail', message: '유저를 찾을 수 없습니다' };
+
+    // 타워가 유효한지 검사 (타워가 존재하는지)
+    const tower = towerModel.getUsersTower(uuid, x, y);
+    if (!tower) return { status: 'fail', message: '타워를 찾을 수 없습니다' };
+
+    // 타워 정보 가져오기
+    const gameAssetsTowers = getGameAssets().towers;
+    const currentTower = gameAssetsTowers.data.find((element) => {
+        return element.id === tower.towerId;
+    });
+
+    // 판매 시 보상 계산 70%
+    const sellPrice = Math.floor(currentTower.cost * 0.7);
+
+    // 타워 제거
+    towerModel.removeUsersTower(uuid, x, y);
+
+    // 유저에게 보상 추가
+    const user = getUser(uuid);
+    const newGold = user.gold + sellPrice;
+    setUserGold(uuid, newGold); // UI 업데이트
+
+    return { status: 'success', message: '타워가 판매되었습니다.', sellPrice };
 }
