@@ -21,6 +21,7 @@ export class Button {
     ctx.globalAlpha = 1;
     ctx.fillStyle = "black";
     ctx.font = "30px Arial";
+    ctx.textAlign = 'left'
     ctx.fillText(this.text, this.x + this.marginX, this.y + this.marginY);
   }
   //마우스가 버튼 위에 있는지 확인
