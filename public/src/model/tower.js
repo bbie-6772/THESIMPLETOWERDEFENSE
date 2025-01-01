@@ -1,7 +1,7 @@
 import Monsters from "./monsterSpawner.js";
 import { getGameAssets } from "../init/assets.js";
 import { setTowerBase } from "./towerBase.model.js";
-import { setUserGold } from "./userInterface.model.js";
+import { setUserGold, getUserGold } from "./userInterface.model.js";
 import { gettowerBaseWidth, gettowerBaseheight } from "./towerBase.model.js";
 import { getGameCanvas } from "./gameCanva.model.js";
 var towers = [];
@@ -79,15 +79,13 @@ export class Tower {
 }
 
 export const GetTowerFromCoordinate = (x, y) => {
-  
+
   const gameCanvas = getGameCanvas();
   const scaleX = gameCanvas.Xscale; // 가로 스케일
   const scaleY = gameCanvas.Yscale; // 세로 스케일
 
-  console.log(x, y);
   return towers.find((e) => {
     const { xPosition, yPosition } = GetTowerCoordinateFromGrid(e.x, e.y);
-    console.log(e.x, e.y, xPosition, yPosition);
     return (
       xPosition * scaleX < x &&
       xPosition * scaleX > x - e.width &&
@@ -103,7 +101,7 @@ export const GetTowerCoordinateFromGrid = (x, y) => {
       tower0Position[0] +
       incremWidth / 2 +
       ((x % 2) * towersGapX - towersGapX / 2) +
-      (x > 1 ? incremWidth : 0) + towerBaseWidth /2 - width /2,
+      (x > 1 ? incremWidth : 0) + towerBaseWidth / 2 - width / 2,
     yPosition:
       tower0Position[1] +
       incremHeight / 2 +
@@ -112,7 +110,7 @@ export const GetTowerCoordinateFromGrid = (x, y) => {
 };
 //return { status: 'success',towerid: towers.data[getRandomTower].id, x: X, y: Y, gold };
 export const setNewTower = (data) => {
-  const { towerid, x, y, gold, tier } = data;
+  const { userId, towerid, x, y, gold, tier } = data;
   //const {towers} = getGameAssets();
   console.log(towerid);
   const tmpTower = getGameAssets().towers.data.find((element) => {
@@ -124,7 +122,7 @@ export const setNewTower = (data) => {
   tmpTowerImage.src = tmpTower.image;
 
   const newtower = new Tower(
-    localStorage.getItem("access-Token"),
+    userId,
     x,
     y,
     tmpTowerImage,
@@ -143,3 +141,29 @@ export const removeTower = (x, y) => {
   console.log(towers);
   setTowerBase(x, y, null);
 }
+
+// 타워 판매 기능 추가
+export const sellTower = (x, y, newGold) => {
+  const { xPosition, yPosition } = GetTowerCoordinateFromGrid(x, y);
+  const targetTower = GetTowerFromCoordinate(xPosition, yPosition);
+  
+  if (!targetTower) {
+    console.log("해당 위치에 타워가 없습니다.");
+    return { success: false, message: "해당 위치에 타워가 없습니다." };
+  }
+
+  // 타워 제거
+  removeTower(targetTower.x, targetTower.y);
+
+  setUserGold(newGold); // 골드 업데이트
+};
+
+// // 타워 클릭 이벤트 추가 (예: 클릭 이벤트에서 판매 기능 호출)
+// canvas.addEventListener('click', (event) => {
+//   const rect = canvas.getBoundingClientRect();
+//   const x = event.clientX - rect.left;
+//   const y = event.clientY - rect.top;
+
+//   // 타워 판매 호출
+//   sellTower(x, y);
+// });

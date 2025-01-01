@@ -36,6 +36,27 @@ export const addRoom = (userId, gameName, password, difficult) => {
     }
 
 }
+// room 정보 갱신.
+export const roomInfoUpdate = (gameId, score, monsterCount, time)=> {
+    const index = gameRooms.findIndex((room) => room.gameId === gameId )
+    
+    if(index !== -1){
+        gameRooms[index].score = score;
+        gameRooms[index].monsterCount = monsterCount;
+        gameRooms[index].startTime = time;
+    }
+}
+
+// room 게임오버 타이머 세팅(외부).
+export const roomGameOverTimerSetting = (gameId) => {
+    const index = gameRooms.findIndex((room) => room.gameId === gameId )
+
+    if(index !== -1){
+        return gameRooms[index].gameOverTimer; 
+    } else {
+        return 60;
+    }
+}
 
 export const getRoom = (userId) => {
     return gameRooms.find((e) => e.userId1 === userId || e.userId2 === userId)

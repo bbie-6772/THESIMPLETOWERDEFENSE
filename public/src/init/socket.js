@@ -6,10 +6,11 @@ import {
   gameStart,
   exitRoom,
   updateUserInfo,
+  updateRank
 } from "../../lobby.js";
 import Monsters from "../model/monsterSpawner.js";
 import { settingAttack } from "../model/towerBase.model.js";
-import { removeTower, setNewTower } from "../model/tower.js";
+import { removeTower, setNewTower, sellTower } from "../model/tower.js";
 import { setUserGold } from "../model/userInterface.model.js";
 
 let userId = null;
@@ -44,10 +45,42 @@ socket.once("connection", (data) => {
     // 방 목록 업데이트
     updateRooms(data[4]);
     updateUserInfo(nickname,highScoreS,highScoreM)
+    updateRank(data[5], data[6])
   }
 });
 
 socket.on("response", (data) => {
+  // console.log(`socket.js:51 - handlerId : ${data[0]} response : ${data[1]}`);
+  // 타워 핸들러
+  if (data[1]?.status === "fail") return;
+
+  if(data[0] === 4001){
+    // console.log(`socket.js:132 - tower place received : ${data[1]}`);
+    setNewTower(data[1]);
+  } 
+
+  if(data[0] === 3001){
+    // 타워 합성 핸들러
+    // data[1] : { uuid, type, tier, x, y, removeX, removeY }
+    const payload = data[1];
+    console.log(payload);
+    const { uuid, towerId, tier, x, y, rx, ry } = data[1];
+    // 기존 타워 삭제
+    removeTower(x, y);
+    removeTower(rx, ry);
+    // 상위 타워 생성
+    setNewTower({towerid : towerId, x : x, y : y, gold : 0, tier: tier});
+  } else if(data[0] === 3002){
+    // 타워 강화 핸들러
+    // data[1] : { level, remainGold, towerId, uuid }
+    const { level, remainGold, towerId, uuid } = data[1];
+    console.log(`socket.js:73 - ${data[1]}`);
+    setUserGold(remainGold);
+  } else if (data[0] === 3003) {
+    const { newGold, x, y } = data[1];
+    //타워 판매 핸들러
+    sellTower(x, y, newGold);
+  }
 });
 
 socket.on("ready", (data) => {
@@ -66,16 +99,15 @@ socket.on("attack", (data) => {
 });
 
 // 방이 파괴되었을 시 
-socket.on('leaveRoom',(data) => {
+socket.on('leaveRoom', (data) => {
   roomId = null
   exitRoom()
   socket.emit('leaveRoom', { roomId: data.roomId })
-})
+}) 
 
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
 export const sendEvent = async (handlerId, payload) => {
   const log = await new Promise((resolve, reject) => {
-    console.log("보냄")
     socket.emit("event", {
       userId,
       token,
@@ -84,15 +116,9 @@ export const sendEvent = async (handlerId, payload) => {
       payload,
     });
 
-    const loadError = setTimeout(() => {
-      alert("서버와 연결이 원할하지 않습니다");
-      return reject(false);
-    }, 2000);
-
     socket.once("response", (data) => {
       if (data[1]?.status === "fail") {
         alert(data[1].message);
-        clearTimeout(loadError);
         return resolve(false);
       }
       // 방 입장 핸들러
@@ -104,34 +130,7 @@ export const sendEvent = async (handlerId, payload) => {
       } else if (data[0] === 1002) {
         updateRooms(data[1].rooms);
       }
-      if(data[0] === 3001){
-        try{
-          // 타워 합성 핸들러
-          // data[1] : { uuid, type, tier, x, y, removeX, removeY }
-          const payload = data[1];
-          console.log(payload);
-          const { uuid, towerId, tier, x, y, rx, ry } = data[1];
-          // 기존 타워 삭제
-          removeTower(x, y);
-          removeTower(rx, ry);
-          // 상위 타워 생성
-          setNewTower({towerid : towerId, x : x, y : y, gold : 0, tier: tier});
-        }catch(err){
-          console.log(err);
-        }
-      }else if(data[0] === 3002){
-        // 타워 강화 핸들러
-        // data[1] : { level, remainGold, towerId, uuid }
-        const { level, remainGold, towerId, uuid } = data[1];
-        console.log(data[1]);
-        
-        setUserGold(remainGold);
-      }
-      // 타워 핸들러
-      if(data[0] === 4001){
-        setNewTower(data[1]);
-      } 
-      clearTimeout(loadError);
+    
       return resolve(true);
     });
   });

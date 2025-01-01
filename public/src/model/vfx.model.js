@@ -1,5 +1,5 @@
 export class Vfx {
-  constructor(Animations, x, y , size, width = 80, height = 80, animationSpeed = 20) {
+  constructor(Animations, x, y , size, animationSpeed, width = 80, height = 80) {
     // 이미지 크기
     this.width = width;
     this.height = height;
