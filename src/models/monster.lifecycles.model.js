@@ -281,7 +281,7 @@ export default class MonsterLifecycles {
       this.io.emit(this.gameId, {
         message: { 
           eventName: "deleteMonster",
-          monster: monster.uuid
+          monster: monster
         }
       }); // 클라이언트에게 ping 전송
 

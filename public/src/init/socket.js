@@ -8,6 +8,7 @@ import {
   updateUserInfo,
 } from "../../lobby.js";
 import Monsters from "../model/monsterSpawner.js";
+import { settingAttack } from "../model/towerBase.model.js";
 import { removeTower, setNewTower } from "../model/tower.js";
 
 let userId = null;
@@ -57,6 +58,10 @@ socket.on("ready", (data) => {
 
 socket.on("room", (data) => {
   updateUser(data);
+});
+
+socket.on("attack", (data) => {
+  settingAttack(data);
 });
 
 // 방이 파괴되었을 시 
@@ -121,7 +126,7 @@ export const sendEvent = async (handlerId, payload) => {
       // 타워 핸들러
       if(data[0] === 4001){
         setNewTower(data[1]);
-      }
+      } 
       clearTimeout(loadError);
       return resolve(true);
     });

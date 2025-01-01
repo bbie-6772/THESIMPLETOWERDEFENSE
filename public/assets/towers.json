@@ -5,9 +5,9 @@
     {
       "id": 1,
       "type": 0,
-      "damage": 100,
+      "damage": 10,
       "target": 1,
-      "range": 100,
+      "range": 500,
       "cost": 100,
       "cooldown": 500,
       "image": "../assets/images/towerSingle.png"
@@ -15,9 +15,9 @@
     {
       "id": 2,
       "type": 1,
-      "damage": 100,
+      "damage": 10,
       "target": 2,
-      "range": 50,
+      "range": 250,
       "cost": 100,
       "cooldown": 500,
       "image": "../assets/images/towerMulti.png"
@@ -25,9 +25,9 @@
     {
       "id": 3,
       "type": 2,
-      "damage": 50,
+      "damage": 10,
       "target": 1,
-      "range": 100,
+      "range": 500,
       "cost": 100,
       "cooldown": 500,
       "image": "../assets/images/towerSplash.png"

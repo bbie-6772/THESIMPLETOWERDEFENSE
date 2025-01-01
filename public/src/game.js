@@ -10,9 +10,9 @@ import {
 import { loadGameAssets } from "./init/assets.js";
 import { getSocket, getRoom } from "./init/socket.js";
 import Monsters from "./model/monsterSpawner.js";
-import { loadMonsterImages, GetMonsterAnimation, } from "./model/monsterAnimations.model.js"
-import { loadVfxImages, GetVfxAnimation, GetVfxAnimations } from "./model/vfxAnimations.model.js";
-import { initTowerBase, towerDraw } from "./model/towerBase.model.js";
+import {loadMonsterImages, GetMonsterAnimation, } from "./model/monsterAnimations.model.js"
+import { loadVfxImages, GetVfxAnimation, GetVfxAnimations} from "./model/vfxAnimations.model.js";
+import { initTowerBase, towerDraw, setBaseImage } from "./model/towerBase.model.js";
 import { setGameCanvas } from "./model/gameCanva.model.js";
 import { getUserGold, getScore, getHighScore, setScore, setUserGold } from "./model/userInterface.model.js";
 import { intiChat } from "./chat/chat.js";
@@ -311,6 +311,7 @@ function gameLoop() {
         // 이곳에 애니 메이션 추가하자.
         monster.updateAnimation();
 
+        vfx = monsterSpawner.vfxs
         // 이팩트 그리기
         for (let value of vfx) {
           value.draw(ctx);
@@ -326,15 +327,13 @@ function gameLoop() {
           }
         }
 
-      } else {
-        // 이펙트 추가
-        const vfxCount = Object.keys(GetVfxAnimations()).length;
-        const randomVfx = Math.floor(Math.random() * (vfxCount));
-        vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y, monster.size))
-        
-        monsterSpawner.sendMonsterDamageMessage(monster.uuid, 10000);
-        /* 몬스터가 죽었을 때 */
-        monsters.splice(i, 1);
+      // } else {
+      //   // 이펙트 추가
+      //   const vfxCount = Object.keys(GetVfxAnimations()).length;
+      //   const randomVfx = Math.floor(Math.random() * (vfxCount));
+      //   vfx.push(new Vfx(GetVfxAnimation(randomVfx), monster.x, monster.y, monster.size))
+      //   /* 몬스터가 죽었을 때 */
+      //   monsters.splice(i, 1);
       }
     }
   }
@@ -366,6 +365,7 @@ async function initGame() {
   placeBase();
   // 버튼 배치
   placeInitButtons();
+  setBaseImage();
   //타워 배치 설정
   initTowerBase();
 
