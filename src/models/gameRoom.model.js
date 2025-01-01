@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import LocationSyncManager from "../manager/LocationSyncManager.js";
 
 let gameRooms = [];
 
@@ -29,6 +30,9 @@ export const addRoom = (userId, gameName, password, difficult) => {
         }
 
         gameRooms.push(room)
+
+        LocationSyncManager.initialize
+
         return true 
     } catch (err) {
         console.log(err)
