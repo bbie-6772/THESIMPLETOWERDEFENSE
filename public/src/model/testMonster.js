@@ -34,6 +34,11 @@ export class TestMonster {
     this.attackPower = 10 + 1 * level; // 몬스터의 공격력 (기지에 가해지는 데미지)
   }
 
+  // 이미지 플립 상태 setter
+  setFlipped(bool) {
+    this.isFlipped = bool;
+  }
+
   move(base) {
     if (this.currentIndex < this.path.length - 1) {
       const nextPoint = this.path[this.currentIndex + 1];
