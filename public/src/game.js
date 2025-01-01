@@ -273,6 +273,7 @@ function gameLoop() {
     monsterLevel = monsterSpawner.getInfo().wave;
   }
 
+  ctx.textAlign = "left";
   ctx.font = "25px Times New Roman";
   ctx.fillStyle = "skyblue";
   ctx.fillText(`최고 기록: ${getHighScore()}`, 100, 50); // 최고 기록 표시
