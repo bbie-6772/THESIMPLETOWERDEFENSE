@@ -21,7 +21,7 @@ export default class Monsters {
   // 싱글턴(아님)
   static getInstance = (socket = null, gameId = null) => {
     //console.log(`접속한 소켓 : ${socket.id} `)
-    return new Monsters(socket, gameId)
+    return new Monsters(socket, gameId);
   };
 
   // 초기화
@@ -46,12 +46,14 @@ export default class Monsters {
 
   spawnMonster(monster) {
     this.monsters.push(monster);
+    this.monsterAliveCountUpdate();
   }
 
   deleteMonster(uuid) {
     const index = this.monsters.findIndex((obj) => obj.uuid === uuid);
     if (index !== -1) {
       this.monsters.splice(index, 1); // 해당 인덱스의 객체를 삭제
+      this.monsterAliveCountUpdate();
     }
   }
 
@@ -59,15 +61,18 @@ export default class Monsters {
     return this.monsters;
   }
 
-  // 데미지 테스트 - 테스트입니다
-  sendMonsterDamageMessage(uuid, damage) {
-    this.socket.emit(this.gameId, {
-      message: {
-        eventName: "monsterDamageMessage",
-        uuid: uuid,
-        damage: damage,
-      },
-    });
+
+
+  // 생존 몬스터 카운터.
+  monsterAliveCountUpdate() {
+    if (this.monsters.length !== 0) {
+      this.socket.emit(this.gameId, {
+        message: {
+          eventName: "monsterAliveCountUpdate",
+          aliveCount: this.monsters.length,
+        },
+      });
+    }
   }
 
   // 서버 -> 클라 메세지.
@@ -87,34 +92,36 @@ export default class Monsters {
       }
 
       // 공격 당했을때 몬스터 체력 갱신.
-      if(data.message.eventName === "monsterDamaged") {
+      if (data.message.eventName === "monsterDamaged") {
         const monsterUuid = data.message.monster.uuid;
         const monsterHealht = data.message.monster.stat.health;
-        const index = this.monsters.findIndex(monster  => monster.uuid === monsterUuid);
-        
+        const index = this.monsters.findIndex(
+          (monster) => monster.uuid === monsterUuid,
+        );
+
         this.monsters[index].hp = monsterHealht;
 
         const vfxCount = Object.keys(GetVfxAnimations()).length;
-        const randomVfx = Math.floor(Math.random() * (vfxCount));
+        const randomVfx = Math.floor(Math.random() * vfxCount);
 
         const x = data.message.monster.x;
         const y = data.message.monster.y;
         const size = 1;
         const speed = 6;
-        this.vfxs.push(new Vfx(GetVfxAnimation(randomVfx), x, y, size, speed))
+        this.vfxs.push(new Vfx(GetVfxAnimation(randomVfx), x, y, size, speed));
       }
 
       // 몬스터 삭제
       if (data.message.eventName === "deleteMonster") {
         this.deleteMonster(data.message.monster.uuid);
         const vfxCount = Object.keys(GetVfxAnimations()).length;
-        const randomVfx = Math.floor(Math.random() * (vfxCount));
+        const randomVfx = Math.floor(Math.random() * vfxCount);
 
         const x = data.message.monster.x;
         const y = data.message.monster.y;
         const size = data.message.monster.size;
         const speed = 6;
-        this.vfxs.push(new Vfx(GetVfxAnimation(randomVfx), x, y, size, speed))
+        this.vfxs.push(new Vfx(GetVfxAnimation(randomVfx), x, y, size, speed));
       }
 
       // 핑퐁
