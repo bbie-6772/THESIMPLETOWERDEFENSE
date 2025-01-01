@@ -100,6 +100,10 @@ export const getRoom = (userId) => {
     return gameRooms.find((e) => e.userId1 === userId || e.userId2 === userId)
 }
 
+export const getRoomFromGameId = (gameId) => {
+    return gameRooms.find((e) => e.gameId === gameId);
+}
+
 export const getRooms = () => {
     return gameRooms
 }

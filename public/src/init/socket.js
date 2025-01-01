@@ -9,7 +9,6 @@ import {
   updateRank,
   getCountBar
 } from "../../lobby.js";
-import Monsters from "../model/monsterSpawner.js";
 import { settingAttack } from "../model/towerBase.model.js";
 import { removeTower, setNewTower, sellTower } from "../model/tower.js";
 import { setUserGold, MonsterCount } from "../model/userInterface.model.js";
@@ -52,33 +51,33 @@ socket.once("connection", (data) => {
 });
 
 socket.on("response", (data) => {
-  // console.log(`socket.js:51 - handlerId : ${data[0]} response : ${data[1]}`);
   // 타워 핸들러
   if (data[1]?.status === "fail") return;
 
   if(data[0] === 4001){
-    // console.log(`socket.js:132 - tower place received : ${data[1]}`);
+    // data[1] : { gold, tier, towerId, userId, x, y }
+    var { gold, tier, towerId, uuid, x, y } = data[1];
     setNewTower(data[1]);
+    if(uuid === userId)
+      setUserGold(gold);
   } 
 
   if(data[0] === 3001){
     // 타워 합성 핸들러
-    // data[1] : { uuid, type, tier, x, y, removeX, removeY }
-    const payload = data[1];
-    console.log(payload);
+    // data[1] : { uuid, towerId, tier, x, y, removeX, removeY }
     const { uuid, towerId, tier, x, y, rx, ry } = data[1];
     // 기존 타워 삭제
     removeTower(x, y);
     removeTower(rx, ry);
     // 상위 타워 생성
-    setNewTower({towerid : towerId, x : x, y : y, gold : 0, tier: tier});
+    setNewTower({towerid : towerId, x : x, y : y, tier: tier});
   } else if(data[0] === 3002){
     // 타워 강화 핸들러
     // data[1] : { level, remainGold, towerId, uuid }
     const { level, remainGold, towerId, uuid } = data[1];
-    console.log(`socket.js:73 - ${data[1]}`);
     setUserGold(remainGold);
-  } else if (data[0] === 3003) {
+  } 
+  else if (data[0] === 3003) {
     const { newGold, x, y } = data[1];
     //타워 판매 핸들러
     sellTower(x, y, newGold);
@@ -108,6 +107,13 @@ socket.on('leaveRoom', (data) => {
   socket.emit('leaveRoom', { roomId: data.roomId })
 }) 
 
+socket.on("gold", (data) => {
+  if(data.user1 === userId){
+    setUserGold(data.gold1);
+  }else if(data.user2 === userId){
+    setUserGold(data.gold2);
+  }
+})
 
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
 export const sendEvent = async (handlerId, payload) => {
@@ -140,7 +146,7 @@ export const sendEvent = async (handlerId, payload) => {
       return resolve(true);
     });
   });
-  return log;
+return log;
 };
 
 socket.on("monsterCount", (data) => {
@@ -166,3 +172,6 @@ export const getRoom = () => {
   return roomId
 }
 
+export const getUserId = () => {
+  return userId;
+}

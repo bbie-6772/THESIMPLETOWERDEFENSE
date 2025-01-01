@@ -224,14 +224,6 @@ function gameLoop() {
     console.warn("monsterPath가 유효하지 않습니다.");
   }
 
-  // 점수 바꾸기
-  if (Object.keys(monsterSpawner.getInfo()).length !== 0) {
-    setScore(monsterSpawner.getInfo().score);
-    setUserGold(monsterSpawner.getInfo().gold);
-    monsterLevel = monsterSpawner.getInfo().wave;
-  }
-
-  ctx.textAlign = "left";
   ctx.font = "25px Times New Roman";
 
 
@@ -249,18 +241,11 @@ function gameLoop() {
   // ctx.fillStyle = "yellow";
   // ctx.fillText(`엔드타이머: ${test}`, 100 , 450); // 최고 기록 표시
 
-
-
-  getButtons().forEach((button) => {
-    button.draw(ctx);
-  });
   towerDraw(ctx);
   // 타워 그리기 및 몬스터 공격 처리
 
   // 몬스터가 공격을 했을 수 있으므로 기지 다시 그리기
   // base.draw(ctx, baseImage);
-  //마우스를 따라가는 아이콘을 그리는 기능
-  drawmousePoint(ctx);
 
   // 리스폰되기전에 돌던문제.
   // 배열, 길이가 0 이상일때만 반복문 도는것을 허용.
@@ -282,10 +267,13 @@ function gameLoop() {
       if (vfx.isFinished === true) {
         vfx.splice(i, 1);
       }
-
     }
-
   }
+  getButtons().forEach((button) => {
+    button.draw(ctx);
+  });
+  //마우스를 따라가는 아이콘을 그리는 기능
+  drawmousePoint(ctx);
 
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }

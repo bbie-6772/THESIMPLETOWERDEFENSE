@@ -1,8 +1,7 @@
 import Monsters from "./monsterSpawner.js";
 import { getGameAssets } from "../init/assets.js";
 import { setTowerBase } from "./towerBase.model.js";
-import { setUserGold, getUserGold } from "./userInterface.model.js";
-import { gettowerBaseWidth, gettowerBaseheight } from "./towerBase.model.js";
+import { setUserGold } from "./userInterface.model.js";
 import { getGameCanvas } from "./gameCanva.model.js";
 var towers = [];
 
@@ -110,7 +109,7 @@ export const GetTowerCoordinateFromGrid = (x, y) => {
 };
 //return { status: 'success',towerid: towers.data[getRandomTower].id, x: X, y: Y, gold };
 export const setNewTower = (data) => {
-  const { userId, towerid, x, y, gold, tier } = data;
+  const { userId, towerid, x, y, tier } = data;
   //const {towers} = getGameAssets();
   console.log(towerid);
   const tmpTower = getGameAssets().towers.data.find((element) => {
@@ -130,7 +129,6 @@ export const setNewTower = (data) => {
   );
   towers.push(newtower);
   setTowerBase(x, y, newtower);
-  setUserGold(gold);
 };
 
 export const removeTower = (x, y) => {
