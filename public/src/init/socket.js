@@ -6,18 +6,20 @@ import {
   gameStart,
   exitRoom,
   updateUserInfo,
-  updateRank
+  updateRank,
+  getCountBar
 } from "../../lobby.js";
 import Monsters from "../model/monsterSpawner.js";
 import { settingAttack } from "../model/towerBase.model.js";
 import { removeTower, setNewTower, sellTower } from "../model/tower.js";
-import { setUserGold } from "../model/userInterface.model.js";
+import { setUserGold, MonsterCount } from "../model/userInterface.model.js";
 
 let userId = null;
 let nickname = null;
 let highScoreS = null;
 let highScoreM = null;
 let roomId = null;
+let monsterCount = null;
 
 const token = localStorage.getItem("access-Token");
 // 로그인이 안되어있을 시 로그인 창으로
@@ -101,9 +103,11 @@ socket.on("attack", (data) => {
 // 방이 파괴되었을 시 
 socket.on('leaveRoom', (data) => {
   roomId = null
+  monsterCount = null
   exitRoom()
   socket.emit('leaveRoom', { roomId: data.roomId })
 }) 
+
 
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
 export const sendEvent = async (handlerId, payload) => {
@@ -125,6 +129,8 @@ export const sendEvent = async (handlerId, payload) => {
       if (data[0] === 1001) {
         updateRoomInfo(data[1].room);
         updateUser(data[1].room);
+        monsterCount = new MonsterCount(data[1].room.monsterCount, getCountBar())
+        monsterCount.updateCountBar()
         roomId = data[1].room.gameId
         // 방 로딩 핸들러
       } else if (data[0] === 1002) {
@@ -136,6 +142,10 @@ export const sendEvent = async (handlerId, payload) => {
   });
   return log;
 };
+
+socket.on("monsterCount", (data) => {
+  if (monsterCount) monsterCount.update(data)
+})
 
 // 준비 신호
 export const ready = (roomId, single) => {
