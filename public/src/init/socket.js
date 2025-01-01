@@ -103,7 +103,6 @@ socket.on('leaveRoom', (data) => {
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
 export const sendEvent = async (handlerId, payload) => {
   const log = await new Promise((resolve, reject) => {
-    console.log("보냄")
     socket.emit("event", {
       userId,
       token,

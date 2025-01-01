@@ -94,7 +94,6 @@ export const towerDraw = (ctx) => {
   }
   for (let i = 0; i < attackMissile.length; i++) {
     const singleMissile = attackMissile[i].data;
-    console.log(singleMissile);
     const attackingTower = singleMissile.tower;
     const attackingTarget = singleMissile.target;
     ctx.beginPath();

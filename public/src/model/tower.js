@@ -84,10 +84,8 @@ export const GetTowerFromCoordinate = (x, y) => {
   const scaleX = gameCanvas.Xscale; // 가로 스케일
   const scaleY = gameCanvas.Yscale; // 세로 스케일
 
-  console.log(x, y);
   return towers.find((e) => {
     const { xPosition, yPosition } = GetTowerCoordinateFromGrid(e.x, e.y);
-    console.log(e.x, e.y, xPosition, yPosition);
     return (
       xPosition * scaleX < x &&
       xPosition * scaleX > x - e.width &&
