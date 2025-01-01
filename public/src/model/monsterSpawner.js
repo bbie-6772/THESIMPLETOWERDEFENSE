@@ -86,12 +86,35 @@ export default class Monsters {
         this.spawnMonster(test);
       }
 
+      // 공격 당했을때 몬스터 체력 갱신.
+      if(data.message.eventName === "monsterDamaged") {
+        const monsterUuid = data.message.monster.uuid;
+        const monsterHealht = data.message.monster.stat.health;
+        const index = this.monsters.findIndex(monster  => monster.uuid === monsterUuid);
+        
+        this.monsters[index].hp = monsterHealht;
+
+        const vfxCount = Object.keys(GetVfxAnimations()).length;
+        const randomVfx = Math.floor(Math.random() * (vfxCount));
+
+        const x = data.message.monster.x;
+        const y = data.message.monster.y;
+        const size = 1;
+        const speed = 6;
+        this.vfxs.push(new Vfx(GetVfxAnimation(randomVfx), x, y, size, speed))
+      }
+
       // 몬스터 삭제
       if (data.message.eventName === "deleteMonster") {
         this.deleteMonster(data.message.monster.uuid);
         const vfxCount = Object.keys(GetVfxAnimations()).length;
         const randomVfx = Math.floor(Math.random() * (vfxCount));
-        this.vfxs.push(new Vfx(GetVfxAnimation(randomVfx), data.message.monster.x, data.message.monster.y, data.message.monster.size))
+
+        const x = data.message.monster.x;
+        const y = data.message.monster.y;
+        const size = data.message.monster.size;
+        const speed = 6;
+        this.vfxs.push(new Vfx(GetVfxAnimation(randomVfx), x, y, size, speed))
       }
 
       // 핑퐁

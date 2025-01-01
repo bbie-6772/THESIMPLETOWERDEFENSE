@@ -311,21 +311,21 @@ function gameLoop() {
         // 이곳에 애니 메이션 추가하자.
         monster.updateAnimation();
 
-        vfx = monsterSpawner.vfxs
-        // 이팩트 그리기
-        for (let value of vfx) {
-          value.draw(ctx);
-        }
+        // vfx = monsterSpawner.vfxs
+        // // 이팩트 그리기
+        // for (let value of vfx) {
+        //   value.draw(ctx);
+        // }
 
-        // 이펙트 삭제 
-        if (vfx.length !== 0) {
-          const index = vfx.findIndex(vfx => vfx.isFinished === true);
+        // // 이펙트 삭제 
+        // if (vfx.length !== 0) {
+        //   const index = vfx.findIndex(vfx => vfx.isFinished === true);
 
-          if (index !== -1) {
-            // 해당 인덱스를 찾아서 배열에서 삭제
-            vfx.splice(index, 1);
-          }
-        }
+        //   if (index !== -1) {
+        //     // 해당 인덱스를 찾아서 배열에서 삭제
+        //     vfx.splice(index, 1);
+        //   }
+        // }
 
       // } else {
       //   // 이펙트 추가
@@ -336,6 +336,18 @@ function gameLoop() {
       //   monsters.splice(i, 1);
       }
     }
+
+    vfx = monsterSpawner.vfxs;
+    for (let i = vfx.length - 1; i >= 0; i--) {
+      const temp = vfx[i];
+      temp.draw(ctx);
+
+      if(vfx.isFinished === true){
+        vfx.splice(i, 1);
+      }
+
+    }
+
   }
 
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함

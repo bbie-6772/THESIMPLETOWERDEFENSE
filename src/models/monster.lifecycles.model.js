@@ -218,7 +218,6 @@ export default class MonsterLifecycles {
       }
       
       if (pingPong === 0 || pingPong === undefined) {
-        console.log("이게 왜 됨")
         clearInterval(interval); // 응답 없으면 타이머 종료
       }
     }, 1000); // 1초마다 체크
@@ -265,6 +264,14 @@ export default class MonsterLifecycles {
 
     // 업데이트를 갱신.
     monster = this.monsterStorage.getMonster(this.gameId, monsterUuid);
+
+    // 몬스터 채력 클라에 보내기.
+    this.io.emit(this.gameId, {
+      message: { 
+        eventName: "monsterDamaged",
+        monster: monster
+      }
+    }); // 클라이언트에게 ping 전송
     
     // 삭제 검사. 
     this.removeMonster(monster);
