@@ -303,6 +303,14 @@ export const updateRooms = (roomsInfo) => {
 
 // 게임 시작 
 export const gameStart = () => {
+    
+      document.getElementById('gold').style.display = "block";
+      document.getElementById('curLevel').style.display = "block";
+      document.getElementById('endTimer').style.display = "block";
+      document.getElementById('divgold').style.display = "block";
+      document.getElementById('divcurLevel').style.display = "block";
+      document.getElementById('divendTimer').style.display = "block";
+
     waitRoom.hide();
 
     import(`./src/game.js?${new Date().getTime()}`).then(module => {
@@ -323,6 +331,14 @@ export const gameStart = () => {
 
 // 게임 오버,끝
 export const gameOver = () => {
+    
+      document.getElementById('gold').style.display = "none";
+      document.getElementById('curLevel').style.display = "none";
+      document.getElementById('endTimer').style.display = "none";
+      document.getElementById('divgold').style.display = "none";
+      document.getElementById('divcurLevel').style.display = "none";
+      document.getElementById('divendTimer').style.display = "none";
+
     console.log(game);
     game = null;
     gameFrame.style.display = "none"

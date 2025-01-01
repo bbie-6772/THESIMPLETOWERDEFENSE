@@ -25,10 +25,9 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const monsterSpawner = Monsters.getInstance(getSocket(), getRoom())
 
-
-const divgold = document.createElement('div');
-const divcurlevel = document.createElement('div');
-const divendTimer = document.createElement('div');
+const divgold = document.getElementById('divgold');
+const divcurlevel = document.getElementById('divcurLevel');
+const divendTimer = document.getElementById('divendTimer');
 
 // #region 위치동기화 받기
 monsterSpawner.socket.on("locationSync", (data) => {
@@ -295,20 +294,6 @@ async function initGame() {
   if (isInitGame) {
     //return;
   }
-
-  let gold = document.getElementById('gold');
-  let curLevel = document.getElementById('curLevel');
-  let endTimer = document.getElementById('endTimer');
-
-  gold.style.display = "block";
-  curLevel.style.display = "block";
-  endTimer.style.display = "block";
-
-  gold.append(divgold);
-  curLevel.append(divcurlevel);
-  endTimer.append(divendTimer);
-
-
 
   gameAssets = await loadGameAssets();
 
