@@ -43,6 +43,7 @@ export const placeTower = (userId, payload, socket) => {
       y: Y,
       gold: changedgold,
       tier: 1,
+      roomcast: true,
     };
   } catch (err) {
     return { status: "fail", message: err.message };

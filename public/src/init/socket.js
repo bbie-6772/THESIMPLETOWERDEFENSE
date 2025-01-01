@@ -48,6 +48,12 @@ socket.once("connection", (data) => {
 });
 
 socket.on("response", (data) => {
+  // console.log(`socket.js:51 - handlerId : ${data[0]} response : ${data[1]}`);
+  // 타워 핸들러
+  if(data[0] === 4001){
+    console.log(`socket.js:132 - tower place received`);
+    setNewTower(data[1]);
+  } 
 });
 
 socket.on("ready", (data) => {
@@ -127,10 +133,7 @@ export const sendEvent = async (handlerId, payload) => {
         
         setUserGold(remainGold);
       }
-      // 타워 핸들러
-      if(data[0] === 4001){
-        setNewTower(data[1]);
-      } 
+      
       clearTimeout(loadError);
       return resolve(true);
     });

@@ -240,8 +240,14 @@ export const handlerEvent = (io, socket, data) => {
             return;
         }
 
+        else if(response.roomcast) {
+            const gameId = getRoom(data.userId).gameId;
+            io.to(gameId).emit('response', [data.handlerId, response]);
+            // console.log(`helper.js:246 - ${data.userId}, ${gameId}, ${getRooms()}`);
+        }
+
         // 대상 유저에게만 보냄
-        socket.emit('response', [data.handlerId, response]);
+        else socket.emit('response', [data.handlerId, response]);
 
     } catch (err) {
         console.log(err)
