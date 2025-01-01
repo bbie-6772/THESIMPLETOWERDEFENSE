@@ -66,17 +66,12 @@ export const TowerSell = (uuid, payload) => {
     if (!room) return { status: 'fail', message: '유저를 찾을 수 없습니다' };
 
     // 타워가 유효한지 검사 (타워가 존재하는지)
-    const tower = towerModel.getUsersTower(uuid, x, y);
+    const tower = towerModel.currentTowerStat(uuid, x, y);
     if (!tower) return { status: 'fail', message: '타워를 찾을 수 없습니다' };
 
-    // 타워 정보 가져오기
-    const gameAssetsTowers = getGameAssets().towers;
-    const currentTower = gameAssetsTowers.data.find((element) => {
-        return element.id === tower.towerId;
-    });
 
     // 판매 시 보상 계산 70%
-    const sellPrice = Math.floor(currentTower.cost * 0.7);
+    const sellPrice = Math.floor(tower.cost * 0.7);
 
     // 타워 제거
     towerModel.removeUsersTower(uuid, x, y);
