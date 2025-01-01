@@ -42,3 +42,12 @@ export const deleteUser = (socketId) => {
     return Object.assign(...users.splice(idx, 1));
   } else return false;
 };
+
+export const resetUser = (userId)=>{
+  const user = getUser(userId);
+  
+  user.gold = 500;
+  user.monsterKill = 0;
+  user.totalDamage = 0;
+  user.upgrades = {};
+}
