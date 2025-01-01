@@ -33,15 +33,9 @@ export class MonsterCount {
         this.countBar = countBar;
     }
 
-    // 몬스터 수 감소
-    down(amount) {
-        this.currentCount = Math.max(0, this.currentCount - amount);
-        this.updateCountBar();
-    }
-
-    // 몬스터 수 증가
-    up(amount) {
-        this.currentCount = Math.min(this.maxCount, this.currentCount + amount);
+    // 몬스터 수 설정
+    update(amount) {
+        this.currentCount = Math.max(0, amount);
         this.updateCountBar();
     }
 

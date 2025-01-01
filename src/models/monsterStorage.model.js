@@ -85,7 +85,7 @@ export default class MonsterStorage {
       // console.log("정보가 존재하지 않습니다.");
       return;
     }
-
+    
     // 정보  업데이트
     this.info[id] = {
       ...this.info[id],

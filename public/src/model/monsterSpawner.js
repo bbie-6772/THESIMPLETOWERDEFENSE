@@ -62,17 +62,17 @@ export default class Monsters {
   }
 
 
-
   // 생존 몬스터 카운터.
   monsterAliveCountUpdate() {
-    if (this.monsters.length !== 0) {
-      this.socket.emit(this.gameId, {
-        message: {
-          eventName: "monsterAliveCountUpdate",
-          aliveCount: this.monsters.length,
-        },
-      });
-    }
+    // if (this.monsters.length !== 0) {
+    //   this.socket.emit(this.gameId, {
+    //     message: {
+    //       eventName: "monsterAliveCountUpdate",
+    //       aliveCount: this.monsters.length,
+    //     },
+    //   });
+    // }
+    console.log("클라", this.monsters.length)
   }
 
   // 서버 -> 클라 메세지.

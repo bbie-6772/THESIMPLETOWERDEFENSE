@@ -103,9 +103,11 @@ socket.on("attack", (data) => {
 // 방이 파괴되었을 시 
 socket.on('leaveRoom', (data) => {
   roomId = null
+  monsterCount = null
   exitRoom()
   socket.emit('leaveRoom', { roomId: data.roomId })
 }) 
+
 
 // 클라이언트에서 총합적으로 server에 보내주는걸 관리
 export const sendEvent = async (handlerId, payload) => {
@@ -140,6 +142,10 @@ export const sendEvent = async (handlerId, payload) => {
   });
   return log;
 };
+
+socket.on("monsterCount", (data) => {
+  if (monsterCount) monsterCount.update(data)
+})
 
 // 준비 신호
 export const ready = (roomId, single) => {

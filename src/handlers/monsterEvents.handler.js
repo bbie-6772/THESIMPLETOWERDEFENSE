@@ -23,9 +23,7 @@ export const receiveMonsterMessage = (io, socket) => {
       monsters.eventNameInitializer(data);
       socket.emit("monsterEventInit", monsterStorage.getInfo(data.message.gameId));
     }
-
-
-    monsters.monsterAliveCountUpdate();
+    
     monsters.sendRespawnPing();
 
     //#region locationSyncManager 싱크 시작
