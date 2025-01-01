@@ -273,10 +273,12 @@ export default class MonsterLifecycles {
   }
 
 
-  //====[몬스터 체력 업데이트]====//
-  updateMonsterHealth(monsterUuid, data) {
-    let monster = this.monsterStorage.getMonster(this.gameId, monsterUuid);
 
+  //====[몬스터 체력 업데이트]====// 
+  updateMonsterHealth(monsterUuid, data, gameId = this.gameId) {
+    
+    let monster = this.monsterStorage.getMonster(gameId, monsterUuid);
+    
     // 몬스터 유효성 검사.
     if (!monster || Object.keys(monster).length === 0) return;
 
@@ -289,7 +291,6 @@ export default class MonsterLifecycles {
     });
 
     // 업데이트를 갱신.
-    monster = this.monsterStorage.getMonster(this.gameId, monsterUuid);
 
     // 몬스터 채력 클라에 보내기.
     this.io.emit(this.gameId, {
@@ -300,6 +301,7 @@ export default class MonsterLifecycles {
     }); // 클라이언트에게 ping 전송
 
     // 삭제 검사.
+    monster = this.monsterStorage.getMonster(gameId, monsterUuid);
     this.removeMonster(monster);
   }
 
