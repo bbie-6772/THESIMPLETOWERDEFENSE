@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="author" content="Changmin Kang" />
-    <title>내일배움캠프 Node.js 트랙 타워 디펜스 게임</title>
+    <title>타워 디펜스 게임</title>
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
     <style>
       body {
@@ -15,18 +15,6 @@
         margin: 0;
         background-color: #2d2d2d;
         flex-direction: column;
-      }
-      #gameCanvas {
-        border: 2px solid #000;
-        display: none;
-        position:absolute;
-        z-index: 1;
-      }
-      #debugCanvas{
-        display:block;
-        position: absolute;
-        z-index: 2;
-        pointer-events: none;
       }
       .button-container {
         display: flex;
@@ -43,12 +31,10 @@
   </head>
   <body>
     <div class="button-container">
-      <h1 style="color: white">내일배움캠프 Node.js 트랙 타워 디펜스 게임</h1>
+      <h1 style="color: white">THE SIMPLE TOWER DEFENSE</h1>
       <button id="registerButton">회원가입</button>
       <button id="loginButton">로그인</button>
     </div>
-    <canvas id="gameCanvas" width="1920" height="1080"></canvas>
-    <canvas id="debugCanvas" width="1920" height="1080"></canvas>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script type="module">
       document
