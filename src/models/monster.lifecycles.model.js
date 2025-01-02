@@ -380,8 +380,6 @@ export default class MonsterLifecycles {
         gold: gold + monstergoid * wave,
       });
 
-      monsterAliveCountUpdate()
-
       // 정보를 게임룸에 전송.
       roomInfoUpdate(
         this.gameId,

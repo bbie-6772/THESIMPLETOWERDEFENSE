@@ -16,6 +16,7 @@ import { initTowerBase, towerDraw, setBaseImage } from "./model/towerBase.model.
 import { setGameCanvas } from "./model/gameCanva.model.js";
 import { getUserGold, getScore, getHighScore, setScore, setUserGold } from "./model/userInterface.model.js";
 import { intiChat } from "./chat/chat.js";
+import { getAttackMissile } from "./model/towerBase.model.js";
 
 import { Vfx } from "./model/vfx.model.js";
 /* 
@@ -23,11 +24,15 @@ import { Vfx } from "./model/vfx.model.js";
 */
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-const monsterSpawner = Monsters.getInstance(getSocket(), getRoom())
+export const monsterSpawner = Monsters.getInstance(getSocket(), getRoom())
 
 const divgold = document.getElementById('divgold');
 const divcurlevel = document.getElementById('divcurLevel');
 const divendTimer = document.getElementById('divendTimer');
+
+let previousTime = 0;
+let currentTime = 0;
+let deltaTime = 0;
 
 // #region 위치동기화 받기
 monsterSpawner.socket.on("locationSync", (data) => {
@@ -213,6 +218,11 @@ function placeBase() {
 }
 
 function gameLoop() {
+  currentTime = Date.now();
+  deltaTime = currentTime - previousTime;
+  if (deltaTime > 10000) deltaTime = 0;
+  previousTime = currentTime;
+
   monsters = monsterSpawner.getMonsters();
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
@@ -231,24 +241,8 @@ function gameLoop() {
   divcurlevel.innerText = monsterLevel;
   divendTimer.innerText = monsterSpawner.getInfo().endTimer;
 
-
-  // ctx.fillStyle = "yellow";
-  // ctx.fillText(`골드: ${getUserGold()}`, 100, 350); // 골드 표시
-  // ctx.fillStyle = "black";
-  // ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 400); // 최고 기록 표시
-
-  // const test = monsterSpawner.getInfo().endTimer;
-  // ctx.fillStyle = "yellow";
-  // ctx.fillText(`엔드타이머: ${test}`, 100 , 450); // 최고 기록 표시
-
   towerDraw(ctx);
-  // 타워 그리기 및 몬스터 공격 처리
 
-  // 몬스터가 공격을 했을 수 있으므로 기지 다시 그리기
-  // base.draw(ctx, baseImage);
-
-  // 리스폰되기전에 돌던문제.
-  // 배열, 길이가 0 이상일때만 반복문 도는것을 허용.
   if (Array.isArray(monsters) && monsters.length > 0) {
     for (let i = monsters.length - 1; i >= 0; i--) {
       const monster = monsters[i];
@@ -269,6 +263,26 @@ function gameLoop() {
       }
     }
   }
+
+  const attackMissile = getAttackMissile();
+
+  for (let i = 0; i < attackMissile.length; i++) {
+    const singleMissile = attackMissile[i].data;
+    const attackingTower = singleMissile.tower;
+    // uuid
+    const attackingTarget = monsterSpawner.getMonsters().find((e) => e.uuid === singleMissile.target);
+
+    ctx.beginPath();
+    ctx.moveTo(attackingTower.towerX + 75/2, attackingTower.towerY + 150/2);
+    ctx.lineTo(attackingTarget?.x, attackingTarget?.y);
+    ctx.strokeStyle = "skyblue";
+    ctx.lineWidth = 10;
+    ctx.stroke();
+    ctx.closePath();
+    singleMissile.duration -= deltaTime;
+    if (singleMissile.duration <= 0) attackMissile.splice(i, 1);
+  }
+
   getButtons().forEach((button) => {
     button.draw(ctx);
   });

@@ -96,7 +96,7 @@ socket.on("room", (data) => {
 });
 
 socket.on("selltower", (data) => {
-  const {  x, y} = data;
+  const { x, y} = data;
   console.log(data);
   // 기존 타워 삭제
   removeTower(x, y);

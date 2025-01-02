@@ -102,8 +102,7 @@ export const towerAttackCondtorl = (io, monstercycle) => {
                   tmpTower.type,
                   xPosition,
                   yPosition,
-                  monsters[mosterkey[monstersIndex]].x,
-                  monsters[mosterkey[monstersIndex]].y
+                  monsters[mosterkey[monstersIndex]].uuid,
                 );
               });
               const tmpupgradeuser = getUser((user1towers ?? []).length
@@ -165,14 +164,13 @@ function sendToClient(
   towertype,
   towerX,
   towerY,
-  targetX,
-  targetY,
+  target,
   duration = 1000
 ) {
   socket.emit("attack", {
     type: towertype,
     tower: { towerX, towerY },
-    target: { targetX, targetY },
+    target,
     duration,
   });
 }

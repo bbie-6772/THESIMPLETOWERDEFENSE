@@ -92,20 +92,6 @@ export const towerDraw = (ctx) => {
       }
     }
   }
-  for (let i = 0; i < attackMissile.length; i++) {
-    const singleMissile = attackMissile[i].data;
-    const attackingTower = singleMissile.tower;
-    const attackingTarget = singleMissile.target;
-    ctx.beginPath();
-    ctx.moveTo(attackingTower.towerX + 75/2, attackingTower.towerY + 150/2);
-    ctx.lineTo(attackingTarget.targetX, attackingTarget.targetY);
-    ctx.strokeStyle = "skyblue";
-    ctx.lineWidth = 10;
-    ctx.stroke();
-    ctx.closePath();
-    singleMissile.duration -= deltaTime;
-    if (singleMissile.duration <= 0) attackMissile.splice(i, 1);
-  }
 };
 export const baseColisionCheck = (x, y) => {
   console.log(x,y);
@@ -132,3 +118,7 @@ export const settingAttack = (data) => {
   // target:{targetX, targetY},
   // duration
 };
+
+export const getAttackMissile = () => {
+  return attackMissile
+}
