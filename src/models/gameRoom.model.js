@@ -2,7 +2,11 @@ import { v4 as uuidv4 } from "uuid";
 import LocationSyncManager from "../manager/LocationSyncManager.js";
 import { removeUser } from "./tower.model.js";
 import { setUserGold, resetUser } from "./users.model.js";
+import { prisma } from "../init/prisma.js";
+import { Prisma } from "@prisma/client";
+
 let gameRooms = [];
+let user = null;
 
 export const addRoom = (userId, gameName, password, difficult) => {
     try {
@@ -79,7 +83,7 @@ export const roomGameOverTimerSetting = (gameId) => {
 }
 
 // room 게임오버 타이머 (로비).
-export const getStartTimer = (gameId,io)=> {
+export const getStartTimer = async (gameId,io)=> {
     const index = gameRooms.findIndex((room) => room.gameId === gameId )
     if(index !== -1){
         if(gameRooms[index].startTime <= 0){
@@ -87,7 +91,7 @@ export const getStartTimer = (gameId,io)=> {
                 timer: gameRooms[index].startTime
             });
 
-            const destroyed = destroyRoom(gameRooms[index].userId1);
+            const destroyed = await destroyRoom(gameRooms[index].userId1);
             io.to(destroyed.gameId).emit('leaveRoom', { roomId: destroyed.gameId })
         }
     } else {
@@ -137,10 +141,63 @@ export const leaveRoom = (gameId, userId) => {
     } else return false  
 }
 
-export const destroyRoom = (userId) => {
+export const destroyRoom = async (userId) => {
     const roomIdx = gameRooms.findIndex((e) => e.userId1 === userId || e.userId2 === userId )
-    if (roomIdx !== -1) return Object.assign(...gameRooms.splice(roomIdx, 1))
+    if (roomIdx !== -1) {
+        const room = Object.assign(...gameRooms.splice(roomIdx, 1))
+
+        console.log(room)
+        if (room.user2) {
+            const score = Math.max(user.highScoreM, room.score)
+
+            const result = await prisma.$transaction(async (tx) => {
+                await tx.users.updateMany({
+                    where: { id: room.userId1 || room.userId2 },
+                    data: { highScoreM: score }
+                })
+
+                await tx.ranks.create({
+                    data: {
+                        user1: {
+                            connect: { id: room.userId1 }
+                        },
+                        user2: {
+                            connect: { id: room.userId2 }
+                        },
+                        score: room.score
+                    }
+                })
+            }, {
+                isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+            })  
+
+        } else {
+            const score = Math.max(user.highScoreS, room.score)
+
+            const result = await prisma.$transaction( async (tx) => {
+                await tx.users.update({
+                    where: { id: room.userId1 },
+                    data: { highScoreS: score }
+                })
+
+                await tx.ranks.create({
+                    data: {
+                        user1: {
+                            connect: { id: room.userId1}
+                        },  
+                        score: room.score
+                    }
+                })
+            },{
+                isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+            })  
+        }
+
+        return room
+    }
     else return false
+
+
 }
 
 export const gameReady = (gameId, userId, single) => {
@@ -172,4 +229,8 @@ export const kick = (gameId) => {
     gameRooms[roomIdx].userId2 = null
     
     return gameRooms[roomIdx]
+}
+
+export const userInfo = (userInfo) => {
+    return user = userInfo
 }

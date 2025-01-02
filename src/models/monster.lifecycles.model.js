@@ -203,7 +203,7 @@ export default class MonsterLifecycles {
         this.monsterAliveCountUpdate()
 
         //// 11. 일정 시간 후 메시지 전송 상태를 다시 초기화 (생성 제한 용.)
-        setTimeout(() => {
+        setTimeout(async () => {
           this.isMonsterSpawnActive = false;
 
           const { wave, totalCount, aliveCount, endTimer } = this.monsterStorage.getInfo(this.gameId);
@@ -226,7 +226,7 @@ export default class MonsterLifecycles {
               this.monsterStorage.getInfo(this.gameId).endTimer
             );
 
-            getStartTimer(this.gameId, this.io);
+            await getStartTimer(this.gameId, this.io);
 
             if(this.monsterStorage.getInfo(this.gameId).endTimer <= 0){
               this.terminateRespawn();

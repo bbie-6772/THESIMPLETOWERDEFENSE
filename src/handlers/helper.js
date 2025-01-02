@@ -2,7 +2,7 @@ import { CLIENT_VERSION } from "../constant.js"
 import handlerMappings from "./handler.Mapping.js"
 import { prisma } from "../init/prisma.js";
 import { addUser, getUser, getUsers, deleteUser } from "../models/users.model.js";
-import { getRoom, getRooms, gameReady, destroyRoom, leaveRoom } from "../models/gameRoom.model.js";
+import { getRoom, getRooms, gameReady, destroyRoom, leaveRoom, userInfo } from "../models/gameRoom.model.js";
 import jwt from "jsonwebtoken";
 
 const Auth = (data) => {
@@ -93,6 +93,8 @@ export const handleConnection = async (socket) => {
             });
             return; ``
         }
+
+        userInfo(loginUser)
         //유저 추가
         addUser(loginUser.id, loginUser.nickname, socket.id)
 
@@ -149,7 +151,7 @@ export const handleConnection = async (socket) => {
     }
 }
 
-export const handleDisconnect = (socket, io) => {
+export const handleDisconnect = async (socket, io) => {
     // 유저 존재 확인
     const user = deleteUser(socket.id)
     let room = getRoom(user.userId);
@@ -159,7 +161,7 @@ export const handleDisconnect = (socket, io) => {
     // console.log(room)
     if (room) {
         if (room.startTime > 0) {
-            destroyed = destroyRoom(user.userId)
+            destroyed = await destroyRoom(user.userId)
             io.to(room.gameId).emit('leaveRoom', { roomId: destroyed.gameId })
         } else {
             left = leaveRoom(room.gameId, user.userId)
