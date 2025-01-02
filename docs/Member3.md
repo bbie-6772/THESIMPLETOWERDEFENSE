@@ -1,4 +1,3 @@
-# 황윤석
 ## 구현기능
 ### monster.lifecycles.model.js
 - 몬스터 생성.
