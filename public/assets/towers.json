@@ -1,0 +1,36 @@
+{
+  "name": "tower",
+  "version": "1.0.0",
+  "data": [
+    {
+      "id": 1,
+      "type": 0,
+      "damage": 10,
+      "target": 1,
+      "range": 500,
+      "cost": 100,
+      "cooldown": 500,
+      "image": "../assets/images/towerSingle.png"
+    },
+    {
+      "id": 2,
+      "type": 1,
+      "damage": 10,
+      "target": 2,
+      "range": 250,
+      "cost": 100,
+      "cooldown": 700,
+      "image": "../assets/images/towerMulti.png"
+    },
+    {
+      "id": 3,
+      "type": 2,
+      "damage": 10,
+      "target": 1,
+      "range": 500,
+      "cost": 100,
+      "cooldown": 1000,
+      "image": "../assets/images/towerSplash.png"
+    }
+  ]
+}
